@@ -40,6 +40,13 @@ ENVIRONMENT=${1:-"production"}
 VERCEL_PROJECT_NAME=${VERCEL_PROJECT_NAME:-"ming-platform"}
 VERCEL_ORG_ID=${VERCEL_ORG_ID:-""}
 VERCEL_PROJECT_ID=${VERCEL_PROJECT_ID:-""}
+# 非交互部署支持：
+# - VERCEL_TOKEN: Vercel Personal Token（推荐在 CI / 自动化场景使用）
+# - VERCEL_SCOPE: Team slug（可选；如需指定团队/组织）
+# - VERCEL_CUSTOM_DOMAIN: 自定义域名（可选；此项目默认 ming.cdao.online）
+VERCEL_TOKEN=${VERCEL_TOKEN:-""}
+VERCEL_SCOPE=${VERCEL_SCOPE:-""}
+VERCEL_CUSTOM_DOMAIN=${VERCEL_CUSTOM_DOMAIN:-"ming.cdao.online"}
 
 log_info "🚀 开始部署 Ming 项目到 Vercel..."
 log_info "项目路径: $PROJECT_ROOT"
@@ -64,8 +71,20 @@ fi
 
 # 检查是否已登录 Vercel
 log_info "🔐 检查 Vercel 登录状态..."
-if ! vercel whoami &> /dev/null; then
-    log_warn "未登录 Vercel，请登录..."
+VERCEL_WHOAMI_ARGS=()
+if [ -n "$VERCEL_TOKEN" ]; then
+    VERCEL_WHOAMI_ARGS+=(--token "$VERCEL_TOKEN")
+fi
+if [ -n "$VERCEL_SCOPE" ]; then
+    VERCEL_WHOAMI_ARGS+=(--scope "$VERCEL_SCOPE")
+fi
+
+if ! vercel whoami "${VERCEL_WHOAMI_ARGS[@]}" &> /dev/null; then
+    if [ -n "$VERCEL_TOKEN" ]; then
+        log_error "❌ Vercel Token 无法通过校验（vercel whoami 失败）。请检查 VERCEL_TOKEN 是否正确、是否有权限访问对应 Team/Project。"
+        exit 1
+    fi
+    log_warn "未登录 Vercel，且未提供 VERCEL_TOKEN，将进入交互式登录..."
     vercel login
     if [ $? -ne 0 ]; then
         log_error "Vercel 登录失败"
@@ -73,7 +92,7 @@ if ! vercel whoami &> /dev/null; then
     fi
 fi
 
-VERCEL_USER=$(vercel whoami 2>/dev/null || echo "unknown")
+VERCEL_USER=$(vercel whoami "${VERCEL_WHOAMI_ARGS[@]}" 2>/dev/null || echo "unknown")
 log_info "当前 Vercel 用户: $VERCEL_USER"
 
 # 进入 srcs 目录
@@ -132,13 +151,22 @@ fi
 # 部署到 Vercel
 log_info "🚀 开始部署到 Vercel..."
 
+# 统一的 Vercel CLI 参数（用于非交互/指定 scope）
+VERCEL_CLI_ARGS=(--yes)
+if [ -n "$VERCEL_TOKEN" ]; then
+    VERCEL_CLI_ARGS+=(--token "$VERCEL_TOKEN")
+fi
+if [ -n "$VERCEL_SCOPE" ]; then
+    VERCEL_CLI_ARGS+=(--scope "$VERCEL_SCOPE")
+fi
+
 # 根据环境选择部署命令
 if [ "$ENVIRONMENT" = "production" ]; then
     log_info "部署到生产环境..."
-    DEPLOY_RESULT=$(vercel --prod --yes 2>&1)
+    DEPLOY_RESULT=$(vercel --prod "${VERCEL_CLI_ARGS[@]}" 2>&1)
 elif [ "$ENVIRONMENT" = "preview" ]; then
     log_info "部署到预览环境..."
-    DEPLOY_RESULT=$(vercel --yes 2>&1)
+    DEPLOY_RESULT=$(vercel "${VERCEL_CLI_ARGS[@]}" 2>&1)
 else
     log_error "未知环境: $ENVIRONMENT (支持: production, preview)"
     exit 1
@@ -167,10 +195,28 @@ if [ $? -eq 0 ]; then
     log_info "📊 部署信息:"
     echo "$DEPLOY_RESULT"
     
+    # 可选：绑定自定义域名到本次部署（生产环境建议）
+    if [ "$ENVIRONMENT" = "production" ] && [ -n "$VERCEL_CUSTOM_DOMAIN" ] && [ -n "$DEPLOY_URL" ]; then
+        log_info ""
+        log_info "🌍 尝试绑定自定义域名: $VERCEL_CUSTOM_DOMAIN"
+
+        # 1) 确保域名在账户中（若已存在会失败，但不影响后续）
+        vercel domains add "$VERCEL_CUSTOM_DOMAIN" "${VERCEL_CLI_ARGS[@]}" 2>/dev/null || true
+
+        # 2) 将本次部署 alias 到自定义域名
+        # 说明：若域名未验证/DNS 未配置，会返回错误；脚本不强制失败，方便先拿到部署 URL。
+        if vercel alias set "$DEPLOY_URL" "$VERCEL_CUSTOM_DOMAIN" "${VERCEL_CLI_ARGS[@]}" 2>&1; then
+            log_info "✅ 域名绑定完成: https://$VERCEL_CUSTOM_DOMAIN"
+        else
+            log_warn "⚠️ 域名绑定未完成（可能需要在 DNS 配置/验证域名，或权限不足）。"
+            log_warn "   你可以在 Vercel 控制台为项目添加域名并按提示配置 DNS：$VERCEL_CUSTOM_DOMAIN"
+        fi
+    fi
+
     # 获取部署详情
     log_info ""
     log_info "📋 获取部署详情..."
-    vercel ls "$VERCEL_PROJECT_NAME" 2>/dev/null || true
+    vercel ls "$VERCEL_PROJECT_NAME" "${VERCEL_CLI_ARGS[@]}" 2>/dev/null || true
     
 else
     log_error "部署失败"

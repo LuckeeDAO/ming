@@ -24,13 +24,13 @@ import { lazy, Suspense } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 
 // 懒加载页面组件（代码分割，提升性能）
-const Home = lazy(() => import('./pages/Home'));
-const Concept = lazy(() => import('./pages/Concept'));
-const ConnectionGuide = lazy(() => import('./pages/ConnectionGuide'));
-const NFTCeremony = lazy(() => import('./pages/NFTCeremony'));
-const MyConnections = lazy(() => import('./pages/MyConnections'));
-const CeremonyResources = lazy(() => import('./pages/CeremonyResources'));
-const About = lazy(() => import('./pages/About'));
+const Home = lazy(() => import('./pages/Home/index'));
+const Concept = lazy(() => import('./pages/Concept/index'));
+const ConnectionGuide = lazy(() => import('./pages/ConnectionGuide/index'));
+const NFTCeremony = lazy(() => import('./pages/NFTCeremony/index'));
+const MyConnections = lazy(() => import('./pages/MyConnections/index'));
+const CeremonyResources = lazy(() => import('./pages/CeremonyResources/index'));
+const About = lazy(() => import('./pages/About/index'));
 
 // 布局组件
 import Layout from './components/layout/Layout';

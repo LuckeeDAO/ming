@@ -54,6 +54,7 @@ const ExternalObjectSelector: React.FC<ExternalObjectSelectorProps> = ({
   );
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [detailObject, setDetailObject] = useState<ExternalObject | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   /**
    * 获取五行元素中文名称
@@ -130,6 +131,15 @@ const ExternalObjectSelector: React.FC<ExternalObjectSelectorProps> = ({
     }
   };
 
+  /**
+   * 处理图片加载错误
+   * 
+   * @param imageSrc - 图片路径
+   */
+  const handleImageError = (imageSrc: string) => {
+    setImageErrors((prev) => new Set(prev).add(imageSrc));
+  };
+
   if (objects.length === 0) {
     return (
       <Card>
@@ -164,13 +174,32 @@ const ExternalObjectSelector: React.FC<ExternalObjectSelectorProps> = ({
               }}
               onClick={() => handleSelect(object)}
             >
-              {object.image && (
+              {object.image && !imageErrors.has(object.image) && (
                 <CardMedia
                   component="img"
                   height="200"
                   image={object.image}
                   alt={object.name}
+                  onError={() => handleImageError(object.image)}
+                  sx={{
+                    objectFit: 'cover',
+                  }}
                 />
+              )}
+              {object.image && imageErrors.has(object.image) && (
+                <Box
+                  sx={{
+                    height: 200,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: 'grey.100',
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {object.name}
+                  </Typography>
+                </Box>
               )}
               <CardContent>
                 <Box
@@ -237,11 +266,12 @@ const ExternalObjectSelector: React.FC<ExternalObjectSelectorProps> = ({
             <DialogTitle>{detailObject.name}</DialogTitle>
             <DialogContent>
               <Box sx={{ mb: 2 }}>
-                {detailObject.image && (
+                {detailObject.image && !imageErrors.has(detailObject.image) && (
                   <Box
                     component="img"
                     src={detailObject.image}
                     alt={detailObject.name}
+                    onError={() => handleImageError(detailObject.image)}
                     sx={{
                       width: '100%',
                       maxHeight: 300,
@@ -249,6 +279,23 @@ const ExternalObjectSelector: React.FC<ExternalObjectSelectorProps> = ({
                       mb: 2,
                     }}
                   />
+                )}
+                {detailObject.image && imageErrors.has(detailObject.image) && (
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: 200,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: 'grey.100',
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      {detailObject.name}
+                    </Typography>
+                  </Box>
                 )}
                 <Typography variant="body1" paragraph>
                   {detailObject.description}

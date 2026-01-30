@@ -4,6 +4,34 @@
 
 ## 📋 脚本列表
 
+### 0. `deploy.sh` - 统一入口脚本 ⭐ 推荐
+
+快速部署的统一入口，支持所有部署操作。
+
+**使用方法：**
+
+```bash
+# 显示帮助信息
+./scripts/deploy.sh help
+
+# 仅提交到 GitHub
+./scripts/deploy.sh github "feat: 添加新功能"
+
+# 仅部署到 Vercel
+./scripts/deploy.sh vercel production
+
+# 完整流程：GitHub + Vercel
+./scripts/deploy.sh all production "feat: 更新功能"
+```
+
+**功能：**
+- ✅ 统一的命令行接口
+- ✅ 支持单独操作或完整流程
+- ✅ 清晰的帮助信息
+- ✅ 调用其他脚本执行具体任务
+
+---
+
 ### 1. `upload_to_github.sh` - 上传到 GitHub
 
 自动提交代码并推送到 GitHub 仓库。
@@ -91,10 +119,15 @@ export VERCEL_PROJECT_ID="your-project-id"
 
 3. **运行脚本：**
    ```bash
-   # 上传到 GitHub
-   ./scripts/upload_to_github.sh
+   # 方式一：使用统一入口脚本（推荐）
+   ./scripts/deploy.sh all production "feat: 初始提交"
    
-   # 部署到 Vercel
+   # 方式二：分别执行
+   ./scripts/deploy.sh github "feat: 初始提交"
+   ./scripts/deploy.sh vercel production
+   
+   # 方式三：直接调用具体脚本
+   ./scripts/upload_to_github.sh "feat: 初始提交"
    ./scripts/deploy_vercel.sh production
    ```
 
@@ -102,30 +135,35 @@ export VERCEL_PROJECT_ID="your-project-id"
 
 ## 📝 使用示例
 
-### 示例 1: 完整部署流程
+### 示例 1: 完整部署流程（推荐）
 
 ```bash
-# 1. 上传代码到 GitHub
-./scripts/upload_to_github.sh "feat: 添加NFT铸造功能"
+# 使用统一入口脚本，一键完成所有操作
+./scripts/deploy.sh all production "feat: 添加NFT铸造功能"
 
-# 2. 部署到 Vercel 预览环境
-./scripts/deploy_vercel.sh preview
-
-# 3. 测试预览环境后，部署到生产环境
-./scripts/deploy_vercel.sh production
+# 或者分步执行
+./scripts/deploy.sh github "feat: 添加NFT铸造功能"
+./scripts/deploy.sh vercel preview
+./scripts/deploy.sh vercel production
 ```
 
 ### 示例 2: 仅更新代码
 
 ```bash
-# 只上传代码，不部署
+# 使用统一入口脚本
+./scripts/deploy.sh github "docs: 更新文档"
+
+# 或直接调用
 ./scripts/upload_to_github.sh "docs: 更新文档"
 ```
 
 ### 示例 3: 仅部署
 
 ```bash
-# 只部署，不上传代码（假设代码已通过其他方式提交）
+# 使用统一入口脚本
+./scripts/deploy.sh vercel production
+
+# 或直接调用
 ./scripts/deploy_vercel.sh production
 ```
 
@@ -226,4 +264,4 @@ export VERCEL_PROJECT_ID="your-project-id"
 
 ---
 
-**最后更新**: 2025-01-14
+**最后更新**: 2025-01-30
