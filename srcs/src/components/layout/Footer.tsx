@@ -1,6 +1,22 @@
+/**
+ * 页脚组件
+ * 
+ * 功能：
+ * - 显示版权信息
+ * - 显示平台描述
+ * - 提供统一的页脚样式
+ * 
+ * @module components/layout/Footer
+ */
+
 import React from 'react';
 import { Box, Typography, Container } from '@mui/material';
 
+/**
+ * 页脚组件
+ * 
+ * @returns JSX元素
+ */
 const Footer: React.FC = () => {
   return (
     <Box

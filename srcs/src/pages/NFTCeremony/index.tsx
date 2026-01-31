@@ -40,6 +40,8 @@ import { ipfsService } from '../../services/ipfs/ipfsService';
 import { nftContractService } from '../../services/contract/nftContract';
 import { walletService } from '../../services/wallet/walletService';
 import ExternalObjectSelector from '../../components/ceremony/ExternalObjectSelector';
+import DateTimePicker from '../../components/ceremony/DateTimePicker';
+import { scheduledMintService } from '../../services/scheduledMint/scheduledMintService';
 
 /**
  * NFT铸造表单数据接口
@@ -51,9 +53,11 @@ interface MintFormData {
   connectionType: string;
   location?: string;
   duration?: string;
+  blessing: string; // 祝福/祝愿文本
   feelingsBefore: string;
   feelingsDuring: string;
   feelingsAfter: string;
+  scheduledTime: string | null; // 定时MINT时间（ISO格式）
 }
 
 /**
@@ -69,12 +73,15 @@ const NFTCeremony: React.FC = () => {
     image: null,
     imagePreview: null,
     connectionType: 'symbolic',
+    blessing: '',
     feelingsBefore: '',
     feelingsDuring: '',
     feelingsAfter: '',
+    scheduledTime: null,
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string>('');
+  const [mintType, setMintType] = useState<'immediate' | 'scheduled'>('immediate');
   const [mintResult, setMintResult] = useState<{
     tokenId: string;
     txHash: string;
@@ -193,11 +200,13 @@ const NFTCeremony: React.FC = () => {
    * 执行NFT铸造流程
    * 
    * 流程：
-   * 1. 上传图片到IPFS
-   * 2. 生成NFT元数据
-   * 3. 上传元数据到IPFS
-   * 4. 生成共识哈希
-   * 5. 调用合约铸造NFT
+   * 1. 如果是定时铸造，创建定时任务
+   * 2. 如果是立即铸造：
+   *    a. 上传图片到IPFS
+   *    b. 生成NFT元数据
+   *    c. 上传元数据到IPFS
+   *    d. 生成共识哈希
+   *    e. 调用合约铸造NFT
    */
   const handleMint = async () => {
     if (!formData.selectedObject || !formData.image || !walletAddress) {
@@ -205,10 +214,56 @@ const NFTCeremony: React.FC = () => {
       return;
     }
 
+    // 如果是定时铸造，验证定时时间
+    if (mintType === 'scheduled') {
+      if (!formData.scheduledTime) {
+        setError('请选择定时执行时间');
+        return;
+      }
+      const scheduledTime = new Date(formData.scheduledTime);
+      const now = new Date();
+      if (scheduledTime <= now) {
+        setError('定时时间必须是未来的时间');
+        return;
+      }
+    }
+
     setIsProcessing(true);
     setError('');
 
     try {
+      // 如果是定时铸造，创建定时任务
+      if (mintType === 'scheduled') {
+        // 将图片转换为base64
+        const imageData = await scheduledMintService.fileToBase64(formData.image);
+        
+        // 创建定时任务
+        const task = scheduledMintService.createTask({
+          walletAddress,
+          selectedObject: formData.selectedObject,
+          imageData,
+          imageFileName: formData.image.name,
+          connectionType: formData.connectionType,
+          location: formData.location,
+          duration: formData.duration,
+          blessing: formData.blessing,
+          feelingsBefore: formData.feelingsBefore,
+          feelingsDuring: formData.feelingsDuring,
+          feelingsAfter: formData.feelingsAfter,
+          scheduledTime: formData.scheduledTime!,
+        });
+        
+        // 进入完成阶段
+        setActiveStep(3);
+        setMintResult({
+          tokenId: '',
+          txHash: '',
+          tokenURI: '',
+        });
+        return;
+      }
+
+      // 立即铸造流程
       // 1. 上传图片到IPFS
       const imageHash = await ipfsService.uploadFile(formData.image);
 
@@ -238,6 +293,19 @@ const NFTCeremony: React.FC = () => {
           during: formData.feelingsDuring,
           after: formData.feelingsAfter,
         },
+        // 添加祝福文本（如果有）
+        ...(formData.blessing && {
+          blessing: {
+            text: formData.blessing,
+            timestamp: new Date().toISOString(),
+          },
+        }),
+        // 添加定时MINT信息（如果是定时任务）
+        ...(formData.scheduledTime && {
+          scheduledMint: {
+            scheduledTime: formData.scheduledTime,
+          },
+        }),
         energyField: {
           consensusHash: '', // 将在合约调用时生成
         },
@@ -420,6 +488,21 @@ const NFTCeremony: React.FC = () => {
                       <TextField
                         fullWidth
                         multiline
+                        rows={4}
+                        label="祝福/祝愿文本"
+                        value={formData.blessing}
+                        onChange={(e) =>
+                          handleFieldChange('blessing', e.target.value)
+                        }
+                        placeholder="写下你的祝福或祝愿（最多500字）..."
+                        inputProps={{ maxLength: 500 }}
+                        helperText={`${formData.blessing.length}/500`}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        multiline
                         rows={3}
                         label="连接前的感受"
                         value={formData.feelingsBefore}
@@ -440,23 +523,56 @@ const NFTCeremony: React.FC = () => {
                     铸造阶段
                   </Typography>
                   <Typography variant="body2" color="text.secondary" paragraph>
-                    确认信息后，将上传到IPFS并调用智能合约铸造NFT
+                    选择立即铸造或定时铸造
                   </Typography>
+                  
+                  <Grid container spacing={2} sx={{ mt: 2 }}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="铸造方式"
+                        select
+                        SelectProps={{ native: true }}
+                        value={mintType}
+                        onChange={(e) => setMintType(e.target.value as 'immediate' | 'scheduled')}
+                      >
+                        <option value="immediate">立即铸造</option>
+                        <option value="scheduled">定时铸造</option>
+                      </TextField>
+                    </Grid>
+                    
+                    {mintType === 'scheduled' && (
+                      <Grid item xs={12}>
+                        <DateTimePicker
+                          value={formData.scheduledTime}
+                          onChange={(value) => handleFieldChange('scheduledTime', value)}
+                          label="选择定时执行时间"
+                          minDateTime={new Date().toISOString()}
+                        />
+                      </Grid>
+                    )}
+                  </Grid>
+                  
                   {isProcessing ? (
                     <Box sx={{ textAlign: 'center', py: 4 }}>
                       <CircularProgress />
                       <Typography variant="body2" sx={{ mt: 2 }}>
-                        正在铸造NFT，请稍候...
+                        {mintType === 'immediate' 
+                          ? '正在铸造NFT，请稍候...' 
+                          : '正在创建定时任务，请稍候...'}
                       </Typography>
                     </Box>
                   ) : (
-                    <Box>
+                    <Box sx={{ mt: 2 }}>
                       <Alert severity="info" sx={{ mb: 2 }}>
                         请确认以下信息：
                         <ul>
                           <li>外物：{formData.selectedObject?.name}</li>
                           <li>连接类型：{formData.connectionType}</li>
                           <li>图片已上传</li>
+                          {mintType === 'scheduled' && formData.scheduledTime && (
+                            <li>定时时间：{new Date(formData.scheduledTime).toLocaleString('zh-CN')}</li>
+                          )}
                         </ul>
                       </Alert>
                     </Box>

@@ -34,6 +34,14 @@ export interface NFTMetadata {
     during: string;
     after: string;
   };
+  blessing?: {
+    text: string;
+    timestamp: string;
+  };
+  scheduledMint?: {
+    scheduledTime: string;
+    mintedTime?: string;
+  };
   energyField: {
     consensusHash: string;
     witnessCount?: number;

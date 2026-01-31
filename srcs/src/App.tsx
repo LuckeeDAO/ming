@@ -13,6 +13,7 @@
  * - /nft-ceremony : NFT仪式制作流程
  * - /my-connections : 我的连接记录
  * - /ceremony-resources : 仪式资源支持
+ * - /scheduled-mints : 定时MINT任务管理
  * 
  * @module App
  */
@@ -20,6 +21,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Box, CircularProgress } from '@mui/material';
+import { useScheduledMint } from './hooks/useScheduledMint';
 
 // 懒加载页面组件（代码分割，提升性能）
 const Home = lazy(() => import('./pages/Home/index'));
@@ -27,6 +29,7 @@ const ConnectionGuide = lazy(() => import('./pages/ConnectionGuide/index'));
 const NFTCeremony = lazy(() => import('./pages/NFTCeremony/index'));
 const MyConnections = lazy(() => import('./pages/MyConnections/index'));
 const CeremonyResources = lazy(() => import('./pages/CeremonyResources/index'));
+const ScheduledMints = lazy(() => import('./pages/ScheduledMints/index'));
 
 // 布局组件
 import Layout from './components/layout/Layout';
@@ -53,6 +56,9 @@ const LoadingFallback = () => (
  * @returns JSX元素
  */
 function App() {
+  // 初始化定时MINT服务
+  useScheduledMint();
+
   return (
     <ErrorBoundary>
       <Layout>
@@ -66,6 +72,7 @@ function App() {
               path="/ceremony-resources"
               element={<CeremonyResources />}
             />
+            <Route path="/scheduled-mints" element={<ScheduledMints />} />
             {/* 向后兼容：重定向到首页 */}
             <Route path="/concept" element={<Home />} />
             <Route path="/about" element={<Home />} />
