@@ -6,7 +6,7 @@
  * @module __tests__/utils/helpers.test
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   sleep,
   debounce,

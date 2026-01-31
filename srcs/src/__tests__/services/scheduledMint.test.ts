@@ -6,10 +6,9 @@
  * @module __tests__/services/scheduledMint.test
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   scheduledMintService,
-  ScheduledMintTask,
 } from '../../services/scheduledMint/scheduledMintService';
 
 // Mock localStorage
@@ -49,6 +48,7 @@ describe('scheduledMintService', () => {
           element: 'wood' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/wood_0.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },
@@ -79,6 +79,7 @@ describe('scheduledMintService', () => {
           element: 'wood' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/wood_0.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },
@@ -106,6 +107,7 @@ describe('scheduledMintService', () => {
           element: 'wood' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/wood_1.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },
@@ -127,6 +129,7 @@ describe('scheduledMintService', () => {
           element: 'fire' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/fire_1.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },
@@ -157,6 +160,7 @@ describe('scheduledMintService', () => {
           element: 'wood' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/wood_0.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },
@@ -189,6 +193,7 @@ describe('scheduledMintService', () => {
           element: 'wood' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/wood_1.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },
@@ -210,6 +215,7 @@ describe('scheduledMintService', () => {
           element: 'fire' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/fire_1.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },
@@ -239,6 +245,7 @@ describe('scheduledMintService', () => {
           element: 'wood' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/wood_0.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },
@@ -272,6 +279,7 @@ describe('scheduledMintService', () => {
           element: 'wood' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/wood_0.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },
@@ -301,6 +309,7 @@ describe('scheduledMintService', () => {
           element: 'wood' as const,
           category: 'nature' as const,
           description: '测试描述',
+          image: '/images/test/wood_0.jpg',
           connectionMethods: [],
           recommendedFor: [],
         },

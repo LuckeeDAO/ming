@@ -56,7 +56,7 @@ describe('ipfsService', () => {
 
       // 由于uploadFile内部会调用uploadToPinata，我们需要mock axios
       try {
-        const hash = await ipfsService.uploadFile(file);
+        await ipfsService.uploadFile(file);
         expect(mockedAxios.post).toHaveBeenCalled();
       } catch (error) {
         // 如果Pinata API未配置，会抛出错误，这是预期的
@@ -95,7 +95,7 @@ describe('ipfsService', () => {
       const data = { test: 'data' };
 
       try {
-        const hash = await ipfsService.uploadJSON(data);
+        await ipfsService.uploadJSON(data);
         expect(mockedAxios.post).toHaveBeenCalled();
       } catch (error) {
         // 如果Pinata API未配置，会抛出错误

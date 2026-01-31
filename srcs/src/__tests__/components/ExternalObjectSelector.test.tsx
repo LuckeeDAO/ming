@@ -6,7 +6,7 @@
  * @module __tests__/components/ExternalObjectSelector.test
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ExternalObjectSelector from '../../components/ceremony/ExternalObjectSelector';
 import { ExternalObject } from '../../types/energy';

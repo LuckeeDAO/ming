@@ -71,7 +71,6 @@ const ScheduledMints: React.FC = () => {
   const { address: walletAddress } = useAppSelector((state) => state.wallet);
   
   const [tasks, setTasks] = useState<ScheduledMintTask[]>([]);
-  const [loading, setLoading] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ScheduledMintTask | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -194,16 +193,16 @@ const ScheduledMints: React.FC = () => {
                     </Box>
                     
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      定时时间：{formatDate(task.scheduledTime, 'YYYY-MM-DD HH:mm')}
+                      定时时间：{formatDate(new Date(task.scheduledTime), 'YYYY-MM-DD HH:mm')}
                     </Typography>
                     
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      创建时间：{formatDate(task.createdAt, 'YYYY-MM-DD HH:mm')}
+                      创建时间：{formatDate(new Date(task.createdAt), 'YYYY-MM-DD HH:mm')}
                     </Typography>
                     
                     {task.mintedAt && (
                       <Typography variant="body2" color="text.secondary" gutterBottom>
-                        执行时间：{formatDate(task.mintedAt, 'YYYY-MM-DD HH:mm')}
+                        执行时间：{formatDate(new Date(task.mintedAt), 'YYYY-MM-DD HH:mm')}
                       </Typography>
                     )}
                     
@@ -282,10 +281,10 @@ const ScheduledMints: React.FC = () => {
                 连接类型：{selectedTask.connectionType}
               </Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                定时时间：{formatDate(selectedTask.scheduledTime)}
+                定时时间：{formatDate(new Date(selectedTask.scheduledTime))}
               </Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                创建时间：{formatDate(selectedTask.createdAt)}
+                创建时间：{formatDate(new Date(selectedTask.createdAt))}
               </Typography>
               {selectedTask.blessing && (
                 <Box sx={{ mt: 2 }}>

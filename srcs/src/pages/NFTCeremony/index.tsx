@@ -238,7 +238,7 @@ const NFTCeremony: React.FC = () => {
         const imageData = await scheduledMintService.fileToBase64(formData.image);
         
         // 创建定时任务
-        const task = scheduledMintService.createTask({
+        scheduledMintService.createTask({
           walletAddress,
           selectedObject: formData.selectedObject,
           imageData,
