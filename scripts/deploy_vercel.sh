@@ -44,9 +44,11 @@ VERCEL_PROJECT_ID=${VERCEL_PROJECT_ID:-""}
 # - VERCEL_TOKEN: Vercel Personal Token（推荐在 CI / 自动化场景使用）
 # - VERCEL_SCOPE: Team slug（可选；如需指定团队/组织）
 # - VERCEL_CUSTOM_DOMAIN: 自定义域名（可选；此项目默认 ming.cdao.online）
+# - VERCEL_SKIP_DOMAIN_BINDING: 跳过域名绑定（默认 true，因为域名通常在 Vercel 控制台已配置）
 VERCEL_TOKEN=${VERCEL_TOKEN:-""}
 VERCEL_SCOPE=${VERCEL_SCOPE:-""}
 VERCEL_CUSTOM_DOMAIN=${VERCEL_CUSTOM_DOMAIN:-"ming.cdao.online"}
+VERCEL_SKIP_DOMAIN_BINDING=${VERCEL_SKIP_DOMAIN_BINDING:-"true"}
 
 log_info "🚀 开始部署 Ming 项目到 Vercel..."
 log_info "项目路径: $PROJECT_ROOT"
@@ -230,17 +232,12 @@ if [ $? -eq 0 ]; then
     echo "$DEPLOY_RESULT"
     
     # 可选：绑定自定义域名到本次部署（生产环境建议）
-    if [ "$ENVIRONMENT" = "production" ] && [ -n "$VERCEL_CUSTOM_DOMAIN" ] && [ -n "$DEPLOY_URL" ]; then
+    # 注意：如果域名已在 Vercel 控制台配置，会自动关联到生产部署，无需手动绑定
+    if [ "$ENVIRONMENT" = "production" ] && [ -n "$VERCEL_CUSTOM_DOMAIN" ] && [ -n "$DEPLOY_URL" ] && [ "$VERCEL_SKIP_DOMAIN_BINDING" != "true" ]; then
         log_info ""
         log_info "🌍 尝试绑定自定义域名: $VERCEL_CUSTOM_DOMAIN"
 
-        # 1) 确保域名在账户中（若已存在会失败，但不影响后续）
-        vercel domains add "$VERCEL_CUSTOM_DOMAIN" "${VERCEL_DEPLOY_ARGS[@]}" 2>/dev/null || true
-
-        # 2) 将本次部署 alias 到自定义域名
-        # 说明：若域名未验证/DNS 未配置，会返回错误；脚本不强制失败，方便先拿到部署 URL。
-        # 注意：域名通常已在 Vercel 控制台配置，会自动关联到生产部署，这里只是尝试手动关联
-        # vercel alias 命令不支持 --yes，所以移除它
+        # 检查域名是否已在账户中
         VERCEL_ALIAS_ARGS=()
         if [ -n "$VERCEL_TOKEN" ]; then
             VERCEL_ALIAS_ARGS+=(--token "$VERCEL_TOKEN")
@@ -248,11 +245,52 @@ if [ $? -eq 0 ]; then
         if [ -n "$VERCEL_SCOPE" ]; then
             VERCEL_ALIAS_ARGS+=(--scope "$VERCEL_SCOPE")
         fi
-        if vercel alias set "$DEPLOY_URL" "$VERCEL_CUSTOM_DOMAIN" "${VERCEL_ALIAS_ARGS[@]}" 2>&1; then
-            log_info "✅ 域名绑定完成: https://$VERCEL_CUSTOM_DOMAIN"
+
+        # 检查域名是否已存在
+        DOMAIN_EXISTS=false
+        if vercel domains ls "${VERCEL_ALIAS_ARGS[@]}" 2>/dev/null | grep -q "$VERCEL_CUSTOM_DOMAIN"; then
+            DOMAIN_EXISTS=true
+            log_info "✅ 域名已在账户中"
         else
-            log_warn "⚠️ 域名绑定未完成（可能需要在 DNS 配置/验证域名，或权限不足）。"
-            log_warn "   你可以在 Vercel 控制台为项目添加域名并按提示配置 DNS：$VERCEL_CUSTOM_DOMAIN"
+            log_info "📝 域名未在账户中，尝试添加..."
+            # 尝试添加域名（若已存在会失败，但不影响后续）
+            if vercel domains add "$VERCEL_CUSTOM_DOMAIN" "${VERCEL_DEPLOY_ARGS[@]}" 2>&1 | tee /tmp/vercel_domain_add.log; then
+                DOMAIN_EXISTS=true
+                log_info "✅ 域名已添加到账户"
+            else
+                DOMAIN_ERROR=$(cat /tmp/vercel_domain_add.log 2>/dev/null || echo "")
+                if echo "$DOMAIN_ERROR" | grep -q "already exists\|already added"; then
+                    DOMAIN_EXISTS=true
+                    log_info "✅ 域名已在账户中（之前已添加）"
+                elif echo "$DOMAIN_ERROR" | grep -q "don't have access"; then
+                    log_warn "⚠️ 您没有访问域名 $VERCEL_CUSTOM_DOMAIN 的权限"
+                    log_warn "   可能原因："
+                    log_warn "   1. 域名属于其他 Vercel 账户或团队"
+                    log_warn "   2. 域名尚未添加到当前账户"
+                    log_warn "   3. 需要团队管理员权限"
+                    log_warn ""
+                    log_warn "   解决方案："
+                    log_warn "   1. 在 Vercel 控制台 (https://vercel.com/dashboard) 手动添加域名"
+                    log_warn "   2. 确保域名 DNS 已正确配置"
+                    log_warn "   3. 联系团队管理员添加域名权限"
+                    DOMAIN_EXISTS=false
+                else
+                    log_warn "⚠️ 添加域名时出现未知错误"
+                    DOMAIN_EXISTS=false
+                fi
+                rm -f /tmp/vercel_domain_add.log
+            fi
+        fi
+
+        # 如果域名存在，尝试绑定到部署
+        if [ "$DOMAIN_EXISTS" = true ]; then
+            log_info "🔗 尝试将域名绑定到本次部署..."
+            if vercel alias set "$DEPLOY_URL" "$VERCEL_CUSTOM_DOMAIN" "${VERCEL_ALIAS_ARGS[@]}" 2>&1; then
+                log_info "✅ 域名绑定完成: https://$VERCEL_CUSTOM_DOMAIN"
+            else
+                log_warn "⚠️ 域名绑定失败（可能 DNS 未配置或域名未验证）"
+                log_warn "   你可以在 Vercel 控制台为项目添加域名并按提示配置 DNS：$VERCEL_CUSTOM_DOMAIN"
+            fi
         fi
     fi
 
