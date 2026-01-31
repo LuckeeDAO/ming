@@ -6,40 +6,60 @@
  * @module __tests__/services/scheduledMint.test
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   scheduledMintService,
 } from '../../services/scheduledMint/scheduledMintService';
+import { mingWalletInterface } from '../../services/wallet/mingWalletInterface';
+import { ipfsService } from '../../services/ipfs/ipfsService';
+import { walletService } from '../../services/wallet/walletService';
 
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
+// Mock dependencies
+vi.mock('../../services/wallet/mingWalletInterface');
+vi.mock('../../services/ipfs/ipfsService');
+vi.mock('../../services/wallet/walletService');
+vi.mock('ethers', () => ({
+  ethers: {
+    keccak256: vi.fn((data: string) => `0x${data.substring(0, 64)}`),
+    toUtf8Bytes: vi.fn((str: string) => str),
+  },
+}));
 
-  return {
-    getItem: (key: string) => store[key] || null,
-    setItem: (key: string, value: string) => {
-      store[key] = value.toString();
-    },
-    removeItem: (key: string) => {
-      delete store[key];
-    },
-    clear: () => {
-      store = {};
-    },
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
+// Mock environment variable
+vi.stubEnv('VITE_NFT_CONTRACT_ADDRESS', '0x1234567890123456789012345678901234567890');
 
 describe('scheduledMintService', () => {
   beforeEach(() => {
-    localStorage.clear();
+    vi.clearAllMocks();
+    
+    // Setup default mocks
+    (ipfsService.uploadFile as any) = vi.fn().mockResolvedValue('QmImageHash');
+    (ipfsService.uploadJSON as any) = vi.fn().mockResolvedValue('QmMetadataHash');
+    (ipfsService.getAccessUrl as any) = vi.fn((hash: string) => `https://ipfs.io/ipfs/${hash}`);
+    (walletService.getNetworkId as any) = vi.fn().mockResolvedValue(1);
+    (mingWalletInterface.createScheduledTask as any) = vi.fn().mockResolvedValue({
+      success: true,
+      data: {
+        taskId: 'test-task-id-123',
+        scheduledTime: new Date(Date.now() + 86400000).toISOString(),
+        status: 'pending',
+      },
+    });
+    (mingWalletInterface.getScheduledTask as any) = vi.fn().mockResolvedValue({
+      success: true,
+      data: {
+        taskId: 'test-task-id-123',
+        scheduledTime: new Date(Date.now() + 86400000).toISOString(),
+        status: 'pending',
+      },
+    });
+    (mingWalletInterface.cancelScheduledTask as any) = vi.fn().mockResolvedValue({
+      success: true,
+    });
   });
 
   describe('createTask', () => {
-    it('应该创建定时任务', () => {
+    it('应该创建定时任务并返回任务ID', async () => {
       const taskData = {
         walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
         selectedObject: {
@@ -62,15 +82,16 @@ describe('scheduledMintService', () => {
         scheduledTime: new Date(Date.now() + 86400000).toISOString(), // 明天
       };
 
-      const task = scheduledMintService.createTask(taskData);
+      const taskId = await scheduledMintService.createTask(taskData);
 
-      expect(task.id).toBeDefined();
-      expect(task.status).toBe('pending');
-      expect(task.createdAt).toBeDefined();
-      expect(task.walletAddress).toBe(taskData.walletAddress);
+      expect(taskId).toBeDefined();
+      expect(taskId).toBe('test-task-id-123');
+      expect(ipfsService.uploadFile).toHaveBeenCalled();
+      expect(ipfsService.uploadJSON).toHaveBeenCalled();
+      expect(mingWalletInterface.createScheduledTask).toHaveBeenCalled();
     });
 
-    it('应该拒绝创建过去时间的任务', () => {
+    it('应该拒绝创建过去时间的任务', async () => {
       const taskData = {
         walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
         selectedObject: {
@@ -93,215 +114,55 @@ describe('scheduledMintService', () => {
         scheduledTime: new Date(Date.now() - 86400000).toISOString(), // 昨天
       };
 
-      expect(() => scheduledMintService.createTask(taskData)).toThrow();
+      await expect(scheduledMintService.createTask(taskData)).rejects.toThrow('定时时间不能是过去的时间');
     });
   });
 
   describe('getAllTasks', () => {
-    it('应该返回所有任务', () => {
-      const task1 = scheduledMintService.createTask({
-        walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
-        selectedObject: {
-          id: 'test-object-1',
-          name: '测试外物1',
-          element: 'wood' as const,
-          category: 'nature' as const,
-          description: '测试描述',
-          image: '/images/test/wood_1.jpg',
-          connectionMethods: [],
-          recommendedFor: [],
-        },
-        imageData: 'data:image/png;base64,test1',
-        imageFileName: 'test1.png',
-        connectionType: 'symbolic',
-        blessing: '测试祝福1',
-        feelingsBefore: '测试前感受',
-        feelingsDuring: '测试中感受',
-        feelingsAfter: '测试后感受',
-        scheduledTime: new Date(Date.now() + 86400000).toISOString(),
-      });
-
-      const task2 = scheduledMintService.createTask({
-        walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
-        selectedObject: {
-          id: 'test-object-2',
-          name: '测试外物2',
-          element: 'fire' as const,
-          category: 'nature' as const,
-          description: '测试描述',
-          image: '/images/test/fire_1.jpg',
-          connectionMethods: [],
-          recommendedFor: [],
-        },
-        imageData: 'data:image/png;base64,test2',
-        imageFileName: 'test2.png',
-        connectionType: 'symbolic',
-        blessing: '测试祝福2',
-        feelingsBefore: '测试前感受',
-        feelingsDuring: '测试中感受',
-        feelingsAfter: '测试后感受',
-        scheduledTime: new Date(Date.now() + 172800000).toISOString(),
-      });
-
-      const allTasks = scheduledMintService.getAllTasks();
-      expect(allTasks).toHaveLength(2);
-      expect(allTasks.find((t) => t.id === task1.id)).toBeDefined();
-      expect(allTasks.find((t) => t.id === task2.id)).toBeDefined();
+    it('应该返回所有任务（当前返回空数组，因为钱包接口未实现）', async () => {
+      const allTasks = await scheduledMintService.getAllTasks();
+      expect(allTasks).toEqual([]);
     });
   });
 
   describe('getTask', () => {
-    it('应该根据ID获取任务', () => {
-      const task = scheduledMintService.createTask({
-        walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
-        selectedObject: {
-          id: 'test-object',
-          name: '测试外物',
-          element: 'wood' as const,
-          category: 'nature' as const,
-          description: '测试描述',
-          image: '/images/test/wood_0.jpg',
-          connectionMethods: [],
-          recommendedFor: [],
-        },
-        imageData: 'data:image/png;base64,test',
-        imageFileName: 'test.png',
-        connectionType: 'symbolic',
-        blessing: '测试祝福',
-        feelingsBefore: '测试前感受',
-        feelingsDuring: '测试中感受',
-        feelingsAfter: '测试后感受',
-        scheduledTime: new Date(Date.now() + 86400000).toISOString(),
-      });
-
-      const foundTask = scheduledMintService.getTask(task.id);
+    it('应该根据ID获取任务', async () => {
+      const taskId = 'test-task-id-123';
+      const foundTask = await scheduledMintService.getTask(taskId);
+      
       expect(foundTask).toBeDefined();
-      expect(foundTask?.id).toBe(task.id);
+      expect(foundTask?.id).toBe(taskId);
+      expect(foundTask?.status).toBe('pending');
+      expect(mingWalletInterface.getScheduledTask).toHaveBeenCalled();
     });
-  });
 
-  describe('getTasksByWallet', () => {
-    it('应该根据钱包地址获取任务', () => {
-      const wallet1 = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0';
-      const wallet2 = '0x842d35Cc6634C0532925a3b844Bc9e7595f0bEb1';
-
-      scheduledMintService.createTask({
-        walletAddress: wallet1,
-        selectedObject: {
-          id: 'test-object-1',
-          name: '测试外物1',
-          element: 'wood' as const,
-          category: 'nature' as const,
-          description: '测试描述',
-          image: '/images/test/wood_1.jpg',
-          connectionMethods: [],
-          recommendedFor: [],
+    it('应该返回null当任务不存在时', async () => {
+      (mingWalletInterface.getScheduledTask as any) = vi.fn().mockResolvedValue({
+        success: false,
+        error: {
+          code: 'TASK_NOT_FOUND',
+          message: 'Task not found',
         },
-        imageData: 'data:image/png;base64,test1',
-        imageFileName: 'test1.png',
-        connectionType: 'symbolic',
-        blessing: '测试祝福1',
-        feelingsBefore: '测试前感受',
-        feelingsDuring: '测试中感受',
-        feelingsAfter: '测试后感受',
-        scheduledTime: new Date(Date.now() + 86400000).toISOString(),
       });
 
-      scheduledMintService.createTask({
-        walletAddress: wallet2,
-        selectedObject: {
-          id: 'test-object-2',
-          name: '测试外物2',
-          element: 'fire' as const,
-          category: 'nature' as const,
-          description: '测试描述',
-          image: '/images/test/fire_1.jpg',
-          connectionMethods: [],
-          recommendedFor: [],
-        },
-        imageData: 'data:image/png;base64,test2',
-        imageFileName: 'test2.png',
-        connectionType: 'symbolic',
-        blessing: '测试祝福2',
-        feelingsBefore: '测试前感受',
-        feelingsDuring: '测试中感受',
-        feelingsAfter: '测试后感受',
-        scheduledTime: new Date(Date.now() + 86400000).toISOString(),
-      });
-
-      const wallet1Tasks = scheduledMintService.getTasksByWallet(wallet1);
-      expect(wallet1Tasks).toHaveLength(1);
-      expect(wallet1Tasks[0].walletAddress).toBe(wallet1);
-    });
-  });
-
-  describe('updateTask', () => {
-    it('应该更新任务', () => {
-      const task = scheduledMintService.createTask({
-        walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
-        selectedObject: {
-          id: 'test-object',
-          name: '测试外物',
-          element: 'wood' as const,
-          category: 'nature' as const,
-          description: '测试描述',
-          image: '/images/test/wood_0.jpg',
-          connectionMethods: [],
-          recommendedFor: [],
-        },
-        imageData: 'data:image/png;base64,test',
-        imageFileName: 'test.png',
-        connectionType: 'symbolic',
-        blessing: '测试祝福',
-        feelingsBefore: '测试前感受',
-        feelingsDuring: '测试中感受',
-        feelingsAfter: '测试后感受',
-        scheduledTime: new Date(Date.now() + 86400000).toISOString(),
-      });
-
-      task.status = 'completed';
-      task.tokenId = '123';
-      scheduledMintService.updateTask(task);
-
-      const updatedTask = scheduledMintService.getTask(task.id);
-      expect(updatedTask?.status).toBe('completed');
-      expect(updatedTask?.tokenId).toBe('123');
-    });
-  });
-
-  describe('deleteTask', () => {
-    it('应该删除任务', () => {
-      const task = scheduledMintService.createTask({
-        walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
-        selectedObject: {
-          id: 'test-object',
-          name: '测试外物',
-          element: 'wood' as const,
-          category: 'nature' as const,
-          description: '测试描述',
-          image: '/images/test/wood_0.jpg',
-          connectionMethods: [],
-          recommendedFor: [],
-        },
-        imageData: 'data:image/png;base64,test',
-        imageFileName: 'test.png',
-        connectionType: 'symbolic',
-        blessing: '测试祝福',
-        feelingsBefore: '测试前感受',
-        feelingsDuring: '测试中感受',
-        feelingsAfter: '测试后感受',
-        scheduledTime: new Date(Date.now() + 86400000).toISOString(),
-      });
-
-      scheduledMintService.deleteTask(task.id);
-      const foundTask = scheduledMintService.getTask(task.id);
+      const foundTask = await scheduledMintService.getTask('non-existent-task');
       expect(foundTask).toBeNull();
     });
   });
 
-  describe('cancelTask', () => {
-    it('应该取消待执行的任务', () => {
-      const task = scheduledMintService.createTask({
+  describe('getTasksByWallet', () => {
+    it('应该根据钱包地址获取任务（当前返回空数组，因为钱包接口未实现）', async () => {
+      const walletAddress = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0';
+      const walletTasks = await scheduledMintService.getTasksByWallet(walletAddress);
+      expect(walletTasks).toEqual([]);
+    });
+  });
+
+  describe('updateTask', () => {
+    it('应该警告updateTask已废弃', () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const task = {
+        id: 'test-task-id',
         walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
         selectedObject: {
           id: 'test-object',
@@ -321,11 +182,44 @@ describe('scheduledMintService', () => {
         feelingsDuring: '测试中感受',
         feelingsAfter: '测试后感受',
         scheduledTime: new Date(Date.now() + 86400000).toISOString(),
+        status: 'pending' as const,
+        createdAt: new Date().toISOString(),
+      };
+
+      scheduledMintService.updateTask(task);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('updateTask() is deprecated')
+      );
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('deleteTask', () => {
+    it('应该调用cancelTask取消任务', async () => {
+      const taskId = 'test-task-id-123';
+      await scheduledMintService.deleteTask(taskId);
+      expect(mingWalletInterface.cancelScheduledTask).toHaveBeenCalledWith({ taskId });
+    });
+  });
+
+  describe('cancelTask', () => {
+    it('应该取消待执行的任务', async () => {
+      const taskId = 'test-task-id-123';
+      await scheduledMintService.cancelTask(taskId);
+      expect(mingWalletInterface.cancelScheduledTask).toHaveBeenCalledWith({ taskId });
+    });
+
+    it('应该在取消失败时抛出错误', async () => {
+      (mingWalletInterface.cancelScheduledTask as any) = vi.fn().mockResolvedValue({
+        success: false,
+        error: {
+          code: 'TASK_NOT_FOUND',
+          message: 'Task not found',
+        },
       });
 
-      scheduledMintService.cancelTask(task.id);
-      const updatedTask = scheduledMintService.getTask(task.id);
-      expect(updatedTask?.status).toBe('cancelled');
+      const taskId = 'non-existent-task';
+      await expect(scheduledMintService.cancelTask(taskId)).rejects.toThrow('取消定时任务失败');
     });
   });
 
