@@ -8,13 +8,11 @@
  * - 页面懒加载
  * 
  * 路由说明：
- * - / : 首页（仪式连接总览）
- * - /concept : 核心概念介绍
+ * - / : 首页（整合了欢迎、核心概念、关于平台）
  * - /connection-guide : 外物连接指导
  * - /nft-ceremony : NFT仪式制作流程
  * - /my-connections : 我的连接记录
  * - /ceremony-resources : 仪式资源支持
- * - /about : 关于仪式平台
  * 
  * @module App
  */
@@ -25,12 +23,10 @@ import { Box, CircularProgress } from '@mui/material';
 
 // 懒加载页面组件（代码分割，提升性能）
 const Home = lazy(() => import('./pages/Home/index'));
-const Concept = lazy(() => import('./pages/Concept/index'));
 const ConnectionGuide = lazy(() => import('./pages/ConnectionGuide/index'));
 const NFTCeremony = lazy(() => import('./pages/NFTCeremony/index'));
 const MyConnections = lazy(() => import('./pages/MyConnections/index'));
 const CeremonyResources = lazy(() => import('./pages/CeremonyResources/index'));
-const About = lazy(() => import('./pages/About/index'));
 
 // 布局组件
 import Layout from './components/layout/Layout';
@@ -63,7 +59,6 @@ function App() {
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/concept" element={<Concept />} />
             <Route path="/connection-guide" element={<ConnectionGuide />} />
             <Route path="/nft-ceremony" element={<NFTCeremony />} />
             <Route path="/my-connections" element={<MyConnections />} />
@@ -71,7 +66,9 @@ function App() {
               path="/ceremony-resources"
               element={<CeremonyResources />}
             />
-            <Route path="/about" element={<About />} />
+            {/* 向后兼容：重定向到首页 */}
+            <Route path="/concept" element={<Home />} />
+            <Route path="/about" element={<Home />} />
           </Routes>
         </Suspense>
       </Layout>
