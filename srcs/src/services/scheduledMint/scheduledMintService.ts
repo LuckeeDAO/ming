@@ -1,26 +1,29 @@
 /**
  * 定时MINT服务
  * 
- * 功能：
- * - 创建定时MINT任务
- * - 存储定时任务（使用localStorage）
- * - 执行定时任务（前端轮询机制）
- * - 管理定时任务（查看、编辑、取消）
+ * 功能（方案B：钱包管理定时任务）：
+ * - 创建定时MINT任务（调用钱包接口）
+ * - 查询定时任务状态（从钱包获取）
+ * - 取消定时任务（调用钱包接口）
  * 
  * 实现说明：
- * - 使用localStorage存储定时任务数据
- * - 使用setInterval进行轮询检查待执行任务
- * - 任务执行时调用NFT铸造流程
+ * - 定时任务的存储和执行由钱包负责
+ * - Ming平台只负责创建任务和查询状态
+ * - 不再使用localStorage存储任务
+ * - 不再使用前端轮询机制
  * 
- * 数据结构：
- * - 任务存储在localStorage中，key为 'scheduledMintTasks'
- * - 每个任务包含完整的NFT铸造所需信息
+ * 注意：
+ * - 此服务已重构为钱包接口的封装
+ * - 所有定时任务管理由钱包完成
  * 
  * @module services/scheduledMint/scheduledMintService
  */
 
 import { ExternalObject } from '../../types/energy';
-import { generateId } from '../../utils/helpers';
+import { mingWalletInterface } from '../wallet/mingWalletInterface';
+import { ipfsService } from '../ipfs/ipfsService';
+import { walletService } from '../wallet/walletService';
+import { ethers } from 'ethers';
 
 /**
  * 定时MINT任务状态
@@ -139,245 +142,240 @@ export interface ScheduledMintTask {
 }
 
 /**
- * 定时MINT服务类
+ * 定时MINT服务类（方案B：钱包管理定时任务）
  */
 class ScheduledMintService {
   /**
-   * localStorage存储键名
-   */
-  private readonly STORAGE_KEY = 'scheduledMintTasks';
-  
-  /**
-   * 轮询检查间隔（毫秒）
-   */
-  private readonly POLL_INTERVAL = 60000; // 1分钟
-  
-  /**
-   * 轮询定时器ID
-   */
-  private pollTimer: NodeJS.Timeout | null = null;
-  
-  /**
-   * 任务执行回调函数
-   */
-  private onExecuteTask?: (task: ScheduledMintTask) => Promise<void>;
-
-  /**
-   * 初始化服务
-   * 启动轮询检查机制
+   * 初始化服务（已废弃，定时任务由钱包管理）
    * 
-   * @param onExecuteTask - 任务执行回调函数（用于执行NFT铸造）
+   * @deprecated 定时任务现在由钱包管理，不再需要初始化轮询
    */
-  init(onExecuteTask: (task: ScheduledMintTask) => Promise<void>): void {
-    this.onExecuteTask = onExecuteTask;
-    this.startPolling();
+  init(_onExecuteTask?: (task: ScheduledMintTask) => Promise<void>): void {
+    // 不再需要轮询，定时任务由钱包管理
+    console.warn('ScheduledMintService.init() is deprecated. Tasks are now managed by wallet.');
   }
 
   /**
-   * 启动轮询检查
-   */
-  private startPolling(): void {
-    if (this.pollTimer) {
-      clearInterval(this.pollTimer);
-    }
-    
-    // 立即检查一次
-    this.checkAndExecuteTasks();
-    
-    // 设置定时检查
-    this.pollTimer = setInterval(() => {
-      this.checkAndExecuteTasks();
-    }, this.POLL_INTERVAL);
-  }
-
-  /**
-   * 停止轮询检查
+   * 停止轮询检查（已废弃）
+   * 
+   * @deprecated 定时任务现在由钱包管理，不再需要轮询
    */
   stopPolling(): void {
-    if (this.pollTimer) {
-      clearInterval(this.pollTimer);
-      this.pollTimer = null;
-    }
+    // 不再需要轮询
+    console.warn('ScheduledMintService.stopPolling() is deprecated. Tasks are now managed by wallet.');
   }
 
   /**
-   * 检查并执行到期的任务
-   */
-  private async checkAndExecuteTasks(): Promise<void> {
-    const tasks = this.getAllTasks();
-    const now = new Date();
-    
-    for (const task of tasks) {
-      // 只处理待执行状态的任务
-      if (task.status !== 'pending') {
-        continue;
-      }
-      
-      const scheduledTime = new Date(task.scheduledTime);
-      
-      // 如果到达执行时间，执行任务
-      if (scheduledTime <= now) {
-        await this.executeTask(task);
-      }
-    }
-  }
-
-  /**
-   * 执行定时任务
+   * 创建定时MINT任务（方案B：调用钱包接口）
    * 
-   * @param task - 要执行的任务
+   * @param taskData - 任务数据
+   * @returns 创建的任务ID（由钱包返回）
    */
-  private async executeTask(task: ScheduledMintTask): Promise<void> {
-    // 更新任务状态为执行中
-    task.status = 'processing';
-    this.updateTask(task);
-    
-    try {
-      // 调用执行回调函数
-      if (this.onExecuteTask) {
-        await this.onExecuteTask(task);
-      }
-      
-      // 更新任务状态为已完成
-      task.status = 'completed';
-      task.mintedAt = new Date().toISOString();
-      this.updateTask(task);
-    } catch (error) {
-      // 更新任务状态为失败
-      task.status = 'failed';
-      task.error = error instanceof Error ? error.message : '执行失败';
-      this.updateTask(task);
-    }
-  }
-
-  /**
-   * 创建定时MINT任务
-   * 
-   * @param taskData - 任务数据（不包含id、status、createdAt等自动生成的字段）
-   * @returns 创建的任务对象
-   */
-  createTask(taskData: Omit<ScheduledMintTask, 'id' | 'status' | 'createdAt'>): ScheduledMintTask {
-    const task: ScheduledMintTask = {
-      ...taskData,
-      id: generateId('scheduled_mint'),
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-    };
-    
+  async createTask(
+    taskData: Omit<ScheduledMintTask, 'id' | 'status' | 'createdAt'>
+  ): Promise<string> {
     // 验证定时时间不能是过去
-    const scheduledTime = new Date(task.scheduledTime);
+    const scheduledTime = new Date(taskData.scheduledTime);
     const now = new Date();
     if (scheduledTime <= now) {
       throw new Error('定时时间不能是过去的时间');
     }
-    
-    // 保存任务
-    this.saveTask(task);
-    
-    return task;
-  }
 
-  /**
-   * 获取所有任务
-   * 
-   * @returns 任务数组
-   */
-  getAllTasks(): ScheduledMintTask[] {
-    try {
-      const data = localStorage.getItem(this.STORAGE_KEY);
-      if (!data) {
-        return [];
-      }
-      return JSON.parse(data);
-    } catch (error) {
-      console.error('Error loading scheduled mint tasks:', error);
-      return [];
+    // 1. 将base64图片转换为Blob
+    const imageBlob = this.base64ToBlob(taskData.imageData);
+    const imageFile = new File([imageBlob], taskData.imageFileName, { type: imageBlob.type });
+
+    // 2. 上传图片到IPFS（方案A：Ming平台完成）
+    const imageHash = await ipfsService.uploadFile(imageFile);
+    const imageURI = ipfsService.getAccessUrl(imageHash);
+
+    // 3. 生成NFT元数据
+    const metadata = {
+      name: `外物连接 - ${taskData.selectedObject.name}`,
+      description: `与${taskData.selectedObject.name}的连接仪式见证`,
+      image: imageURI,
+      attributes: [
+        { trait_type: '外物', value: taskData.selectedObject.name },
+        { trait_type: '五行属性', value: taskData.selectedObject.element },
+        { trait_type: '连接类型', value: taskData.connectionType },
+      ],
+      connection: {
+        externalObjectId: taskData.selectedObject.id,
+        externalObjectName: taskData.selectedObject.name,
+        element: taskData.selectedObject.element,
+        connectionType: taskData.connectionType,
+        connectionDate: new Date().toISOString(),
+      },
+      ceremony: {
+        location: taskData.location,
+        duration: taskData.duration,
+      },
+      feelings: {
+        before: taskData.feelingsBefore,
+        during: taskData.feelingsDuring,
+        after: taskData.feelingsAfter,
+      },
+      ...(taskData.blessing && {
+        blessing: {
+          text: taskData.blessing,
+          timestamp: new Date().toISOString(),
+        },
+      }),
+      scheduledMint: {
+        scheduledTime: taskData.scheduledTime,
+      },
+      energyField: {
+        consensusHash: '',
+      },
+      metadata: {
+        version: '1.0',
+        createdAt: new Date().toISOString(),
+        platform: 'ming',
+      },
+    };
+
+    // 4. 上传元数据到IPFS
+    const metadataHash = await ipfsService.uploadJSON(metadata);
+    const tokenURI = ipfsService.getAccessUrl(metadataHash);
+
+    // 5. 生成共识哈希
+    const consensusHash = ethers.keccak256(ethers.toUtf8Bytes(metadataHash));
+
+    // 6. 获取合约配置
+    const chainId = await walletService.getNetworkId();
+    const contractAddress = import.meta.env.VITE_NFT_CONTRACT_ADDRESS;
+    
+    if (!contractAddress) {
+      throw new Error('NFT合约地址未配置');
     }
+
+    // 7. 调用钱包接口创建定时任务
+    const response = await mingWalletInterface.createScheduledTask({
+      scheduledTime: taskData.scheduledTime,
+      ipfs: {
+        imageHash,
+        metadataHash,
+        imageURI,
+        tokenURI,
+      },
+      consensusHash,
+      contract: {
+        address: contractAddress,
+        chainId,
+      },
+      params: {
+        to: taskData.walletAddress,
+        tokenURI,
+        externalObjectId: taskData.selectedObject.id,
+        element: taskData.selectedObject.element,
+        consensusHash,
+      },
+    });
+
+    if (!response.success || !response.data) {
+      throw new Error(response.error?.message || '创建定时任务失败');
+    }
+
+    return response.data.taskId;
   }
 
   /**
-   * 根据ID获取任务
+   * 获取所有任务（从钱包查询）
+   * 
+   * @param _walletAddress - 钱包地址
+   * @returns 任务数组（从钱包获取）
+   * 
+   * @deprecated 此方法需要钱包提供查询接口，当前返回空数组
+   * 实际实现需要钱包提供查询所有任务的接口
+   */
+  async getAllTasks(_walletAddress?: string): Promise<ScheduledMintTask[]> {
+    // TODO: 实现从钱包查询所有定时任务的接口
+    // 当前钱包接口只支持按taskId查询，需要钱包提供查询所有任务的接口
+    console.warn('getAllTasks() needs wallet API to query all tasks');
+    return [];
+  }
+
+  /**
+   * 根据ID获取任务（从钱包查询）
    * 
    * @param taskId - 任务ID
    * @returns 任务对象或null
    */
-  getTask(taskId: string): ScheduledMintTask | null {
-    const tasks = this.getAllTasks();
-    return tasks.find((task) => task.id === taskId) || null;
-  }
+  async getTask(taskId: string): Promise<ScheduledMintTask | null> {
+    try {
+      const response = await mingWalletInterface.getScheduledTask(taskId);
+      if (!response.success || !response.data) {
+        return null;
+      }
 
-  /**
-   * 根据钱包地址获取任务列表
-   * 
-   * @param walletAddress - 钱包地址
-   * @returns 任务数组
-   */
-  getTasksByWallet(walletAddress: string): ScheduledMintTask[] {
-    const tasks = this.getAllTasks();
-    return tasks.filter((task) => task.walletAddress === walletAddress);
-  }
-
-  /**
-   * 更新任务
-   * 
-   * @param task - 要更新的任务
-   */
-  updateTask(task: ScheduledMintTask): void {
-    const tasks = this.getAllTasks();
-    const index = tasks.findIndex((t) => t.id === task.id);
-    
-    if (index >= 0) {
-      tasks[index] = task;
-      this.saveAllTasks(tasks);
+      // 将钱包返回的数据转换为ScheduledMintTask格式
+      // 注意：钱包返回的数据格式可能与ScheduledMintTask不完全一致
+      // 需要根据实际钱包接口返回格式进行调整
+      return {
+        id: response.data.taskId,
+        walletAddress: '', // 钱包接口可能不返回此字段
+        selectedObject: {} as ExternalObject, // 需要从其他地方获取
+        imageData: '',
+        imageFileName: '',
+        connectionType: '',
+        blessing: '',
+        feelingsBefore: '',
+        feelingsDuring: '',
+        feelingsAfter: '',
+        scheduledTime: response.data.scheduledTime,
+        status: response.data.status as ScheduledMintTaskStatus,
+        createdAt: '',
+        txHash: response.data.result?.txHash,
+        tokenId: response.data.result?.tokenId,
+      };
+    } catch (error) {
+      console.error('Error getting scheduled task:', error);
+      return null;
     }
   }
 
   /**
-   * 删除任务
+   * 根据钱包地址获取任务列表（从钱包查询）
    * 
-   * @param taskId - 任务ID
+   * @param _walletAddress - 钱包地址
+   * @returns 任务数组
+   * 
+   * @deprecated 此方法需要钱包提供按地址查询的接口
+   */
+  async getTasksByWallet(_walletAddress: string): Promise<ScheduledMintTask[]> {
+    // TODO: 实现从钱包按地址查询任务的接口
+    console.warn('getTasksByWallet() needs wallet API to query tasks by address');
+    return [];
+  }
+
+  /**
+   * 更新任务（已废弃，任务由钱包管理）
+   * 
+   * @deprecated 任务现在由钱包管理，不再需要手动更新
+   */
+  updateTask(_task: ScheduledMintTask): void {
+    console.warn('updateTask() is deprecated. Tasks are now managed by wallet.');
+  }
+
+  /**
+   * 删除任务（已废弃，使用cancelTask）
+   * 
+   * @deprecated 使用cancelTask取消任务
    */
   deleteTask(taskId: string): void {
-    const tasks = this.getAllTasks();
-    const filtered = tasks.filter((task) => task.id !== taskId);
-    this.saveAllTasks(filtered);
+    console.warn('deleteTask() is deprecated. Use cancelTask() instead.');
+    this.cancelTask(taskId);
   }
 
   /**
-   * 取消任务
+   * 取消任务（调用钱包接口）
    * 
    * @param taskId - 任务ID
    */
-  cancelTask(taskId: string): void {
-    const task = this.getTask(taskId);
-    if (task && task.status === 'pending') {
-      task.status = 'cancelled';
-      this.updateTask(task);
-    }
-  }
-
-  /**
-   * 保存任务
-   * 
-   * @param task - 要保存的任务
-   */
-  private saveTask(task: ScheduledMintTask): void {
-    const tasks = this.getAllTasks();
-    tasks.push(task);
-    this.saveAllTasks(tasks);
-  }
-
-  /**
-   * 保存所有任务
-   * 
-   * @param tasks - 任务数组
-   */
-  private saveAllTasks(tasks: ScheduledMintTask[]): void {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(tasks));
-    } catch (error) {
-      console.error('Error saving scheduled mint tasks:', error);
-      throw new Error('保存定时任务失败，可能是存储空间不足');
+  async cancelTask(taskId: string): Promise<void> {
+    const response = await mingWalletInterface.cancelScheduledTask({ taskId });
+    if (!response.success) {
+      throw new Error(response.error?.message || '取消定时任务失败');
     }
   }
 

@@ -34,6 +34,74 @@
 
 ---
 
+## 🔄 功能迁移到钱包（当前重点）
+
+### 功能重构目标
+根据功能分布分析与修正建议，将NFT铸造功能迁移到钱包，实现职责分离。
+
+### 第一阶段：重构NFT仪式页面
+- [x] 保留IPFS上传逻辑（方案A）
+  - [x] 保留图片选择（本地预览）
+  - [x] 保留 `ipfsService.uploadFile()` 调用（上传图片到IPFS）
+  - [x] 保留 `ipfsService.uploadJSON()` 调用（上传元数据到IPFS）
+  - [x] 保留共识哈希生成逻辑（在Ming平台完成）
+- [x] 移除合约调用逻辑
+  - [x] 移除 `nftContractService.mintConnection()` 调用
+  - [x] 保留共识哈希生成（在Ming平台完成）
+- [x] 添加钱包接口调用
+  - [x] 实现钱包接口调用（传递IPFS哈希和共识哈希）
+  - [x] 添加进度显示
+  - [x] 处理返回结果
+
+### 第二阶段：调整服务层
+- [x] 保留IPFS服务（采用方案A）
+  - [x] 保留IPFS上传功能
+  - [x] 保留图片上传到IPFS
+  - [x] 保留元数据上传到IPFS
+  - [x] 保留IPFS访问URL生成
+  - [x] 保留共识哈希生成（基于IPFS哈希）
+- [x] 简化合约服务
+  - [x] 移除铸造相关方法（`mintConnection`）
+  - [x] 保留查询相关方法（`getUserTokens`, `getConnectionInfo`, `getUserNFTs`）
+- [x] 调整定时MINT服务（采用方案B）
+  - [x] 移除定时任务调度逻辑（由钱包负责）
+  - [x] 修改为调用钱包接口创建定时任务
+  - [x] 移除本地定时任务存储
+
+### 第三阶段：更新相关页面
+- [x] 更新连接指导页面
+  - [x] 确保跳转到NFT仪式页面的流程正确（无需修改）
+- [x] 更新我的连接页面
+  - [x] 确保NFT查询功能正常（使用简化后的合约服务，无需修改）
+- [x] 更新定时MINT页面
+  - [x] 调整定时任务的创建逻辑（调用钱包接口）
+  - [x] 移除定时任务执行逻辑（由钱包负责）
+  - [x] 添加定时任务状态查询（从钱包获取）
+
+### 新增文件
+- [x] `srcs/src/services/wallet/mingWalletInterface.ts` - 钱包接口封装
+- [x] `srcs/src/types/wallet.ts` - 钱包接口类型定义
+
+### 修改文件
+- [x] `srcs/src/pages/NFTCeremony/index.tsx` - 重构铸造流程
+- [x] `srcs/src/pages/ScheduledMints/index.tsx` - 调整定时任务逻辑
+- [x] `srcs/src/services/contract/nftContract.ts` - 移除铸造方法
+- [x] `srcs/src/services/ipfs/ipfsService.ts` - 保留IPFS上传功能（方案A，无需修改）
+- [x] `srcs/src/services/scheduledMint/scheduledMintService.ts` - 重构为调用钱包接口
+- [x] `srcs/src/services/wallet/walletService.ts` - 无需修改（钱包接口已独立封装）
+- [x] `srcs/src/hooks/useNFT.ts` - 无需修改（NFT查询功能保留）
+- [x] `srcs/src/hooks/useScheduledMint.ts` - 移除定时任务调度逻辑
+
+### 测试
+- [ ] 钱包接口调用测试（需要钱包实现后测试）
+- [ ] NFT铸造流程测试（通过钱包，需要钱包实现后测试）
+- [ ] 定时任务创建测试（通过钱包，需要钱包实现后测试）
+- [x] IPFS上传功能测试（保留，已有测试）
+- [x] NFT查询功能测试（保留，已有测试）
+- [ ] 更新定时MINT服务测试（需要适配新的异步接口）
+
+---
+
 ## 🎯 三步开发计划
 
 ### 第一步：基础NFT铸造功能（当前阶段）

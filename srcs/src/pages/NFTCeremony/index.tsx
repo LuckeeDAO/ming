@@ -4,15 +4,18 @@
  * 完成外物连接仪式后铸造 NFT 的完整流程：
  * 1. 准备阶段：选择外物、准备素材
  * 2. 内容创建：上传图片、填写连接信息
- * 3. 铸造阶段：IPFS上传、合约调用、生成共识哈希
+ * 3. 铸造阶段：IPFS上传、生成共识哈希、调用钱包接口
  * 4. 完成阶段：确认信息、记录感受、保存记录
  * 
  * 功能说明：
  * - 集成外物选择组件
- * - 支持图片上传到IPFS
+ * - 支持图片上传到IPFS（方案A：Ming平台完成）
  * - 生成NFT元数据
- * - 调用智能合约铸造NFT
+ * - 生成共识哈希
+ * - 调用钱包接口铸造NFT（钱包负责合约调用）
  * - 记录连接感受和仪式信息
+ * 
+ * 注意：合约调用已迁移到钱包，本页面只负责准备数据和调用钱包接口
  * 
  * @module pages/NFTCeremony
  */
@@ -37,11 +40,10 @@ import { ethers } from 'ethers';
 import { useAppSelector } from '../../store/hooks';
 import { ExternalObject } from '../../types/energy';
 import { ipfsService } from '../../services/ipfs/ipfsService';
-import { nftContractService } from '../../services/contract/nftContract';
 import { walletService } from '../../services/wallet/walletService';
+import { mingWalletInterface } from '../../services/wallet/mingWalletInterface';
 import ExternalObjectSelector from '../../components/ceremony/ExternalObjectSelector';
 import DateTimePicker from '../../components/ceremony/DateTimePicker';
-import { scheduledMintService } from '../../services/scheduledMint/scheduledMintService';
 
 /**
  * NFT铸造表单数据接口
@@ -232,46 +234,16 @@ const NFTCeremony: React.FC = () => {
     setError('');
 
     try {
-      // 如果是定时铸造，创建定时任务
-      if (mintType === 'scheduled') {
-        // 将图片转换为base64
-        const imageData = await scheduledMintService.fileToBase64(formData.image);
-        
-        // 创建定时任务
-        scheduledMintService.createTask({
-          walletAddress,
-          selectedObject: formData.selectedObject,
-          imageData,
-          imageFileName: formData.image.name,
-          connectionType: formData.connectionType,
-          location: formData.location,
-          duration: formData.duration,
-          blessing: formData.blessing,
-          feelingsBefore: formData.feelingsBefore,
-          feelingsDuring: formData.feelingsDuring,
-          feelingsAfter: formData.feelingsAfter,
-          scheduledTime: formData.scheduledTime!,
-        });
-        
-        // 进入完成阶段
-        setActiveStep(3);
-        setMintResult({
-          tokenId: '',
-          txHash: '',
-          tokenURI: '',
-        });
-        return;
-      }
-
-      // 立即铸造流程
+      // 方案A：Ming平台完成IPFS上传和共识哈希生成
       // 1. 上传图片到IPFS
       const imageHash = await ipfsService.uploadFile(formData.image);
+      const imageURI = ipfsService.getAccessUrl(imageHash);
 
       // 2. 生成NFT元数据
       const metadata = {
         name: `外物连接 - ${formData.selectedObject.name}`,
         description: `与${formData.selectedObject.name}的连接仪式见证`,
-        image: ipfsService.getAccessUrl(imageHash),
+        image: imageURI,
         attributes: [
           { trait_type: '外物', value: formData.selectedObject.name },
           { trait_type: '五行属性', value: formData.selectedObject.element },
@@ -307,7 +279,7 @@ const NFTCeremony: React.FC = () => {
           },
         }),
         energyField: {
-          consensusHash: '', // 将在合约调用时生成
+          consensusHash: '', // 将在生成共识哈希后更新
         },
         metadata: {
           version: '1.0',
@@ -324,7 +296,7 @@ const NFTCeremony: React.FC = () => {
       // 注意：IPFS哈希不是16进制字符串，需要使用keccak256进行哈希处理
       const consensusHash = ethers.keccak256(ethers.toUtf8Bytes(metadataHash));
 
-      // 5. 初始化合约服务
+      // 5. 获取合约配置
       const chainId = await walletService.getNetworkId();
       const contractAddress = import.meta.env.VITE_NFT_CONTRACT_ADDRESS;
       
@@ -337,33 +309,79 @@ const NFTCeremony: React.FC = () => {
       if (!/^0x[a-fA-F0-9]{40}$/.test(contractAddress)) {
         throw new Error('NFT合约地址格式无效');
       }
-      
-      await nftContractService.init({
-        contractAddress,
-        chainId,
-      });
 
-      // 6. 调用合约铸造NFT
-      const txHash = await nftContractService.mintConnection(
-        walletAddress,
-        tokenURI,
-        formData.selectedObject.id,
-        formData.selectedObject.element,
-        consensusHash
-      );
+      // 6. 根据铸造类型选择处理方式
+      if (mintType === 'scheduled') {
+        // 定时铸造：调用钱包接口创建定时任务
+        const taskResponse = await mingWalletInterface.createScheduledTask({
+          scheduledTime: formData.scheduledTime!,
+          ipfs: {
+            imageHash,
+            metadataHash,
+            imageURI,
+            tokenURI,
+          },
+          consensusHash,
+          contract: {
+            address: contractAddress,
+            chainId,
+          },
+          params: {
+            to: walletAddress,
+            tokenURI,
+            externalObjectId: formData.selectedObject.id,
+            element: formData.selectedObject.element,
+            consensusHash,
+          },
+        });
 
-      // 7. 获取Token ID（从交易事件中解析）
-      // 等待交易确认后，从事件中获取Token ID
-      const tokenId = await nftContractService.getTokenIdFromTransaction(txHash);
+        if (!taskResponse.success) {
+          throw new Error(taskResponse.error?.message || '创建定时任务失败');
+        }
 
-      setMintResult({
-        tokenId,
-        txHash,
-        tokenURI,
-      });
+        // 进入完成阶段
+        setActiveStep(3);
+        setMintResult({
+          tokenId: '',
+          txHash: '',
+          tokenURI,
+        });
+      } else {
+        // 立即铸造：调用钱包接口铸造NFT
+        const mintResponse = await mingWalletInterface.mintNFT({
+          ipfs: {
+            imageHash,
+            metadataHash,
+            imageURI,
+            tokenURI,
+          },
+          consensusHash,
+          contract: {
+            address: contractAddress,
+            chainId,
+          },
+          params: {
+            to: walletAddress,
+            tokenURI,
+            externalObjectId: formData.selectedObject.id,
+            element: formData.selectedObject.element,
+            consensusHash,
+          },
+        });
 
-      // 进入完成阶段
-      setActiveStep(3);
+        if (!mintResponse.success || !mintResponse.data) {
+          throw new Error(mintResponse.error?.message || 'NFT铸造失败');
+        }
+
+        setMintResult({
+          tokenId: mintResponse.data.tokenId,
+          txHash: mintResponse.data.txHash,
+          tokenURI,
+        });
+
+        // 进入完成阶段
+        setActiveStep(3);
+      }
     } catch (error) {
       console.error('NFT铸造失败:', error);
       setError(

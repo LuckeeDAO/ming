@@ -1,23 +1,25 @@
 /**
  * NFT 合约服务
  * 
- * 提供与 ConnectionNFT 智能合约交互的完整功能
+ * 提供与 ConnectionNFT 智能合约交互的查询功能
  * 
  * 功能：
  * - 初始化合约连接（需要MetaMask和合约地址）
- * - 铸造连接NFT（mintConnection）
  * - 查询用户的所有NFT Token ID
  * - 查询NFT连接信息（getConnectionInfo）
- * - 更新共识哈希（updateConsensusHash）
  * - 批量查询用户NFT信息
+ * 
+ * 注意：
+ * - 铸造功能已迁移到钱包，本服务仅保留查询功能
+ * - 更新共识哈希功能已迁移到钱包
  * 
  * 使用说明：
  * 1. 首先调用 init() 初始化合约服务（需要合约地址和链ID）
  * 2. 确保用户已连接MetaMask钱包
- * 3. 调用相应的方法进行合约交互
+ * 3. 调用相应的方法进行合约查询
  * 
  * 注意事项：
- * - 所有写操作（mint、update）需要用户签名确认
+ * - 所有方法都是只读查询，不需要用户签名
  * - 合约地址和ABI需要根据实际部署的合约配置
  * - 错误处理：所有方法都会抛出错误，需要调用方处理
  * 
@@ -26,12 +28,14 @@
 import { ethers } from 'ethers';
 import { NFTOnChain } from '../../types/nft';
 
-// ConnectionNFT 合约 ABI（简化版，实际应从合约编译后获取）
+// ConnectionNFT 合约 ABI（仅包含查询方法，铸造功能已迁移到钱包）
 const CONNECTION_NFT_ABI = [
-  'function mintConnection(address to, string memory tokenURI, string memory externalObjectId, string memory element, bytes32 consensusHash) public returns (uint256)',
+  // 查询方法（只读）
   'function getUserTokens(address user) public view returns (uint256[])',
   'function getConnectionInfo(uint256 tokenId) public view returns (tuple(uint256 tokenId, address owner, string tokenURI, uint256 connectionDate, string externalObjectId, string element, bytes32 consensusHash))',
-  'function updateConsensusHash(uint256 tokenId, bytes32 consensusHash) public',
+  'function getUserTokenCount(address user) public view returns (uint256)',
+  'function totalSupply() public view returns (uint256)',
+  // 事件（用于查询历史记录）
   'event ConnectionMinted(uint256 indexed tokenId, address indexed owner, string tokenURI, uint256 connectionDate, string externalObjectId, string element)',
 ];
 
@@ -63,32 +67,21 @@ class NFTContractService {
 
   /**
    * 铸造连接 NFT
+   * 
+   * @deprecated 此方法已迁移到钱包，请使用钱包接口进行铸造
+   * 保留此方法仅用于向后兼容，实际不会执行任何操作
    */
   async mintConnection(
-    to: string,
-    tokenURI: string,
-    externalObjectId: string,
-    element: string,
-    consensusHash: string
+    _to: string,
+    _tokenURI: string,
+    _externalObjectId: string,
+    _element: string,
+    _consensusHash: string
   ): Promise<string> {
-    if (!this.contract || !this.signer) {
-      throw new Error('Contract not initialized');
-    }
-
-    try {
-      const tx = await this.contract.mintConnection(
-        to,
-        tokenURI,
-        externalObjectId,
-        element,
-        consensusHash
-      );
-      const receipt = await tx.wait();
-      return receipt.hash;
-    } catch (error) {
-      console.error('Error minting NFT:', error);
-      throw error;
-    }
+    throw new Error(
+      'mintConnection has been moved to wallet. ' +
+      'Please use mingWalletInterface.mintNFT() instead.'
+    );
   }
 
   /**
@@ -127,23 +120,18 @@ class NFTContractService {
 
   /**
    * 更新共识哈希
+   * 
+   * @deprecated 此方法已迁移到钱包，请使用钱包接口进行更新
+   * 保留此方法仅用于向后兼容，实际不会执行任何操作
    */
   async updateConsensusHash(
-    tokenId: string,
-    consensusHash: string
+    _tokenId: string,
+    _consensusHash: string
   ): Promise<string> {
-    if (!this.contract || !this.signer) {
-      throw new Error('Contract not initialized');
-    }
-
-    try {
-      const tx = await this.contract.updateConsensusHash(tokenId, consensusHash);
-      const receipt = await tx.wait();
-      return receipt.hash;
-    } catch (error) {
-      console.error('Error updating consensus hash:', error);
-      throw error;
-    }
+    throw new Error(
+      'updateConsensusHash has been moved to wallet. ' +
+      'Please use wallet interface instead.'
+    );
   }
 
   /**
@@ -155,6 +143,8 @@ class NFTContractService {
    * 1. 等待交易确认并获取交易收据
    * 2. 从收据的日志中查找ConnectionMinted事件
    * 3. 解析事件中的tokenId（第一个indexed参数）
+   * 
+   * 注意：此方法保留用于查询功能，实际铸造由钱包完成
    * 
    * @param txHash - 交易哈希
    * @returns Token ID（字符串格式）

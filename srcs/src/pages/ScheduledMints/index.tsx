@@ -1,11 +1,15 @@
 /**
  * 定时MINT任务管理页面
  * 
- * 功能：
- * - 显示所有定时MINT任务列表
- * - 支持查看任务详情
- * - 支持取消待执行的任务
- * - 显示任务执行状态和结果
+ * 功能（方案B：钱包管理定时任务）：
+ * - 从钱包查询所有定时MINT任务列表
+ * - 支持查看任务详情（从钱包获取）
+ * - 支持取消待执行的任务（调用钱包接口）
+ * - 显示任务执行状态和结果（从钱包获取）
+ * 
+ * 注意：
+ * - 定时任务现在由钱包管理
+ * - 需要钱包提供查询所有任务的接口
  * 
  * @module pages/ScheduledMints
  */
@@ -77,20 +81,27 @@ const ScheduledMints: React.FC = () => {
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   /**
-   * 加载任务列表
+   * 加载任务列表（从钱包查询）
    */
-  const loadTasks = () => {
+  const loadTasks = async () => {
     if (!walletAddress) {
       setTasks([]);
       return;
     }
     
-    const userTasks = scheduledMintService.getTasksByWallet(walletAddress);
-    // 按创建时间倒序排列
-    userTasks.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    setTasks(userTasks);
+    try {
+      // 从钱包查询任务列表
+      const userTasks = await scheduledMintService.getTasksByWallet(walletAddress);
+      // 按创建时间倒序排列
+      userTasks.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setTasks(userTasks);
+    } catch (error) {
+      console.error('Error loading scheduled tasks:', error);
+      // 如果钱包接口未实现，显示空列表
+      setTasks([]);
+    }
   };
 
   /**
@@ -114,25 +125,35 @@ const ScheduledMints: React.FC = () => {
   };
 
   /**
-   * 确认删除任务
+   * 确认删除任务（调用钱包接口取消）
    */
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (taskToDelete) {
-      scheduledMintService.deleteTask(taskToDelete);
-      loadTasks();
-      setDeleteDialogOpen(false);
-      setTaskToDelete(null);
+      try {
+        await scheduledMintService.cancelTask(taskToDelete);
+        await loadTasks();
+        setDeleteDialogOpen(false);
+        setTaskToDelete(null);
+      } catch (error) {
+        console.error('Error canceling task:', error);
+        // 可以显示错误提示
+      }
     }
   };
 
   /**
-   * 取消任务
+   * 取消任务（调用钱包接口）
    * 
    * @param taskId - 任务ID
    */
-  const handleCancelTask = (taskId: string) => {
-    scheduledMintService.cancelTask(taskId);
-    loadTasks();
+  const handleCancelTask = async (taskId: string) => {
+    try {
+      await scheduledMintService.cancelTask(taskId);
+      await loadTasks();
+    } catch (error) {
+      console.error('Error canceling task:', error);
+      // 可以显示错误提示
+    }
   };
 
   // 组件挂载时加载任务列表

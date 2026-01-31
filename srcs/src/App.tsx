@@ -21,7 +21,8 @@
 import { Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Box, CircularProgress } from '@mui/material';
-import { useScheduledMint } from './hooks/useScheduledMint';
+// 定时MINT功能已迁移到钱包，不再需要初始化
+// import { useScheduledMint } from './hooks/useScheduledMint';
 
 // 懒加载页面组件（代码分割，提升性能）
 const Home = lazy(() => import('./pages/Home/index'));
@@ -56,8 +57,8 @@ const LoadingFallback = () => (
  * @returns JSX元素
  */
 function App() {
-  // 初始化定时MINT服务
-  useScheduledMint();
+  // 定时MINT服务已迁移到钱包，不再需要初始化
+  // useScheduledMint();
 
   return (
     <ErrorBoundary>
