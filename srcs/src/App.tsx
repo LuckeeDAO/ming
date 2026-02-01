@@ -9,11 +9,8 @@
  * 
  * 路由说明：
  * - / : 首页（整合了欢迎、核心概念、关于平台）
- * - /connection-guide : 外物连接指导
- * - /nft-ceremony : NFT仪式制作流程
+ * - /connection-ceremony : 外物连接仪式（整合了连接指导、NFT仪式、定时MINT、仪式资源）
  * - /my-connections : 我的连接记录
- * - /ceremony-resources : 仪式资源支持
- * - /scheduled-mints : 定时MINT任务管理
  * 
  * @module App
  */
@@ -26,11 +23,8 @@ import { Box, CircularProgress } from '@mui/material';
 
 // 懒加载页面组件（代码分割，提升性能）
 const Home = lazy(() => import('./pages/Home/index'));
-const ConnectionGuide = lazy(() => import('./pages/ConnectionGuide/index'));
-const NFTCeremony = lazy(() => import('./pages/NFTCeremony/index'));
+const ConnectionCeremony = lazy(() => import('./pages/ConnectionCeremony/index'));
 const MyConnections = lazy(() => import('./pages/MyConnections/index'));
-const CeremonyResources = lazy(() => import('./pages/CeremonyResources/index'));
-const ScheduledMints = lazy(() => import('./pages/ScheduledMints/index'));
 
 // 布局组件
 import Layout from './components/layout/Layout';
@@ -66,15 +60,13 @@ function App() {
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/connection-guide" element={<ConnectionGuide />} />
-            <Route path="/nft-ceremony" element={<NFTCeremony />} />
+            <Route path="/connection-ceremony" element={<ConnectionCeremony />} />
             <Route path="/my-connections" element={<MyConnections />} />
-            <Route
-              path="/ceremony-resources"
-              element={<CeremonyResources />}
-            />
-            <Route path="/scheduled-mints" element={<ScheduledMints />} />
-            {/* 向后兼容：重定向到首页 */}
+            {/* 向后兼容：重定向到合并后的页面 */}
+            <Route path="/connection-guide" element={<ConnectionCeremony />} />
+            <Route path="/nft-ceremony" element={<ConnectionCeremony />} />
+            <Route path="/scheduled-mints" element={<ConnectionCeremony />} />
+            <Route path="/ceremony-resources" element={<ConnectionCeremony />} />
             <Route path="/concept" element={<Home />} />
             <Route path="/about" element={<Home />} />
           </Routes>

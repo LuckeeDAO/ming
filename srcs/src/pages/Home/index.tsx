@@ -133,15 +133,15 @@ const Home: React.FC = () => {
         </Container>
       </Box>
 
-      <Divider />
+      <Divider sx={{ my: 0 }} />
 
       {/* 平台内核区域 - 第二部分 */}
-      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 10 } }}>
+        <Box sx={{ textAlign: 'center', mb: 5 }}>
           <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
             平台内核
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '800px', mx: 'auto' }}>
             基于四柱八字五行生克理论，以 NFT 为能量见证载体，融合链上可验证仪式与集体意识共识机制
           </Typography>
         </Box>
@@ -209,11 +209,11 @@ const Home: React.FC = () => {
         </Card>
       </Container>
 
-      <Divider />
+      <Divider sx={{ my: 0 }} />
 
       {/* 核心主张区域 - 第三部分 */}
-      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 10 } }}>
+        <Box sx={{ textAlign: 'center', mb: 5 }}>
           <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
             核心主张
           </Typography>
@@ -318,15 +318,15 @@ const Home: React.FC = () => {
         </Grid>
       </Container>
 
-      <Divider />
+      <Divider sx={{ my: 0 }} />
 
       {/* 体验形态区域 - 第四部分 */}
-      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 10 } }}>
+        <Box sx={{ textAlign: 'center', mb: 5 }}>
           <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
             体验形态
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '800px', mx: 'auto' }}>
             用户通过完成对应五行、节气、星宿的链上仪式，铸造专属能量 NFT，同时接入相应共识池
           </Typography>
         </Box>
@@ -381,11 +381,11 @@ const Home: React.FC = () => {
         </Card>
       </Container>
 
-      <Divider />
+      <Divider sx={{ my: 0 }} />
 
       {/* 技术架构区域 - 第五部分 */}
-      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 10 } }}>
+        <Box sx={{ textAlign: 'center', mb: 5 }}>
           <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
             技术架构
           </Typography>
@@ -462,35 +462,13 @@ const Home: React.FC = () => {
         </Grid>
       </Container>
 
-      <Divider />
+      <Divider sx={{ my: 0 }} />
 
-      {/* 重要说明区域 */}
-      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
-        <Box
-          sx={{
-            p: 4,
-            bgcolor: 'background.paper',
-            borderRadius: 2,
-            border: `1px solid ${theme.palette.divider}`,
-            textAlign: 'center',
-          }}
-        >
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-            重要说明
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8, maxWidth: '700px', mx: 'auto' }}>
-            Ming 平台提供的是基于传统文化智慧的象征性仪式体验，融合 Web3 技术与集体共识机制。
-            我们致力于构建一种人与命运共修的新范式，而非提供精确的命理预测或效果量化验证。
-            建议将仪式视为个人成长、文化体验与集体能量共振的一部分。
-          </Typography>
-        </Box>
-      </Container>
-
-      {/* 行动号召区域 - 最后部分 */}
+      {/* 行动号召区域 */}
       <Box
         sx={{
           textAlign: 'center',
-          py: { xs: 6, md: 10 },
+          py: { xs: 8, md: 12 },
           background: `linear-gradient(135deg, ${theme.palette.primary.main}10 0%, ${theme.palette.secondary.main}10 100%)`,
         }}
       >
@@ -499,14 +477,14 @@ const Home: React.FC = () => {
             variant="h4"
             component="h2"
             gutterBottom
-            sx={{ fontWeight: 600, mb: 2 }}
+            sx={{ fontWeight: 600, mb: 3 }}
           >
             开始你的仪式之旅
           </Typography>
           <Typography
             variant="body1"
             color="text.secondary"
-            sx={{ mt: 2, mb: 4, maxWidth: '600px', mx: 'auto', lineHeight: 1.8 }}
+            sx={{ mt: 2, mb: 5, maxWidth: '600px', mx: 'auto', lineHeight: 1.8 }}
           >
             连接钱包，输入四柱八字，系统将分析你的能量循环，推荐合适的外物连接。
             完成仪式后铸造专属能量 NFT，接入共识池，形成个人与集体能量场的共振。
@@ -516,7 +494,7 @@ const Home: React.FC = () => {
               variant="contained"
               size="large"
               component={Link}
-              to="/connection-guide"
+              to="/connection-ceremony"
               sx={{ 
                 px: 6, 
                 py: 1.5,
@@ -530,6 +508,30 @@ const Home: React.FC = () => {
           </Box>
         </Container>
       </Box>
+
+      <Divider sx={{ my: 0 }} />
+
+      {/* 重要说明区域 - 最后部分 */}
+      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 10 } }}>
+        <Box
+          sx={{
+            p: { xs: 3, md: 4 },
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            border: `1px solid ${theme.palette.divider}`,
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+            重要说明
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8, maxWidth: '700px', mx: 'auto' }}>
+            Ming 平台提供的是基于传统文化智慧的象征性仪式体验，融合 Web3 技术与集体共识机制。
+            我们致力于构建一种人与命运共修的新范式，而非提供精确的命理预测或效果量化验证。
+            建议将仪式视为个人成长、文化体验与集体能量共振的一部分。
+          </Typography>
+        </Box>
+      </Container>
     </Box>
   );
 };

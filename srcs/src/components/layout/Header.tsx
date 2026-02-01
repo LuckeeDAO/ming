@@ -8,11 +8,8 @@ const Header: React.FC = () => {
 
   const navItems = [
     { label: '首页', path: '/' },
-    { label: '连接指导', path: '/connection-guide' },
-    { label: 'NFT仪式', path: '/nft-ceremony' },
-    { label: '定时MINT', path: '/scheduled-mints' },
+    { label: '外物连接仪式', path: '/connection-ceremony' },
     { label: '我的连接', path: '/my-connections' },
-    { label: '仪式资源', path: '/ceremony-resources' },
   ];
 
   return (
