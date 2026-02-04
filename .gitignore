@@ -49,3 +49,6 @@ Thumbs.db
 
 # Documentation (excluded from GitHub)
 docs/
+
+# Reference files (excluded from GitHub)
+ref/

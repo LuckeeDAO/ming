@@ -22,6 +22,12 @@ import { store } from './store/store';
 import { theme } from './styles/theme';
 import './styles/global.css';
 
+// 兼容部分依赖中使用的 Node.js `process` 对象（例如 chinese-lunar 的打包代码）
+// 在浏览器环境中注入一个最小的 polyfill，避免运行时报 `process is not defined`
+if (typeof (globalThis as any).process === 'undefined') {
+  (globalThis as any).process = { env: {} };
+}
+
 /**
  * 渲染应用根组件
  * 

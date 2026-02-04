@@ -282,7 +282,14 @@ class ScheduledMintService {
   /**
    * 获取所有任务（从钱包查询）
    * 
-   * @param _walletAddress - 钱包地址
+   * 注意：此方法需要钱包提供查询所有任务的接口。
+   * 当前钱包接口只支持按taskId查询单个任务，不支持批量查询。
+   * 
+   * 实现方案：
+   * 1. 钱包需要提供 getAllScheduledTasks(walletAddress) 接口
+   * 2. 或者钱包需要提供 getTaskIdsByWallet(walletAddress) 接口，然后逐个查询
+   * 
+   * @param _walletAddress - 钱包地址（可选，如果不提供则使用当前连接的钱包）
    * @returns 任务数组（从钱包获取）
    * 
    * @deprecated 此方法需要钱包提供查询接口，当前返回空数组
@@ -290,8 +297,16 @@ class ScheduledMintService {
    */
   async getAllTasks(_walletAddress?: string): Promise<ScheduledMintTask[]> {
     // TODO: 实现从钱包查询所有定时任务的接口
+    // 方案1：钱包提供 getAllScheduledTasks(walletAddress) 接口
+    // 方案2：钱包提供 getTaskIdsByWallet(walletAddress) 接口，然后使用 getTask() 逐个查询
+    
     // 当前钱包接口只支持按taskId查询，需要钱包提供查询所有任务的接口
-    console.warn('getAllTasks() needs wallet API to query all tasks');
+    console.warn(
+      'getAllTasks() needs wallet API to query all tasks. ' +
+      'Please implement wallet.getAllScheduledTasks() or wallet.getTaskIdsByWallet() interface.'
+    );
+    
+    // 返回空数组，避免调用方出错
     return [];
   }
 
@@ -337,14 +352,32 @@ class ScheduledMintService {
   /**
    * 根据钱包地址获取任务列表（从钱包查询）
    * 
-   * @param _walletAddress - 钱包地址
+   * 注意：此方法需要钱包提供按地址查询任务的接口。
+   * 
+   * 实现方案：
+   * 1. 钱包需要提供 getScheduledTasksByWallet(walletAddress) 接口
+   * 2. 或者使用 getAllTasks(walletAddress) 方法（如果钱包支持）
+   * 
+   * @param walletAddress - 钱包地址
    * @returns 任务数组
    * 
    * @deprecated 此方法需要钱包提供按地址查询的接口
    */
-  async getTasksByWallet(_walletAddress: string): Promise<ScheduledMintTask[]> {
+  async getTasksByWallet(walletAddress: string): Promise<ScheduledMintTask[]> {
     // TODO: 实现从钱包按地址查询任务的接口
-    console.warn('getTasksByWallet() needs wallet API to query tasks by address');
+    // 方案1：钱包提供 getScheduledTasksByWallet(walletAddress) 接口
+    // 方案2：使用 getAllTasks(walletAddress) 方法（如果钱包支持）
+    
+    if (!walletAddress) {
+      throw new Error('Wallet address is required');
+    }
+    
+    console.warn(
+      'getTasksByWallet() needs wallet API to query tasks by address. ' +
+      'Please implement wallet.getScheduledTasksByWallet() interface.'
+    );
+    
+    // 返回空数组，避免调用方出错
     return [];
   }
 

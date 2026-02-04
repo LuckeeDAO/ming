@@ -8,7 +8,9 @@
  * - 页面懒加载
  * 
  * 路由说明：
- * - / : 首页（整合了欢迎、核心概念、关于平台）
+ * - / : 首页 - 关于平台（默认）
+ * - /experience : 首页 - 体验与功能
+ * - /technology : 首页 - 技术说明
  * - /connection-ceremony : 外物连接仪式（整合了连接指导、NFT仪式、定时MINT、仪式资源）
  * - /my-connections : 我的连接记录
  * 
@@ -23,8 +25,10 @@ import { Box, CircularProgress } from '@mui/material';
 
 // 懒加载页面组件（代码分割，提升性能）
 const Home = lazy(() => import('./pages/Home/index'));
+const About = lazy(() => import('./pages/About/index'));
 const ConnectionCeremony = lazy(() => import('./pages/ConnectionCeremony/index'));
 const MyConnections = lazy(() => import('./pages/MyConnections/index'));
+const FourPillarsConverter = lazy(() => import('./pages/FourPillarsConverter/index'));
 
 // 布局组件
 import Layout from './components/layout/Layout';
@@ -59,7 +63,22 @@ function App() {
       <Layout>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
-            <Route path="/" element={<Home />} />
+            {/* 首页路由 - 使用key确保路由变化时重新渲染 */}
+            <Route path="/" element={<Home key="home" />} />
+            <Route path="/experience" element={<Home key="experience" />} />
+            <Route path="/technology" element={<Home key="technology" />} />
+
+            {/* 生辰 & 四柱八字转换页面 */}
+            <Route path="/four-pillars" element={<FourPillarsConverter />} />
+            
+            {/* 关于平台路由 */}
+            <Route path="/about" element={<About key="about-intro" />} />
+            <Route path="/about/intro" element={<About key="about-intro" />} />
+            <Route path="/about/philosophy" element={<About key="about-philosophy" />} />
+            {/* 向后兼容路由 */}
+            <Route path="/concept" element={<About key="about-philosophy" />} />
+            
+            {/* 其他页面路由 */}
             <Route path="/connection-ceremony" element={<ConnectionCeremony />} />
             <Route path="/my-connections" element={<MyConnections />} />
             {/* 向后兼容：重定向到合并后的页面 */}
@@ -67,8 +86,6 @@ function App() {
             <Route path="/nft-ceremony" element={<ConnectionCeremony />} />
             <Route path="/scheduled-mints" element={<ConnectionCeremony />} />
             <Route path="/ceremony-resources" element={<ConnectionCeremony />} />
-            <Route path="/concept" element={<Home />} />
-            <Route path="/about" element={<Home />} />
           </Routes>
         </Suspense>
       </Layout>

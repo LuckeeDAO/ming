@@ -144,10 +144,10 @@ const ConnectionGuide: React.FC = () => {
                     </Typography>
                     <Button
                       variant="contained"
-                      onClick={() => navigate('/')}
+                      onClick={() => navigate('/four-pillars')}
                       sx={{ mt: 2 }}
                     >
-                      前往首页输入四柱八字
+                      前往生辰 & 四柱转换页面
                     </Button>
                   </Alert>
                 )}
@@ -229,7 +229,7 @@ const ConnectionGuide: React.FC = () => {
                 ) : (
                   <Alert severity="info">
                     <Typography variant="body2">
-                      暂无推荐外物。请先完成能量分析，或查看仪式资源页面了解更多外物选择。
+                      暂无推荐外物。请先完成能量分析，或切换到“仪式资源”标签页了解更多外物选择。
                     </Typography>
                   </Alert>
                 )}

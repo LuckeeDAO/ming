@@ -31,7 +31,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  useTheme,
+  Divider,
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { useNFT } from '../../hooks/useNFT';
 import { setNFTs } from '../../store/slices/nftSlice';
@@ -39,6 +42,7 @@ import { NFTMetadata } from '../../types/nft';
 import { formatDate } from '../../utils/format';
 
 const MyConnections: React.FC = () => {
+  const theme = useTheme();
   const dispatch = useAppDispatch();
   const { address } = useAppSelector((state) => state.wallet);
   const { nfts, loading, error, getNFTMetadata, refreshNFTs } = useNFT();
@@ -92,6 +96,7 @@ const MyConnections: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
+        {/* 页面标题和操作按钮 */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Box>
             <Typography variant="h4" component="h1" gutterBottom>
@@ -110,6 +115,54 @@ const MyConnections: React.FC = () => {
             {loading ? <CircularProgress size={20} /> : '刷新'}
           </Button>
         </Box>
+
+        {/* 开始连接区域 - 从首页转移过来 */}
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: { xs: 6, md: 8 },
+            mb: 4,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main}10 0%, ${theme.palette.secondary.main}10 100%)`,
+            borderRadius: 2,
+            border: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography
+            variant="h5"
+            component="h2"
+            gutterBottom
+            sx={{ fontWeight: 600, mb: 2 }}
+          >
+            开始你的仪式之旅
+          </Typography>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mt: 2, mb: 4, maxWidth: '600px', mx: 'auto', lineHeight: 1.8 }}
+          >
+            连接钱包，输入四柱八字，系统将分析你的能量循环，推荐合适的外物连接。
+            完成仪式后铸造专属能量 NFT，接入共识池，形成个人与集体能量场的共振。
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Button
+              variant="contained"
+              size="large"
+              component={Link}
+              to="/connection-ceremony"
+              sx={{ 
+                px: 6, 
+                py: 1.5,
+                fontSize: '1.1rem',
+                fontWeight: 500,
+                textTransform: 'none',
+              }}
+            >
+              开始连接
+            </Button>
+          </Box>
+        </Box>
+
+        <Divider sx={{ my: 4 }} />
 
         {/* 错误提示 */}
         {error && (

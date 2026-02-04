@@ -8,16 +8,20 @@
  * - 检测能量循环状态（顺畅/受阻/偏弱）
  * - 识别缺失元素及其严重程度
  * - 根据分析结果推荐合适的外物
+ * - 计算十神并分析格局（基于chinese-lunar-master算法）
  * 
  * 算法说明：
  * 1. 五行能量计算：统计四柱八字中天干地支对应的五行出现次数
  * 2. 能量状态判断：根据出现次数与平均值比较，判断为旺盛/正常/偏弱/缺失
  * 3. 循环检测：检查是否存在缺失或偏弱的元素，判断循环是否受阻
  * 4. 外物推荐：根据缺失元素的严重程度，推荐对应属性的外物
+ * 5. 十神分析：基于日柱天干计算各柱的十神关系
+ * 6. 格局分析：根据十神分布判断命理格局
  * 
  * @module services/energy/energyAnalysisService
  */
 import { FourPillars, EnergyAnalysis, ExternalObject } from '../../types/energy';
+import { tenGodService } from './tenGodService';
 
 class EnergyAnalysisService {
   /**
@@ -36,6 +40,12 @@ class EnergyAnalysisService {
     // 识别缺失元素
     const missingElements = this.identifyMissingElements(fiveElements);
 
+    // 计算十神
+    const tenGods = tenGodService.calculateTenGods(fourPillars);
+
+    // 分析格局
+    const patternAnalysis = tenGodService.analyzePattern(tenGods);
+
     return {
       walletAddress: '', // 需要从外部传入
       analysisId: this.generateAnalysisId(),
@@ -43,6 +53,8 @@ class EnergyAnalysisService {
       fiveElements,
       circulation,
       missingElements,
+      tenGods,
+      patternAnalysis,
       analyzedAt: new Date(),
     };
   }

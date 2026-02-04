@@ -51,8 +51,6 @@ import {
   ListItem,
   ListItemText,
   Chip,
-  Tabs,
-  Tab,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -66,7 +64,7 @@ import {
   Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { ethers } from 'ethers';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { setSelectedObject, setRecommendedObjects } from '../../store/slices/energySlice';
 import { ExternalObject } from '../../types/energy';
@@ -129,6 +127,7 @@ const statusTexts: Record<ScheduledMintTaskStatus, string> = {
  */
 const ConnectionCeremony: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const dispatch = useAppDispatch();
   const { analysis, recommendedObjects, selectedObject } = useAppSelector(
     (state) => state.energy
@@ -163,7 +162,22 @@ const ConnectionCeremony: React.FC = () => {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState(0); // 0: 仪式流程, 1: 定时任务管理, 2: 仪式资源
+  
+  // 从URL query参数读取tab，如果没有则默认为0
+  const tabFromUrl = searchParams.get('tab');
+  const initialTab = tabFromUrl ? parseInt(tabFromUrl, 10) : 0;
+  const [activeTab, setActiveTab] = useState(initialTab); // 0: 仪式流程, 1: 定时任务管理, 2: 仪式资源
+
+  // 当URL query参数变化时，更新activeTab
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl !== null) {
+      const tabValue = parseInt(tabFromUrl, 10);
+      if (!isNaN(tabValue) && tabValue >= 0 && tabValue <= 2) {
+        setActiveTab(tabValue);
+      }
+    }
+  }, [searchParams]);
 
   // 统一流程步骤
   const steps = [
@@ -615,32 +629,8 @@ const ConnectionCeremony: React.FC = () => {
           </Typography>
         </Box>
 
-        {/* 左右分栏布局：左侧标签页，右侧内容 */}
-        <Grid container spacing={3}>
-          {/* 左侧：垂直标签页 */}
-          <Grid item xs={12} md={3}>
-            <Tabs 
-              orientation="vertical"
-              value={activeTab} 
-              onChange={(_, newValue) => setActiveTab(newValue)}
-              sx={{
-                borderRight: 1,
-                borderColor: 'divider',
-                minHeight: 400,
-                '& .MuiTabs-indicator': {
-                  left: 0,
-                  right: 'auto',
-                },
-              }}
-            >
-              <Tab label="仪式流程" sx={{ textAlign: 'left', alignItems: 'flex-start' }} />
-              <Tab label="定时任务管理" sx={{ textAlign: 'left', alignItems: 'flex-start' }} />
-              <Tab label="仪式资源" sx={{ textAlign: 'left', alignItems: 'flex-start' }} />
-            </Tabs>
-          </Grid>
-
-          {/* 右侧：内容区域 */}
-          <Grid item xs={12} md={9}>
+        {/* 内容区域 */}
+        <Box>
             {/* 主流程标签页 */}
             {activeTab === 0 && (
               <>
@@ -674,10 +664,10 @@ const ConnectionCeremony: React.FC = () => {
                           </Typography>
                           <Button
                             variant="contained"
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/four-pillars')}
                             sx={{ mt: 2 }}
                           >
-                            前往首页输入四柱八字
+                            前往生辰 & 四柱转换页面
                           </Button>
                         </Alert>
                       )}
@@ -757,7 +747,7 @@ const ConnectionCeremony: React.FC = () => {
                       ) : (
                         <Alert severity="info">
                           <Typography variant="body2">
-                            暂无推荐外物。请先完成能量分析，或查看仪式资源页面了解更多外物选择。
+                            暂无推荐外物。请先完成能量分析，或切换到“仪式资源”标签页了解更多外物选择。
                           </Typography>
                         </Alert>
                       )}
@@ -1274,8 +1264,13 @@ const ConnectionCeremony: React.FC = () => {
                   仪式资源
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                  获取仪式指南、素材和文化知识
+                  获取仪式指南、素材与知识库：把“地”的工具（含时间/节律）转化为可执行的仪式步骤，并沉淀为可复盘的记录。
                 </Typography>
+                <Box sx={{ mb: 2 }}>
+                  <Button size="small" onClick={() => navigate('/about/philosophy')}>
+                    先读哲学理念（天/道/地/人/时）
+                  </Button>
+                </Box>
 
                 <Grid container spacing={3} sx={{ mt: 2 }}>
                   <Grid item xs={12} sm={6} md={4}>
@@ -1448,8 +1443,7 @@ const ConnectionCeremony: React.FC = () => {
                 </Grid>
               </Box>
             )}
-          </Grid>
-        </Grid>
+        </Box>
       </Box>
 
       {/* 任务详情对话框 */}

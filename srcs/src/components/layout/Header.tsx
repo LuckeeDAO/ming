@@ -1,26 +1,59 @@
+/**
+ * 顶部栏组件
+ * 
+ * 功能：
+ * - 显示Logo
+ * - 显示钱包连接组件
+ * - 移动端显示菜单按钮（用于打开侧边栏）
+ * 
+ * @module components/layout/Header
+ */
+
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material';
+import { Link } from 'react-router-dom';
+import MenuIcon from '@mui/icons-material/Menu';
 import WalletConnect from '../wallet/WalletConnect';
 
-const Header: React.FC = () => {
-  const location = useLocation();
+/**
+ * Header组件属性接口
+ */
+interface HeaderProps {
+  /**
+   * 菜单按钮点击回调（用于移动端打开侧边栏）
+   */
+  onMenuClick?: () => void;
+}
 
-  const navItems = [
-    { label: '首页', path: '/' },
-    { label: '外物连接仪式', path: '/connection-ceremony' },
-    { label: '我的连接', path: '/my-connections' },
-  ];
-
+/**
+ * 顶部栏组件
+ * 
+ * @param props - 组件属性
+ * @param props.onMenuClick - 菜单按钮点击回调
+ */
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   return (
     <AppBar position="static" elevation={1}>
       <Toolbar>
+        {/* 移动端菜单按钮 */}
+        {onMenuClick && (
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={onMenuClick}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
+
+        {/* Logo */}
         <Typography
           variant="h6"
           component={Link}
           to="/"
           sx={{
-            flexGrow: 1,
             textDecoration: 'none',
             color: 'inherit',
             fontWeight: 600,
@@ -28,23 +61,10 @@ const Header: React.FC = () => {
         >
           Ming
         </Typography>
-        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-          {navItems.map((item) => (
-            <Button
-              key={item.path}
-              component={Link}
-              to={item.path}
-              color="inherit"
-              sx={{
-                textTransform: 'none',
-                fontWeight: location.pathname === item.path ? 600 : 400,
-              }}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </Box>
-        <Box sx={{ ml: 2 }}>
+
+        {/* 右侧钱包连接 */}
+        <Box sx={{ flexGrow: 1 }} />
+        <Box>
           <WalletConnect />
         </Box>
       </Toolbar>
