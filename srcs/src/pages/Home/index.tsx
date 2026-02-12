@@ -452,24 +452,7 @@ const Home: React.FC = () => {
             gutterBottom
             sx={{ mt: 2, fontWeight: 400 }}
           >
-            以"道不可尽知、地为工具、人为主体、时为地之用"为内核的 Web3 仪式平台
-          </Typography>
-          
-          {/* 当前选择的小标题（章节标题） */}
-          <Typography
-            variant="h6"
-            component="h3"
-            color="text.secondary"
-            sx={{ 
-              mt: 3,
-              fontWeight: 500,
-              color: theme.palette.primary.main
-            }}
-          >
-            {(() => {
-              const currentChapter = chapters.find((c) => c.id === activeChapter);
-              return currentChapter?.title || '序 · 平台简介';
-            })()}
+            基于天地人三才框架的"道不可尽知、地为共识理论、人为主体"的 Web3 仪式平台
           </Typography>
         </Container>
       </Box>
@@ -516,23 +499,12 @@ const Home: React.FC = () => {
             {/* 第二部分：八个顺序章节（平台简介 + 七个章节） */}
             <Box>
               <Box sx={{ textAlign: 'center', mb: 4 }}>
-                <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                  平台与哲学 · 八个顺序章节
-                </Typography>
                 <Typography
                   variant="body1"
                   color="text.secondary"
-                  sx={{ mt: 2, maxWidth: '900px', mx: 'auto', lineHeight: 1.9 }}
+                  sx={{ maxWidth: '900px', mx: 'auto', lineHeight: 1.9 }}
                 >
-                  以下八个章节按顺序呈现：<strong>序（平台简介）→ 卷一 → 卷二 → 卷三 → 卷四 → 卷五 → 卷六 → 卷七</strong>。
-                </Typography>
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  sx={{ mt: 1, maxWidth: '900px', mx: 'auto', lineHeight: 1.9, fontWeight: 500 }}
-                >
-                  💡 <strong>点击任意章节卡片，上方内容区域会显示该章节的完整详细内容</strong>（包含所有核心逻辑节点）。
-                  建议按顺序阅读，或直接访问 <Link to="/philosophy" style={{ color: theme.palette.primary.main, textDecoration: 'none' }}>完整白皮书页面</Link> 查看全部内容。
+                  直接访问 <Link to="/philosophy" style={{ color: theme.palette.primary.main, textDecoration: 'none' }}>完整白皮书页面</Link> 查看全部内容。
                 </Typography>
               </Box>
 
