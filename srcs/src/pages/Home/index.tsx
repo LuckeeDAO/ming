@@ -434,6 +434,7 @@ const Home: React.FC = () => {
         }}
       >
         <Container maxWidth="lg">
+          {/* 主标题 */}
           <Typography
             variant="h2"
             component="h1"
@@ -442,6 +443,8 @@ const Home: React.FC = () => {
           >
             明命 · Ming
           </Typography>
+          
+          {/* 副标题 */}
           <Typography
             variant="h5"
             component="h2"
@@ -449,169 +452,66 @@ const Home: React.FC = () => {
             gutterBottom
             sx={{ mt: 2, fontWeight: 400 }}
           >
-            以“道不可尽知、地为工具、人为主体、时为地之用”为内核的 Web3 仪式平台
+            以"道不可尽知、地为工具、人为主体、时为地之用"为内核的 Web3 仪式平台
           </Typography>
           
-          <Box sx={{ mt: 4, mb: 3, maxWidth: '800px', mx: 'auto' }}>
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ 
-                fontSize: '1.1rem',
-                lineHeight: 1.8,
-                fontStyle: 'italic',
-                mb: 2
-              }}
-            >
-              知命为明，非为窥道，乃为明心。
-            </Typography>
-            
-            <Typography
-              variant="body1"
-              color="text.primary"
-              sx={{ 
-                fontSize: '1rem',
-                lineHeight: 1.8,
-                textAlign: 'left',
-                maxWidth: '700px',
-                mx: 'auto'
-              }}
-            >
-              那驱动日月星辰的终极法则——我们称之为「道」——或许永远超出人类认知的边界。
-              但人类最伟大的创造，是编织了一张名为「地」的知识之网：数学、物理、律法、艺术，以及流传千年的命理之学，都是这张网上的经纬；
-              时间（生辰、节气、择时）也是「地」的关键工具维度。
-              Ming 不回答「命运是什么」，而是将「地」的智慧转化为开源、可编程的数字工具，
-              帮助你在这张地图上，画出属于自己的航线。
-            </Typography>
-          </Box>
-
-          <Box sx={{ mt: 4 }}>
-            <Typography
-              variant="h6"
-              sx={{ 
-                fontWeight: 500,
-                color: theme.palette.primary.main,
-                mb: 1
-              }}
-            >
-              我们不是先知，我们是绘图师与航海者
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ fontStyle: 'italic' }}
-            >
-              我们绘制地图，不是为了定义星空，而是为了脚下的旅程，多一份参照，多一份诗意，多一份同行的温暖。
-            </Typography>
-          </Box>
-
-          <Box sx={{ mt: 4 }}>
-            <Typography
-              variant="h5"
-              sx={{ 
-                fontWeight: 500,
-                letterSpacing: '0.1em',
-                mb: 1
-              }}
-            >
-              明其心，知其地，行其路，续其明。
-            </Typography>
-            <Typography
-              variant="h6"
-              color="text.secondary"
-              sx={{ 
-                fontWeight: 400,
-                letterSpacing: '0.1em'
-              }}
-            >
-              这里没有关于"道"的终极答案，这里有一群清醒而热忱的人，在不可知的星空下，共同绘制动态海图。
-            </Typography>
-          </Box>
-
-          {/* 产品状态声明和行动召唤 */}
-          <Box sx={{ mt: 6, mb: 4 }}>
-            <Box sx={{ 
-              p: 3, 
-              borderRadius: 2, 
-              bgcolor: 'background.paper', 
-              border: `1px solid ${theme.palette.divider}`,
-              maxWidth: '800px',
-              mx: 'auto'
-            }}>
-              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-                创世开发中 · Web3 仪式平台
-              </Typography>
-              <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                我们正在构建一个开源、可编程的仪式平台。代码已托管于{' '}
-                <a 
-                  href="https://github.com/LuckeeDAO/ming" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={{ 
-                    color: theme.palette.primary.main, 
-                    textDecoration: 'none',
-                    fontWeight: 500
-                  }}
-                >
-                  GitHub
-                </a>
-                ，欢迎审阅、贡献与反馈。
-              </Typography>
-              <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Button
-                  component={Link}
-                  to="/philosophy"
-                  variant="contained"
-                  sx={{ minWidth: 150 }}
-                >
-                  阅读完整白皮书
-                </Button>
-                <Button
-                  component="a"
-                  href="https://github.com/LuckeeDAO/ming"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="outlined"
-                  sx={{ minWidth: 150 }}
-                >
-                  GitHub 仓库
-                </Button>
-              </Box>
-            </Box>
-          </Box>
+          {/* 当前选择的小标题（章节标题） */}
+          <Typography
+            variant="h6"
+            component="h3"
+            color="text.secondary"
+            sx={{ 
+              mt: 3,
+              fontWeight: 500,
+              color: theme.palette.primary.main
+            }}
+          >
+            {(() => {
+              const currentChapter = chapters.find((c) => c.id === activeChapter);
+              return currentChapter?.title || '序 · 平台简介';
+            })()}
+          </Typography>
         </Container>
       </Box>
       )}
 
-      {showHero && <Divider sx={{ my: 0 }} />}
-
       {/* 内容区域（根据路由显示） */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }} key={location.pathname}>
-        {/* 根据路由路径显示对应内容 */}
-        {location.pathname === '/' ? (
-          /* 首页：1）栏目内容 2）栏目选择 */
-          <>
-            {/* 第一部分：当前选中章节的详细内容（显示在上方） */}
-            <Box sx={{ mb: 6 }}>
-              <Card
-                key={`chapter-detail-${activeChapter}`}
-                sx={{
-                  border: `1px solid ${theme.palette.divider}`,
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, ${theme.palette.secondary.main}05 100%)`,
-                }}
-              >
-                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-                  {(() => {
-                    const currentChapter = chapters.find((c) => c.id === activeChapter);
-                    return currentChapter?.detail || (
-                      <Typography variant="body1" color="text.secondary">
-                        正在加载章节内容...
-                      </Typography>
-                    );
-                  })()}
-                </CardContent>
-              </Card>
-            </Box>
+      <Box
+        sx={{
+          background: showHero 
+            ? `linear-gradient(180deg, ${theme.palette.primary.main}08 0%, ${theme.palette.secondary.main}06 30%, ${theme.palette.primary.main}03 60%, transparent 100%)`
+            : 'transparent',
+          pt: showHero ? 0 : 0,
+        }}
+      >
+        <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 }, pt: showHero ? { xs: 2, md: 3 } : { xs: 4, md: 6 } }} key={location.pathname}>
+          {/* 根据路由路径显示对应内容 */}
+          {location.pathname === '/' ? (
+            /* 首页：1）栏目内容 2）栏目选择 */
+            <>
+              {/* 第一部分：当前选中章节的详细内容（显示在上方） */}
+              <Box sx={{ mb: 6, mt: { xs: 1, md: 2 } }}>
+                <Card
+                  key={`chapter-detail-${activeChapter}`}
+                  sx={{
+                    border: 'none',
+                    boxShadow: 'none',
+                    background: 'transparent',
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <CardContent sx={{ p: { xs: 2, md: 3 }, pt: { xs: 1, md: 2 }, px: { xs: 2, md: 3 } }}>
+                    {(() => {
+                      const currentChapter = chapters.find((c) => c.id === activeChapter);
+                      return currentChapter?.detail || (
+                        <Typography variant="body1" color="text.secondary">
+                          正在加载章节内容...
+                        </Typography>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+              </Box>
 
             {/* 第二部分：八个顺序章节（平台简介 + 七个章节） */}
             <Box>
@@ -1267,7 +1167,8 @@ const Home: React.FC = () => {
             </Grid>
           </>
         )}
-      </Container>
+        </Container>
+      </Box>
     </Box>
   );
 };
