@@ -37,14 +37,37 @@ import { Link, useLocation } from 'react-router-dom';
 const Home: React.FC = () => {
   const theme = useTheme();
   const location = useLocation();
-  const [activeChapter, setActiveChapter] = React.useState<string>('volume1');
+  const [activeChapter, setActiveChapter] = React.useState<string>('intro');
 
   // 避免 TypeScript 将部分从 UI 库导入的组件误判为未使用
   // （这些组件在条件分支与 JSX 中均有实际使用）
   void [CardActions, Button, Link];
 
-  // 哲学白皮书七个章节（摘要+详细内容）
+  // 平台简介 + 哲学白皮书七个章节（摘要+详细内容）
   const chapters = [
+    {
+      id: 'intro',
+      title: '序 · 平台简介',
+      tag: '平台简介',
+      summary: '从「道不可尽知、地为工具、人为主体、时为地之用」出发，介绍 Ming 是怎样的一张海图与工具箱。',
+      detail: (
+        <>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+            序 · 平台简介
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            明命 · Ming 是一个以「道不可尽知、地为工具、人为主体、时为地之用」为内核的 Web3 仪式平台。
+            我们不替你回答「命运究竟是什么」，而是将人类长期积累的「地」之智慧——包括命理在内的诸多工具——转译为开源、可编程的数字组件，
+            帮助你在现实约束之内，重新组织自我叙事与时间感。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            在这里，每一次仪式既是一段链上代码的执行，也是一次对自己的温柔声明：
+            你可以选择外物作为符号锚点，以节气与择时作为时间坐标，通过可编程 NFT 把这些意图记录在链上。
+            共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者轻轻见证。
+          </Typography>
+        </>
+      ),
+    },
     {
       id: 'volume1',
       title: '卷一 · 我们是谁',
@@ -106,16 +129,44 @@ const Home: React.FC = () => {
             卷三 · 三元闭环 · 命理·共识·仪式
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            命理 · 镜头：以你选择的命理流派为建模语言——四柱、星宿、紫微、五行……为你提供理解个人状态的结构化视角。
+            🔮 命理 · 镜头：以你选择的命理流派为建模语言——四柱、星宿、紫微、五行……为你提供理解个人状态的结构化视角。
             这不是诊断，这是视角；不是预言，是翻译。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            共识 · 镜头维护者：每个流派都是一套独特的观察镜头。DAO 是镜头维护者的自治组织，他们负责让这套镜头持续开源、可审计、
-            可迭代，同时通过版本化约束，保证你始终拥有选择不同版本与不同镜头的权利。
+            🤝 共识 · 镜头维护者：每个流派都是一套独特的观察镜头。子平镜头下，你是日主强弱、格局高低；星宿镜头下，你是二十八宿分野；
+            五行镜头下，你是木火土金水的流动节律。没有镜头是「唯一真实的」——就像没有色温是「唯一正确的」。它们只是不同的猜测模型，
+            用来逼近，或用来对话那个不可穷尽的隐藏信号。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            仪式 · 契约：仪式是将意图锚定成链上契约的动作。每一次铸造，都是一份可编程的自我承诺；链上记录每一次履约，不是为了监视你，
-            而是为了让未来的你，看得见过去的自己走了多远。
+            DAO 是镜头维护者的自治组织——他们负责让这套镜头持续开源、可审计、可迭代。镜头维护者的权力有明确边界：
+            任何改变算法输出的修改，必须发布为独立版本号（如子平 v1.2、子平 v2.0），与原版本长期并存、永不强制替换，并在切换界面标明版本差异与演化历史。
+            DAO 不裁决「哪个版本正确」，它只确保每个版本都开源、可审计、可追溯。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            你的个人主页可以一键切换镜头，并长期保留选择旧版本的权利。当某个版本因客观依赖无法继续维护时，DAO 会提前公告并提供迁移工具或存档快照。
+            昨天你信子平 v1.0，今天你试子平 v2.0，明天你切到星宿——这里没有叛教，只有视角迁徙。
+            我们将逐步开源所有流派算法的核心实现，并以开源协议托管于 GitHub，邀请你审阅代码、提交提案，甚至成为镜头维护者的一员。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            🎭 仪式 · 契约：仪式是将意图锚定成链上契约的动作。每一次铸造，都是一份可编程的自我承诺。你可以这样为自己写下契约：
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.9, ml: 2, fontStyle: 'italic' }}>
+            「未来 40 天，我将在晨间播放这段誓言。」<br />
+            「每日静坐 10 分钟，持续 21 天。」<br />
+            「每当看到这枚 NFT，提醒自己：如山稳固。」
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            链上记录每一次履约，不是为了监视你——是为了让未来的你，看得见过去的自己走了多远。
+            当你完成第 40 次播放，NFT 将自动点亮一枚徽章。这不是平台的奖励，而是你自己兑现给自己的勋章。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            如果契约没有走完——如果 40 天的誓言在第 15 天就悄然沉寂——那枚 NFT 会永远停留在 15/40。
+            它不是耻辱柱，是未完成的路标。你可以让它留在钱包里，作为温柔的提醒；也可以将它发送至黑洞地址，让链上时间帮你封印那段半途。
+            销毁不是删除记忆，销毁是一场关于放下的微型仪式。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            无论你是否销毁，你永远有权铸造一枚新的契约。上一份誓言没有兑现，不剥夺你重新承诺的资格。
+            你可以公开这份履约记录，作为链上简历；也可以永久私藏，作为无人知晓的骄傲。
           </Typography>
         </>
       ),
@@ -131,15 +182,38 @@ const Home: React.FC = () => {
             卷四 · 体验形态 · 你的工具箱
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            外物 · 符号锚点：根据你选择的镜头，系统会推荐与之共鸣的自然符号——昆仑的土、太湖的水、长白山的木、罗浮山的火、
-            华山的金……这不是「借能量」，而是选择一个符号，作为你接下来一段时间注意力投向的锚点，并通过仪式 NFT 记录这份选择。
+            🌿 外物 · 符号锚点：根据你选择的镜头，系统会推荐与之共鸣的自然符号——昆仑的土、太湖的水、长白山的木、罗浮山的火、华山的金……
+            这不是「借能量」，而是选择一个符号，作为你接下来一段时间注意力投向的锚点。
+            完成链上仪式，铸造仪式 NFT。这枚 NFT 不是「补了五行」，它是你对自己说：「接下来，我要像山一样稳固，像水一样流动。」
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            节气 · 共识节律：立春、夏至、秋分、冬至……终有一天，会有成千上万人在同一时刻完成同一套仪式动作。
-            即便在创世初期，共识池还很稀疏，你点亮的那一个光点也永远不是孤岛。
+            🌍 节气 · 共识节律：立春、夏至、秋分、冬至……终有一天，会有成千上万人在同一时刻完成同一套仪式动作。
+            而在创世第一年，共识池可能还很稀疏——但你点亮的那个光点，永远不是孤岛。
+            千百年来，人类围火而坐、击节而歌，那不是迷信，是我们的大脑天生会为「同频」奖励自己。Ming 的节气仪式，只是让这份古老的奖赏，有了链上的回响。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            择时 · 个人节律、履历 · 可缩放的地图、共识池 · 集体注意力计数器，则共同构成你与自己、与他人、与时间对话的坐标系和可视化界面。
+            ⏳ 择时 · 个人节律：时间，是你与自我对话的坐标系。共识节律，是与千万人同步，感受共识的温度；
+            个人节律，则是你选定的镜头为你标记出理论上下游刃有余的时间窗口。这不是「吉凶神煞」，而是系统根据你当下的状态转译，为你推荐的注意力锚点候选。
+            你完全可以选择另一个时间，另一种算法——择时的最终目的，是让你主动决定「何时认真」。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            📈 履历 · 可缩放的地图：你每一次仪式、每一次意图锚定、每一次流派切换，都会成为能量履历上的一笔。
+            系统根据你当前选定的镜头，将你的状态波动绘制成一条曲线——它不是体检报告，而是你选择的语言，对你当下状态的实时转译。
+            这条曲线的一个重要性质是：它不是胶片，而是实时显影液。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            每一次切换镜头，过去的日子都会被新的语言重新诉说——昨天的「火旺」可能变成今天的「燥土」。
+            不是记忆被篡改，而是你拥有了重新理解记忆的权利。你也可以锁定某个镜头，让履历从此固定用这种语言讲述。
+            锁定不是封印，是暂停自动重译；就像选定一本不再修订的史书——你可以随时解锁，让过去重新开口。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            📊 共识池 · 集体注意力的实时计数器：共识池不是玄学容器，它是集体仪式的链上聚合页。
+            当你参与立春集体仪式，你会看到屏幕上的光点开始汇聚——此刻，和你同时完成铸造的人，正化作一个个光点，在地图上缓缓点亮。
+            共识池不承诺规模，它只承诺真实；每一个光点背后，都是一枚真实铸造的链上契约。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            你可以查看历史累计次数、地域分布、节气共鸣峰值。这不是为了炫耀，这是为了让孤独的自我承诺，被千万个陌生的同频者轻轻见证。
+            共识池不存储「能量」，它存储此时此刻，有人和你一样，选择了认真对待自己。
           </Typography>
         </>
       ),
@@ -198,12 +272,23 @@ const Home: React.FC = () => {
             卷七 · 明其心，知其地，行其路，续其明
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            当一个人在立春的晨光里，为自己铸造一枚迎春仪式的 NFT——那一刻，他不是在向不可知的天乞求恩典。
-            他是在对自己说：「这个春天，我选择认真度过。」这一声低语，被代码接住，被哈希见证，被时间封存。
+            我们不知道天命是什么。但我们知道一件事：当一个人在立春的晨光里，为自己铸造一枚迎春仪式的 NFT——
+            那一刻，他不是在向不可知的天乞求恩典，他是在对自己说：「这个春天，我选择认真度过。」
+            这一声低语，被代码接住，被哈希见证，被时间封存。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            所有地图、镜头、契约，都只是渡河的筏子。当你开始认真对待自己——用什么工具、信什么流派、是否兑现契约，都已不是最初的
-            问题。重要的是：那个在立春晨光里说「这个春天我选择认真度过」的人，已经不一样了。
+            它不是写给天的奏章，它是写给自己的契约。而契约的效力，从来不在于墨水是否神圣，而在于签名者是否愿意，
+            在未来的日子里，记得自己曾许下过什么。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            我们不知道天命是什么。但我们知道，所有地图、镜头、契约，都只是渡河的筏子。
+            当你开始认真对待自己——用什么工具、信什么流派、是否兑现契约，都已不是最初的问题。
+            重要的是：那个在立春晨光里说「这个春天我选择认真度过」的人，已经不一样了。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            我们提供地图，你定义目的地；我们提供镜头，你选择对焦方式；
+            我们提供契约，你决定履约的节奏；我们提供可重译的履历，你保留重新翻译的权利；
+            我们提供失败，你持有放下的仪式。这就是「人为主体」的全部含义。
           </Typography>
         </>
       ),
@@ -362,18 +447,18 @@ const Home: React.FC = () => {
 
             <Divider sx={{ my: 4 }} />
 
-            {/* 第二部分：七个章节目录（方框摘要） */}
+            {/* 第二部分：八个栏目目录（平台简介 + 七个章节） */}
             <Box sx={{ mb: 4 }}>
               <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                  哲学白皮书 · 七个章节目录
+                  平台与哲学 · 八个栏目目录
                 </Typography>
                 <Typography
                   variant="body1"
                   color="text.secondary"
                   sx={{ mt: 2, maxWidth: '900px', mx: 'auto', lineHeight: 1.9 }}
                 >
-                  下方七个方框对应完整白皮书的七个章节。
+                  下方八个方框中，第一个是「序 · 平台简介」，其余七个对应完整白皮书的七个章节。
                   点击任意一个方框，只会在本页下方切换详细内容，不会跳转页面，你始终可以看见自己处在第几个章节。
                 </Typography>
               </Box>
