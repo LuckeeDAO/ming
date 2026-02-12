@@ -605,70 +605,109 @@ const Home: React.FC = () => {
               </Card>
             </Box>
 
-            {/* 第二部分：八个栏目目录（平台简介 + 七个章节） */}
+            {/* 第二部分：八个顺序章节（平台简介 + 七个章节） */}
             <Box>
               <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                  平台与哲学 · 八个栏目目录
+                  平台与哲学 · 八个顺序章节
                 </Typography>
                 <Typography
                   variant="body1"
                   color="text.secondary"
                   sx={{ mt: 2, maxWidth: '900px', mx: 'auto', lineHeight: 1.9 }}
                 >
-                  下方八个方框中，第一个是「序 · 平台简介」，其余七个对应完整白皮书的七个章节。
-                  点击任意一个方框，上方内容区域会切换显示对应的详细内容。
+                  以下八个章节按顺序呈现：<strong>序（平台简介）→ 卷一 → 卷二 → 卷三 → 卷四 → 卷五 → 卷六 → 卷七</strong>。
+                </Typography>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ mt: 1, maxWidth: '900px', mx: 'auto', lineHeight: 1.9, fontWeight: 500 }}
+                >
+                  💡 <strong>点击任意章节卡片，上方内容区域会显示该章节的完整详细内容</strong>（包含所有核心逻辑节点）。
+                  建议按顺序阅读，或直接访问 <Link to="/philosophy" style={{ color: theme.palette.primary.main, textDecoration: 'none' }}>完整白皮书页面</Link> 查看全部内容。
                 </Typography>
               </Box>
 
-              <Grid container spacing={2}>
-                {chapters.map((chapter) => {
+              <Box sx={{ maxWidth: '1000px', mx: 'auto' }}>
+                {chapters.map((chapter, index) => {
                   const selected = activeChapter === chapter.id;
+                  const chapterNumber = index + 1;
                   return (
-                    <Grid item xs={12} sm={6} md={3} key={chapter.id}>
-                      <Card
-                        onClick={() => setActiveChapter(chapter.id)}
-                        sx={{
-                          height: '100%',
-                          border: selected
-                            ? `2px solid ${theme.palette.primary.main}`
-                            : `1px solid ${theme.palette.divider}`,
-                          cursor: 'pointer',
-                          transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
-                          backgroundColor: selected ? `${theme.palette.primary.main}08` : 'background.paper',
-                          '&:hover': {
-                            transform: 'translateY(-4px)',
-                            boxShadow: theme.shadows[4],
-                          },
-                        }}
-                      >
-                        <CardContent sx={{ p: 2.5 }}>
-                          <Chip
-                            label={chapter.tag}
-                            size="small"
-                            color={selected ? 'primary' : 'default'}
-                            sx={{ mb: 1.5 }}
-                          />
-                          <Typography
-                            variant="subtitle1"
-                            gutterBottom
-                            sx={{ fontWeight: 600, fontSize: '0.98rem' }}
+                    <Card
+                      key={chapter.id}
+                      onClick={() => setActiveChapter(chapter.id)}
+                      sx={{
+                        mb: 2,
+                        border: selected
+                          ? `2px solid ${theme.palette.primary.main}`
+                          : `1px solid ${theme.palette.divider}`,
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
+                        backgroundColor: selected ? `${theme.palette.primary.main}08` : 'background.paper',
+                        '&:hover': {
+                          transform: 'translateX(4px)',
+                          boxShadow: theme.shadows[4],
+                        },
+                      }}
+                    >
+                      <CardContent sx={{ p: 3 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                          {/* 序号标识 */}
+                          <Box
+                            sx={{
+                              minWidth: 48,
+                              height: 48,
+                              borderRadius: '50%',
+                              bgcolor: selected ? theme.palette.primary.main : theme.palette.grey[200],
+                              color: selected ? 'white' : theme.palette.text.secondary,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 600,
+                              fontSize: '1.2rem',
+                              flexShrink: 0,
+                            }}
                           >
-                            {chapter.title}
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ lineHeight: 1.7, fontSize: '0.86rem' }}
-                          >
-                            {chapter.summary}
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
+                            {chapterNumber}
+                          </Box>
+                          {/* 内容区域 */}
+                          <Box sx={{ flex: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                              <Chip
+                                label={chapter.tag}
+                                size="small"
+                                color={selected ? 'primary' : 'default'}
+                              />
+                              {selected && (
+                                <Chip
+                                  label="当前阅读"
+                                  size="small"
+                                  color="primary"
+                                  variant="outlined"
+                                />
+                              )}
+                            </Box>
+                            <Typography
+                              variant="h6"
+                              gutterBottom
+                              sx={{ fontWeight: 600, mb: 1.5 }}
+                            >
+                              {chapter.title}
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ lineHeight: 1.7 }}
+                            >
+                              {chapter.summary}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
                   );
                 })}
-              </Grid>
+              </Box>
             </Box>
 
             {/* 附言和用户分层引导 */}
