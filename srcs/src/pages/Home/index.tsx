@@ -594,13 +594,21 @@ const Home: React.FC = () => {
             {/* 第一部分：当前选中章节的详细内容（显示在上方） */}
             <Box sx={{ mb: 6 }}>
               <Card
+                key={`chapter-detail-${activeChapter}`}
                 sx={{
                   border: `1px solid ${theme.palette.divider}`,
                   background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, ${theme.palette.secondary.main}05 100%)`,
                 }}
               >
                 <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-                  {chapters.find((c) => c.id === activeChapter)?.detail}
+                  {(() => {
+                    const currentChapter = chapters.find((c) => c.id === activeChapter);
+                    return currentChapter?.detail || (
+                      <Typography variant="body1" color="text.secondary">
+                        正在加载章节内容...
+                      </Typography>
+                    );
+                  })()}
                 </CardContent>
               </Card>
             </Box>
