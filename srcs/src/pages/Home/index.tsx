@@ -49,7 +49,7 @@ const Home: React.FC = () => {
       id: 'intro',
       title: '序 · 平台简介',
       tag: '平台简介',
-      summary: '从「道不可尽知、地为工具、人为主体、时为地之用」出发，介绍 Ming 是怎样的一张海图与工具箱。',
+      summary: 'Ming 是一个以「道不可尽知、地为工具、人为主体、时为地之用」为内核的 Web3 仪式平台。我们不提供关于「天命」的终极答案，而是将人类长期积累的「地」之智慧——包括命理在内的诸多工具——转译为开源、可编程的数字组件，帮助你在现实约束之内，重新组织自我叙事与时间感。在这里，每一次仪式既是一段链上代码的执行，也是一次对自己的温柔声明：你可以选择外物作为符号锚点，以节气与择时作为时间坐标，通过可编程 NFT 把这些意图记录在链上。共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者轻轻见证。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
@@ -413,42 +413,24 @@ const Home: React.FC = () => {
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }} key={location.pathname}>
         {/* 根据路由路径显示对应内容 */}
         {location.pathname === '/' ? (
-          /* 首页：1）平台简介 2）七个章节目录 3）选中章节详情 */
+          /* 首页：1）栏目内容 2）栏目选择 */
           <>
-            {/* 第一部分：平台简介（独立于章节） */}
+            {/* 第一部分：当前选中章节的详细内容（显示在上方） */}
             <Box sx={{ mb: 6 }}>
-              <Box sx={{ textAlign: 'center', mb: 3 }}>
-                <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                  平台简介 · 明命 · Ming
-                </Typography>
-              </Box>
-              <Box sx={{ maxWidth: '900px', mx: 'auto' }}>
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  paragraph
-                  sx={{ lineHeight: 1.9 }}
-                >
-                  Ming 是一个以「道不可尽知、地为工具、人为主体、时为地之用」为内核的 Web3 仪式平台。
-                  我们不提供关于「天命」的终极答案，而是将人类长期积累的「地」之智慧——包括命理在内的诸多工具——转译为开源、可编程的数字组件，
-                  帮助你在现实约束之内，重新组织自我叙事与时间感。
-                </Typography>
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  paragraph
-                  sx={{ lineHeight: 1.9 }}
-                >
-                  在这里，每一次仪式既是一段链上代码的执行，也是一次对自己的温柔声明：你可以选择外物作为符号锚点，以节气与择时作为时间坐标，
-                  通过可编程 NFT 把这些意图记录在链上。共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者轻轻见证。
-                </Typography>
-              </Box>
+              <Card
+                sx={{
+                  border: `1px solid ${theme.palette.divider}`,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, ${theme.palette.secondary.main}05 100%)`,
+                }}
+              >
+                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                  {chapters.find((c) => c.id === activeChapter)?.detail}
+                </CardContent>
+              </Card>
             </Box>
 
-            <Divider sx={{ my: 4 }} />
-
             {/* 第二部分：八个栏目目录（平台简介 + 七个章节） */}
-            <Box sx={{ mb: 4 }}>
+            <Box>
               <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
                   平台与哲学 · 八个栏目目录
@@ -459,7 +441,7 @@ const Home: React.FC = () => {
                   sx={{ mt: 2, maxWidth: '900px', mx: 'auto', lineHeight: 1.9 }}
                 >
                   下方八个方框中，第一个是「序 · 平台简介」，其余七个对应完整白皮书的七个章节。
-                  点击任意一个方框，只会在本页下方切换详细内容，不会跳转页面，你始终可以看见自己处在第几个章节。
+                  点击任意一个方框，上方内容区域会切换显示对应的详细内容。
                 </Typography>
               </Box>
 
@@ -511,20 +493,6 @@ const Home: React.FC = () => {
                   );
                 })}
               </Grid>
-            </Box>
-
-            {/* 第三部分：当前选中章节的详细内容 */}
-            <Box sx={{ mt: 4 }}>
-              <Card
-                sx={{
-                  border: `1px solid ${theme.palette.divider}`,
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, ${theme.palette.secondary.main}05 100%)`,
-                }}
-              >
-                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-                  {chapters.find((c) => c.id === activeChapter)?.detail}
-                </CardContent>
-              </Card>
             </Box>
           </>
         ) : location.pathname === '/experience' ? (
