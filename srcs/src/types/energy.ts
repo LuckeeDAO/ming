@@ -65,6 +65,29 @@ export interface PatternAnalysis {
   description: string;
   /** 格局特征 */
   characteristics: string[];
+  /** 计算过程详情（可选） */
+  calculationProcess?: {
+    /** 步骤列表 */
+    steps: Array<{
+      /** 步骤序号 */
+      step: number;
+      /** 步骤描述 */
+      description: string;
+      /** 步骤详情数据 */
+      details: Record<string, any>;
+    }>;
+    /** 十神统计结果 */
+    tenGodCounts: Record<TenGodType, number>;
+    /** 各柱十神分布详情 */
+    pillarDetails: Array<{
+      /** 柱名称 */
+      pillar: string;
+      /** 天干十神 */
+      stemTenGod: TenGodType | null;
+      /** 地支藏干十神列表 */
+      branchTenGods: Array<{ stem: string; tenGod: TenGodType | null }>;
+    }>;
+  };
 }
 
 /**
@@ -82,26 +105,37 @@ export interface EnergyAnalysis {
   /** 四柱八字数据 - 用于分析的基础数据 */
   fourPillars: FourPillars;
   /** 五行能量分布 - 木、火、土、金、水的能量值和状态 */
+  /** 能量状态：5级划分（命理学标准）
+   * 
+   * 注意：五行能量使用5级划分，但不包含"从弱/从强"概念。
+   * "从弱/从强"是专门用于描述日主（日柱天干）的格局判断，不能用于其他五行。
+   * 
+   * - veryWeak: 极弱 - 能量极低，接近缺失
+   * - weak: 弱 - 能量偏弱
+   * - balanced: 中和 - 能量平衡
+   * - strong: 强 - 能量偏强
+   * - veryStrong: 极强 - 能量极强
+   */
   fiveElements: {
     wood: {
       value: number;
-      status: 'strong' | 'normal' | 'weak' | 'missing';
+      status: 'veryWeak' | 'weak' | 'balanced' | 'strong' | 'veryStrong';
     };
     fire: {
       value: number;
-      status: 'strong' | 'normal' | 'weak' | 'missing';
+      status: 'veryWeak' | 'weak' | 'balanced' | 'strong' | 'veryStrong';
     };
     earth: {
       value: number;
-      status: 'strong' | 'normal' | 'weak' | 'missing';
+      status: 'veryWeak' | 'weak' | 'balanced' | 'strong' | 'veryStrong';
     };
     metal: {
       value: number;
-      status: 'strong' | 'normal' | 'weak' | 'missing';
+      status: 'veryWeak' | 'weak' | 'balanced' | 'strong' | 'veryStrong';
     };
     water: {
       value: number;
-      status: 'strong' | 'normal' | 'weak' | 'missing';
+      status: 'veryWeak' | 'weak' | 'balanced' | 'strong' | 'veryStrong';
     };
   };
   circulation: {
@@ -114,10 +148,140 @@ export interface EnergyAnalysis {
     level: 'critical' | 'moderate' | 'minor';
     recommendation: string;
   }>;
+  /**
+   * 日主（身旺 / 身弱）判定结果（可选，5级划分）
+   *
+   * 命理学标准：极弱（从弱）/ 弱 / 中和（平和）/ 强 / 极强（从强）
+   */
+  dayMaster?: {
+    /** 日柱天干（如：甲、乙等） */
+    stem: string;
+    /** 日主五行 */
+    element: 'wood' | 'fire' | 'earth' | 'metal' | 'water';
+    /** 日主对应五行的绝对能量值 */
+    value: number;
+    /** 身旺/身弱 判定（5级划分，与五行能量状态标准一致） */
+    strength: 'veryWeak' | 'weak' | 'balanced' | 'strong' | 'veryStrong';
+  };
+  /**
+   * 能量计算调试日志
+   *
+   * 记录 V2 量化算法在每一个关键步骤完成后的各节点能量快照，
+   * 便于在前端展示为「检验标准」，用于对比与排查。
+   */
+  energyDebugLog?: Array<{
+    /** 步骤标识（英文 key） */
+    step: string;
+    /** 步骤中文说明 */
+    description: string;
+    /** 当前步骤后各节点能量数据 */
+    nodes: Array<{
+      name: string;
+      nodeType: 'stem' | 'branch';
+      position: string;
+      originalElement: 'wood' | 'fire' | 'earth' | 'metal' | 'water';
+      polarity: 'YANG' | 'YIN';
+      totalEnergy: number;
+      energies: Record<string, number>;
+      flags: Record<string, boolean>;
+    }>;
+  }>;
   /** 十神分析 - 四柱十神数据 */
   tenGods?: TenGods;
   /** 格局分析 - 基于十神的格局判断 */
   patternAnalysis?: PatternAnalysis;
+  /** 格局判断与调理方案 - 基于量化病值的格局判断与用药建议 */
+  patternMedicine?: {
+    patternJudgment: {
+      pattern: string;
+      description: string;
+      primaryDiseases: Array<{
+        tenGod: TenGodType;
+        index: number;
+        energy: number;
+        diseaseValue: number;
+        normalizedDiseaseValue: number;
+        level: 'severe' | 'moderate' | 'mild' | 'none';
+      }>;
+      medicines: Array<{
+        tenGod: TenGodType;
+        index: number;
+        energy: number;
+        effectiveness: number;
+        action: '制' | '化' | '泄';
+        priority: 'primary' | 'secondary' | 'auxiliary';
+        coefficient: number;
+      }>;
+      confidence: number;
+      /** 计算过程详情（可选） */
+      calculationProcess?: {
+        /** 原始能量（计算前） */
+        E_raw: Record<TenGodType, number>;
+        /** 平衡后能量（计算后） */
+        E_balanced: Record<TenGodType, number>;
+        /** 病神识别过程 */
+        diseaseIdentification: {
+          threats: Array<{ tenGod: TenGodType; threat: number; normalizedThreat: number }>;
+          primaryDisease: { tenGod: TenGodType; threat: number; normalizedThreat: number } | null;
+          /** 节点级别的威胁值计算详情（可选） */
+          nodeThreatDetails?: Array<{
+            nodeName: string;
+            nodeType: 'stem' | 'branch';
+            position: string;
+            tenGod: TenGodType | null;
+            nodeEnergy: number;
+            positionWeight: number;
+            threatValue: number;
+          }>;
+          /** 计算步骤详情（可选） */
+          calculationSteps?: {
+            step1: string;
+            step2: Array<{ node: string; threat: number; tenGod: string }>;
+            step3: Array<{ tenGod: string; totalThreat: number; nodeCount: number }>;
+          };
+        };
+        /** 相神识别过程 */
+        xiangShenIdentification: {
+          lossRates: Array<{ tenGod: TenGodType; lossRate: number; rawEnergy: number; balancedEnergy: number }>;
+          xiangShen: { tenGod: TenGodType; lossRate: number; rawEnergy: number; balancedEnergy: number } | null;
+        };
+        /** 动作判断 */
+        action: { xiangShen: TenGodType; disease: TenGodType; action: '制' | '化' | '泄' } | null;
+        /** 结果判断 */
+        results: Array<{ tenGod: TenGodType; increaseRate: number; rawEnergy: number; balancedEnergy: number; resultType: string }>;
+        /** 格局层次评估 */
+        evaluation: {
+          totalScore: number;
+          level: '上等格局' | '中等格局' | '下等格局' | '破格';
+          details: {
+            suppression: number;
+            selfStatus: number;
+            xiangEfficiency: number;
+          };
+        };
+      };
+    };
+    medicinePlan: {
+      primaryDisease: {
+        tenGod: TenGodType;
+        diseaseValue: number;
+        normalizedDiseaseValue: number;
+        level: 'severe' | 'moderate' | 'mild' | 'none';
+      };
+      medicines: Array<{
+        tenGod: TenGodType;
+        index: number;
+        energy: number;
+        effectiveness: number;
+        action: '制' | '化' | '泄';
+        priority: 'primary' | 'secondary' | 'auxiliary';
+        coefficient: number;
+      }>;
+      pattern: string;
+      confidence: number;
+      description: string;
+    };
+  };
   analyzedAt: Date;
 }
 

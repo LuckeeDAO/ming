@@ -67,6 +67,7 @@ import { ethers } from 'ethers';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { setSelectedObject, setRecommendedObjects } from '../../store/slices/energySlice';
+import { ceremonyResourcesService } from '../../services/ceremony/ceremonyResourcesService';
 import { ExternalObject } from '../../types/energy';
 import { ipfsService } from '../../services/ipfs/ipfsService';
 import { walletService } from '../../services/wallet/walletService';
@@ -1273,173 +1274,40 @@ const ConnectionCeremony: React.FC = () => {
                 </Box>
 
                 <Grid container spacing={3} sx={{ mt: 2 }}>
-                  <Grid item xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 4,
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="overline" color="text.secondary">
-                      指南
-                    </Typography>
-                    <Typography variant="h6" gutterBottom>
-                      基础仪式指南
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      了解基本的连接仪式流程和注意事项
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small">查看详情</Button>
-                  </CardActions>
-                </Card>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 4,
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="overline" color="text.secondary">
-                      指南
-                    </Typography>
-                    <Typography variant="h6" gutterBottom>
-                      自然物特定仪式
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      针对不同自然物的专门仪式指导
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small">查看详情</Button>
-                  </CardActions>
-                </Card>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 4,
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="overline" color="text.secondary">
-                      素材
-                    </Typography>
-                    <Typography variant="h6" gutterBottom>
-                      象征图片库
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      用于仪式的象征性图片素材
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small">查看详情</Button>
-                  </CardActions>
-                </Card>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 4,
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="overline" color="text.secondary">
-                      素材
-                    </Typography>
-                    <Typography variant="h6" gutterBottom>
-                      仪式文案模板
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      仪式中使用的文案模板
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small">查看详情</Button>
-                  </CardActions>
-                </Card>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 4,
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="overline" color="text.secondary">
-                      知识库
-                    </Typography>
-                    <Typography variant="h6" gutterBottom>
-                      五行能量理论
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      深入了解五行生克理论和能量循环
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small">查看详情</Button>
-                  </CardActions>
-                </Card>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 4,
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="overline" color="text.secondary">
-                      知识库
-                    </Typography>
-                    <Typography variant="h6" gutterBottom>
-                      四柱八字基础
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      学习四柱八字的基本概念和计算方法
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small">查看详情</Button>
-                  </CardActions>
-                </Card>
-                  </Grid>
+                  {ceremonyResourcesService.getAllResources().map((resource) => (
+                    <Grid item xs={12} sm={6} md={4} key={resource.id}>
+                      <Card
+                        sx={{
+                          height: '100%',
+                          transition: 'transform 0.2s, box-shadow 0.2s',
+                          '&:hover': {
+                            transform: 'translateY(-4px)',
+                            boxShadow: 4,
+                          },
+                        }}
+                      >
+                        <CardContent>
+                          <Typography variant="overline" color="text.secondary">
+                            {resource.category}
+                          </Typography>
+                          <Typography variant="h6" gutterBottom>
+                            {resource.title}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {resource.description}
+                          </Typography>
+                        </CardContent>
+                        <CardActions>
+                          <Button
+                            size="small"
+                            onClick={() => navigate(resource.route)}
+                          >
+                            查看详情
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    </Grid>
+                  ))}
                 </Grid>
               </Box>
             )}

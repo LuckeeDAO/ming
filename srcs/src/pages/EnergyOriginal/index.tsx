@@ -1,23 +1,22 @@
 /**
- * 生辰日期 & 四柱八字转换页面
+ * 本命原局能量分析页面
  *
  * 功能：
  * - 输入公历生辰日期和时间，计算四柱八字（年柱、月柱、日柱、时柱）
- * - 展示转换结果，便于用户校对与后续使用
- * - 只负责「生辰 → 四柱」转换，不再在同一步中直接执行能量分析
+ * - 调用 V2 量化算法计算本命原局五行能量与循环状态
+ * - 显示大运流年信息
+ * - 将分析结果写入全局状态，供连接指导 / 外物推荐等后续流程使用
  *
  * 设计说明：
  * - 使用本地封装的 `convertBirthToFourPillars`（基于 chinese-lunar 库）
  * - 不做复杂时区处理，默认按用户本地时间理解
- *
- * @module pages/FourPillarsConverter
  */
 
 import React, { useState } from 'react';
 import {
   Container,
-  Typography,
   Box,
+  Typography,
   Card,
   CardContent,
   TextField,
@@ -37,7 +36,7 @@ import { energyAnalysisService } from '../../services/energy/energyAnalysisServi
 import type { FourPillars, EnergyAnalysis } from '../../types/energy';
 import EnergyAnalysisResult from '../../components/energy/EnergyAnalysisResult';
 
-const FourPillarsConverter: React.FC = () => {
+const EnergyOriginal: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const today = new Date();
@@ -49,7 +48,7 @@ const FourPillarsConverter: React.FC = () => {
   const [time, setTime] = useState<string>('12:00');
   const [fourPillars, setFourPillars] = useState<FourPillars | null>(null);
   const [error, setError] = useState<string>('');
-  const [isConverting, setIsConverting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   // 性别选择：默认为女
   const [gender, setGender] = useState<'female' | 'male'>('female');
   const [analysis, setAnalysis] = useState<EnergyAnalysis | null>(null);
@@ -89,43 +88,43 @@ const FourPillarsConverter: React.FC = () => {
   };
 
   /**
-   * 处理“计算四柱八字”并直接完成本命原局能量分析（八字 + 十神）
+   * 处理"开始分析"并完成本命原局能量分析
    */
-  const handleConvert = () => {
+  const handleAnalyze = () => {
     setError('');
-    setIsConverting(true);
+    setIsAnalyzing(true);
     try {
       const { year, month, day, hour } = parseDateTime();
       const pillars = convertBirthToFourPillars(year, month, day, hour);
       setFourPillars(pillars);
       // 将四柱写入全局状态
       dispatch(setFourPillarsInStore(pillars));
-      // 本命原局能量 + 十神分析
+      // 本命原局能量分析
       const analysisResult = energyAnalysisService.analyze(pillars);
       dispatch(analyzeEnergy(analysisResult));
       setAnalysis(analysisResult);
     } catch (e) {
-      console.error('生辰转换四柱失败:', e);
+      console.error('能量分析失败:', e);
       setFourPillars(null);
       setAnalysis(null);
       setError(
         e instanceof Error
           ? e.message
-          : '生辰转换四柱或能量分析失败，请检查输入'
+          : '能量分析失败，请检查输入'
       );
     } finally {
-      setIsConverting(false);
+      setIsAnalyzing(false);
     }
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          生辰日期 & 四柱八字转换
+          五行能量测算
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          输入公历出生日期与时间，系统将计算对应的四柱八字（年、月、日、时），用于后续的本命能量分析或大运流年推演。
+          输入公历出生日期与时间，系统将计算对应的四柱八字，并完成本命原局的五行能量分析，包括大运流年信息。
         </Typography>
       </Box>
 
@@ -163,7 +162,7 @@ const FourPillarsConverter: React.FC = () => {
             </Grid>
             <Grid item xs={12}>
               <FormControl component="fieldset">
-                <FormLabel component="legend">性别</FormLabel>
+                <FormLabel component="legend">性别（用于大运顺逆判断）</FormLabel>
                 <RadioGroup
                   row
                   aria-label="gender"
@@ -187,11 +186,11 @@ const FourPillarsConverter: React.FC = () => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleConvert();
+                handleAnalyze();
               }}
-              disabled={isConverting}
+              disabled={isAnalyzing}
             >
-              {isConverting ? '计算中...' : '计算四柱八字'}
+              {isAnalyzing ? '分析中...' : '开始分析'}
             </Button>
           </Box>
         </CardContent>
@@ -239,7 +238,7 @@ const FourPillarsConverter: React.FC = () => {
             </Grid>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              请先填写生辰日期和时间，并点击“计算四柱八字”。
+              请先填写生辰日期和时间，并点击"开始分析"。
             </Typography>
           )}
         </CardContent>
@@ -248,7 +247,7 @@ const FourPillarsConverter: React.FC = () => {
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            三、本命原局能量与十神
+            三、本命原局能量分析（含大运流年）
           </Typography>
           {analysis ? (
             <Box sx={{ mt: 2 }}>
@@ -261,7 +260,7 @@ const FourPillarsConverter: React.FC = () => {
             </Box>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              计算出四柱后，系统会自动完成本命原局的五行能量与身旺身弱分析，并展示十神与流年参考信息。
+              请先填写生辰信息并点击"开始分析"，系统会在此展示本命原局的能量分布、循环状态以及大运流年信息。
             </Typography>
           )}
         </CardContent>
@@ -270,5 +269,5 @@ const FourPillarsConverter: React.FC = () => {
   );
 };
 
-export default FourPillarsConverter;
+export default EnergyOriginal;
 

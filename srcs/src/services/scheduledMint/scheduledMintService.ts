@@ -447,6 +447,128 @@ class ScheduledMintService {
     }
     return new Blob([u8arr], { type: mime });
   }
+
+  /**
+   * 检查定时任务是否需要提醒
+   * 
+   * 功能说明：
+   * - 在任务执行时间前一定时间（默认提前1小时）提醒用户
+   * - 使用浏览器通知API（Notification API）发送提醒
+   * - 需要用户授权通知权限
+   * 
+   * @param task - 定时任务
+   * @param advanceMinutes - 提前提醒时间（分钟，默认60分钟）
+   * @returns 是否需要提醒
+   */
+  shouldRemind(task: ScheduledMintTask, advanceMinutes: number = 60): boolean {
+    if (task.status !== 'pending') {
+      return false; // 只有待执行的任务才需要提醒
+    }
+
+    const now = new Date();
+    const scheduledTime = new Date(task.scheduledTime);
+    const diffMs = scheduledTime.getTime() - now.getTime();
+    const diffMinutes = diffMs / (1000 * 60);
+
+    // 如果任务时间已过，不需要提醒
+    if (diffMinutes < 0) {
+      return false;
+    }
+
+    // 如果距离任务时间在提前提醒时间范围内，需要提醒
+    return diffMinutes <= advanceMinutes && diffMinutes > 0;
+  }
+
+  /**
+   * 发送定时任务提醒通知
+   * 
+   * 功能说明：
+   * - 使用浏览器通知API发送提醒
+   * - 需要用户授权通知权限
+   * - 如果浏览器不支持通知API，则使用console.log输出提醒信息
+   * 
+   * @param task - 定时任务
+   * @returns Promise<void>
+   */
+  async sendReminder(task: ScheduledMintTask): Promise<void> {
+    if (!this.shouldRemind(task)) {
+      return; // 不需要提醒
+    }
+
+    const scheduledTime = new Date(task.scheduledTime);
+    const timeStr = scheduledTime.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const title = '定时MINT提醒';
+    const body = `您的定时MINT任务将在 ${timeStr} 执行，请做好准备。`;
+
+    // 检查浏览器是否支持通知API
+    if ('Notification' in window) {
+      // 请求通知权限
+      if (Notification.permission === 'granted') {
+        // 已授权，直接发送通知
+        new Notification(title, {
+          body,
+          icon: '/favicon.ico', // 可选：通知图标
+          tag: `scheduled-mint-${task.id}`, // 防止重复通知
+        });
+      } else if (Notification.permission !== 'denied') {
+        // 未授权，请求权限
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          new Notification(title, {
+            body,
+            icon: '/favicon.ico',
+            tag: `scheduled-mint-${task.id}`,
+          });
+        } else {
+          // 用户拒绝授权，使用console.log输出提醒
+          console.log(`[定时MINT提醒] ${body}`);
+        }
+      } else {
+        // 用户已拒绝授权，使用console.log输出提醒
+        console.log(`[定时MINT提醒] ${body}`);
+      }
+    } else {
+      // 浏览器不支持通知API，使用console.log输出提醒
+      console.log(`[定时MINT提醒] ${body}`);
+    }
+  }
+
+  /**
+   * 检查所有待执行任务并发送提醒
+   * 
+   * 功能说明：
+   * - 获取所有待执行任务
+   * - 检查每个任务是否需要提醒
+   * - 发送提醒通知
+   * 
+   * 使用场景：
+   * - 可以在页面加载时调用
+   * - 可以在定时器中定期调用（例如每5分钟检查一次）
+   * 
+   * @param advanceMinutes - 提前提醒时间（分钟，默认60分钟）
+   * @returns Promise<void>
+   */
+  async checkAndSendReminders(advanceMinutes: number = 60): Promise<void> {
+    try {
+      const tasks = await this.getAllTasks();
+      const pendingTasks = tasks.filter((task) => task.status === 'pending');
+
+      for (const task of pendingTasks) {
+        if (this.shouldRemind(task, advanceMinutes)) {
+          await this.sendReminder(task);
+        }
+      }
+    } catch (error) {
+      console.error('检查定时任务提醒时出错：', error);
+    }
+  }
 }
 
 export const scheduledMintService = new ScheduledMintService();

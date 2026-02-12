@@ -29,6 +29,15 @@ const About = lazy(() => import('./pages/About/index'));
 const ConnectionCeremony = lazy(() => import('./pages/ConnectionCeremony/index'));
 const MyConnections = lazy(() => import('./pages/MyConnections/index'));
 const FourPillarsConverter = lazy(() => import('./pages/FourPillarsConverter/index'));
+const EnergyOriginal = lazy(() => import('./pages/EnergyOriginal/index'));
+const FortuneFlow = lazy(() => import('./pages/FortuneFlow/index'));
+const CeremonyResources = lazy(() => import('./pages/CeremonyResources/index'));
+const CeremonyResourceDetail = lazy(() => import('./pages/CeremonyResourceDetail/index'));
+const Tools = lazy(() => import('./pages/Tools/index'));
+const Learning = lazy(() => import('./pages/Learning/index'));
+const Technology = lazy(() => import('./pages/Learning/Technology'));
+const SimpleMint = lazy(() => import('./pages/SimpleMint/index'));
+const ImageTemplateReference = lazy(() => import('./pages/ImageTemplateReference/index'));
 
 // 布局组件
 import Layout from './components/layout/Layout';
@@ -63,29 +72,43 @@ function App() {
       <Layout>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
-            {/* 首页路由 - 使用key确保路由变化时重新渲染 */}
+            {/* 首页路由 */}
             <Route path="/" element={<Home key="home" />} />
-            <Route path="/experience" element={<Home key="experience" />} />
-            <Route path="/technology" element={<Home key="technology" />} />
-
-            {/* 生辰 & 四柱八字转换页面 */}
+            
+            {/* 工具页面 */}
+            <Route path="/tools" element={<Tools />} />
+            {/* 生辰 → 四柱转换 */}
             <Route path="/four-pillars" element={<FourPillarsConverter />} />
+            {/* 本命原局能量分析 */}
+            <Route path="/energy-original" element={<EnergyOriginal />} />
+            {/* 大运 / 流年流转查看 */}
+            <Route path="/fortune-flow" element={<FortuneFlow />} />
+            
+            {/* 学习页面 */}
+            <Route path="/learning" element={<Learning />} />
+            <Route path="/learning/technology" element={<Technology />} />
+            <Route path="/learning/other" element={<Learning />} />
+            <Route path="/ceremony-resources" element={<CeremonyResources />} />
+            <Route path="/ceremony-resources/:id" element={<CeremonyResourceDetail />} />
             
             {/* 关于平台路由 */}
             <Route path="/about" element={<About key="about-intro" />} />
             <Route path="/about/intro" element={<About key="about-intro" />} />
             <Route path="/about/philosophy" element={<About key="about-philosophy" />} />
-            {/* 向后兼容路由 */}
-            <Route path="/concept" element={<About key="about-philosophy" />} />
             
             {/* 其他页面路由 */}
             <Route path="/connection-ceremony" element={<ConnectionCeremony />} />
+            <Route path="/simple-mint" element={<SimpleMint />} />
+            <Route path="/image-template-reference" element={<ImageTemplateReference />} />
             <Route path="/my-connections" element={<MyConnections />} />
-            {/* 向后兼容：重定向到合并后的页面 */}
+            
+            {/* 向后兼容路由 */}
+            <Route path="/experience" element={<Home key="experience" />} />
+            <Route path="/technology" element={<Home key="technology" />} />
+            <Route path="/concept" element={<About key="about-philosophy" />} />
             <Route path="/connection-guide" element={<ConnectionCeremony />} />
             <Route path="/nft-ceremony" element={<ConnectionCeremony />} />
             <Route path="/scheduled-mints" element={<ConnectionCeremony />} />
-            <Route path="/ceremony-resources" element={<ConnectionCeremony />} />
           </Routes>
         </Suspense>
       </Layout>

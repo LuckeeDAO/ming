@@ -140,14 +140,14 @@ const ConnectionGuide: React.FC = () => {
                 ) : (
                   <Alert severity="info">
                     <Typography variant="body1" gutterBottom>
-                      请先完成四柱八字分析
+                      请先在「工具」中完成四柱转换和本命能量分析
                     </Typography>
                     <Button
                       variant="contained"
-                      onClick={() => navigate('/four-pillars')}
+                      onClick={() => navigate('/tools')}
                       sx={{ mt: 2 }}
                     >
-                      前往生辰 & 四柱转换页面
+                      前往工具页面
                     </Button>
                   </Alert>
                 )}

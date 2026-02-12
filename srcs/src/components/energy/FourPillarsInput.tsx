@@ -30,6 +30,8 @@ import { isValidPillar } from '../../utils/validation';
 interface FourPillarsInputProps {
   walletAddress?: string;
   onAnalysisComplete?: (analysisId: string) => void;
+  /** 可选：预填的四柱八字（例如由生辰转换工具计算得到） */
+  initialFourPillars?: FourPillars | null;
 }
 
 /**
@@ -42,6 +44,7 @@ interface FourPillarsInputProps {
 const FourPillarsInput: React.FC<FourPillarsInputProps> = ({
   walletAddress = '',
   onAnalysisComplete,
+  initialFourPillars,
 }: FourPillarsInputProps) => {
   const dispatch = useAppDispatch();
   const [fourPillars, setFourPillars] = useState<FourPillars>({
@@ -53,6 +56,17 @@ const FourPillarsInput: React.FC<FourPillarsInputProps> = ({
   const [errors, setErrors] = useState<Partial<Record<keyof FourPillars, string>>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  /**
+   * 当外部提供了 initialFourPillars 时，用其预填本地状态
+   */
+  React.useEffect(() => {
+    if (initialFourPillars) {
+      setFourPillars(initialFourPillars);
+      setErrorMessage('');
+      setErrors({});
+    }
+  }, [initialFourPillars]);
 
   /**
    * 验证四柱八字格式

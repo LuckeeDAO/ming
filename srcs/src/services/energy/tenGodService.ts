@@ -209,7 +209,7 @@ class TenGodService {
    * 根据十神分布判断命理格局（包含天干和地支藏干）
    * 
    * @param tenGods - 四柱十神数据（包含天干和地支藏干）
-   * @returns 格局分析结果
+   * @returns 格局分析结果（包含计算过程）
    */
   analyzePattern(tenGods: {
     year: TenGodType | null;
@@ -225,8 +225,23 @@ class TenGodService {
     pattern: string;
     description: string;
     characteristics: string[];
+    calculationProcess?: {
+      steps: Array<{
+        step: number;
+        description: string;
+        details: Record<string, any>;
+      }>;
+      tenGodCounts: Record<TenGodType, number>;
+      pillarDetails: Array<{
+        pillar: string;
+        stemTenGod: TenGodType | null;
+        branchTenGods: Array<{ stem: string; tenGod: TenGodType | null }>;
+      }>;
+    };
   } {
-    // 统计各十神的出现次数（包含天干和地支藏干）
+    const steps: Array<{ step: number; description: string; details: Record<string, any> }> = [];
+
+    // 步骤1：初始化十神计数
     const counts: Record<TenGodType, number> = {
       '比': 0,
       '劫': 0,
@@ -239,49 +254,144 @@ class TenGodService {
       'ㄗ': 0,
       '印': 0,
     };
+    steps.push({
+      step: 1,
+      description: '初始化十神计数表',
+      details: {
+        counts: { ...counts },
+        note: '所有十神初始计数为 0',
+      },
+    });
 
-    // 统计天干十神
-    if (tenGods.year) counts[tenGods.year]++;
-    if (tenGods.month) counts[tenGods.month]++;
-    if (tenGods.day) counts[tenGods.day]++;
-    if (tenGods.hour) counts[tenGods.hour]++;
+    // 步骤2：统计天干十神
+    const stemCounts: Record<string, TenGodType | null> = {};
+    if (tenGods.year) {
+      counts[tenGods.year]++;
+      stemCounts['年柱天干'] = tenGods.year;
+    }
+    if (tenGods.month) {
+      counts[tenGods.month]++;
+      stemCounts['月柱天干'] = tenGods.month;
+    }
+    if (tenGods.day) {
+      counts[tenGods.day]++;
+      stemCounts['日柱天干'] = tenGods.day;
+    }
+    if (tenGods.hour) {
+      counts[tenGods.hour]++;
+      stemCounts['时柱天干'] = tenGods.hour;
+    }
+    steps.push({
+      step: 2,
+      description: '统计天干十神',
+      details: {
+        stemTenGods: stemCounts,
+        updatedCounts: { ...counts },
+      },
+    });
 
-    // 统计地支藏干十神
+    // 步骤3：统计地支藏干十神
+    const branchCounts: Record<string, Array<{ stem: string; tenGod: TenGodType | null }>> = {};
     tenGods.yearBranch.forEach(({ tenGod }) => {
       if (tenGod) counts[tenGod]++;
     });
+    branchCounts['年柱藏干'] = tenGods.yearBranch;
     tenGods.monthBranch.forEach(({ tenGod }) => {
       if (tenGod) counts[tenGod]++;
     });
+    branchCounts['月柱藏干'] = tenGods.monthBranch;
     tenGods.dayBranch.forEach(({ tenGod }) => {
       if (tenGod) counts[tenGod]++;
     });
+    branchCounts['日柱藏干'] = tenGods.dayBranch;
     tenGods.hourBranch.forEach(({ tenGod }) => {
       if (tenGod) counts[tenGod]++;
     });
+    branchCounts['时柱藏干'] = tenGods.hourBranch;
+    steps.push({
+      step: 3,
+      description: '统计地支藏干十神',
+      details: {
+        branchTenGods: branchCounts,
+        updatedCounts: { ...counts },
+      },
+    });
 
-    // 找出出现次数最多的十神
+    // 步骤4：找出出现次数最多的十神
     let maxCount = 0;
     let dominantTenGod: TenGodType | null = null;
-    Object.entries(counts).forEach(([tenGod, count]) => {
-      if (count > maxCount) {
-        maxCount = count;
-        dominantTenGod = tenGod as TenGodType;
-      }
+    const sortedCounts = Object.entries(counts)
+      .map(([tenGod, count]) => ({ tenGod: tenGod as TenGodType, count }))
+      .sort((a, b) => b.count - a.count);
+    
+    if (sortedCounts.length > 0 && sortedCounts[0].count > 0) {
+      maxCount = sortedCounts[0].count;
+      dominantTenGod = sortedCounts[0].tenGod;
+    }
+    
+    steps.push({
+      step: 4,
+      description: '找出主导十神',
+      details: {
+        sortedCounts: sortedCounts.map(({ tenGod, count }) => ({
+          tenGod,
+          count,
+          name: TEN_GOD_NAMES[tenGod].full,
+        })),
+        dominantTenGod: dominantTenGod ? {
+          tenGod: dominantTenGod,
+          count: maxCount,
+          name: TEN_GOD_NAMES[dominantTenGod].full,
+        } : null,
+      },
     });
 
     // 如果所有十神分布较为平均（最高只出现 0 或 1 次），则认为没有明显格局
     // 此时不强行给出某个十神格局，而是返回普通格局且不设置 dominantTenGod
     if (!dominantTenGod || maxCount <= 1) {
+      steps.push({
+        step: 5,
+        description: '判断格局类型',
+        details: {
+          judgment: '十神分布较为平均，无明显主导格局',
+          pattern: '普通格局',
+        },
+      });
       return {
         dominantTenGod: null,
         pattern: '普通格局',
         description: '十神分布较为平均，暂无明显以某一十神为主导的专门格局，可视为普通格局。',
         characteristics: [],
+        calculationProcess: {
+          steps,
+          tenGodCounts: counts,
+          pillarDetails: [
+            {
+              pillar: '年柱',
+              stemTenGod: tenGods.year,
+              branchTenGods: tenGods.yearBranch,
+            },
+            {
+              pillar: '月柱',
+              stemTenGod: tenGods.month,
+              branchTenGods: tenGods.monthBranch,
+            },
+            {
+              pillar: '日柱',
+              stemTenGod: tenGods.day,
+              branchTenGods: tenGods.dayBranch,
+            },
+            {
+              pillar: '时柱',
+              stemTenGod: tenGods.hour,
+              branchTenGods: tenGods.hourBranch,
+            },
+          ],
+        },
       };
     }
 
-    // 根据主导十神判断格局
+    // 步骤5：根据主导十神判断格局
     let pattern = '普通格局';
     let description = '';
     const characteristics: string[] = [];
@@ -326,13 +436,292 @@ class TenGodService {
       }
     }
 
+    steps.push({
+      step: 5,
+      description: '判断格局类型',
+      details: {
+        dominantTenGod: dominantTenGod ? {
+          tenGod: dominantTenGod,
+          name: TEN_GOD_NAMES[dominantTenGod].full,
+          count: maxCount,
+        } : null,
+        pattern,
+        description,
+        characteristics,
+      },
+    });
+
     return {
       dominantTenGod,
       pattern,
       description,
       characteristics,
+      calculationProcess: {
+        steps,
+        tenGodCounts: counts,
+        pillarDetails: [
+          {
+            pillar: '年柱',
+            stemTenGod: tenGods.year,
+            branchTenGods: tenGods.yearBranch,
+          },
+          {
+            pillar: '月柱',
+            stemTenGod: tenGods.month,
+            branchTenGods: tenGods.monthBranch,
+          },
+          {
+            pillar: '日柱',
+            stemTenGod: tenGods.day,
+            branchTenGods: tenGods.dayBranch,
+          },
+          {
+            pillar: '时柱',
+            stemTenGod: tenGods.hour,
+            branchTenGods: tenGods.hourBranch,
+          },
+        ],
+      },
     };
   }
+}
+
+/**
+ * 十神基础影响系数（主文档《细节说明（参数公式与数据表）.md》16.2节）
+ *
+ * 每种十神对日主有一个基础影响系数，用于将「节点能量」映射到「对日主的综合影响值」
+ */
+export const TEN_GOD_BASE_COEFFICIENTS: Record<TenGodType, { base: number; range: number; description: string }> = {
+  '比': { base: 1.00, range: 0.20, description: '直接帮扶' },
+  '劫': { base: 1.20, range: 0.25, description: '强帮扶，易夺财' },
+  '食': { base: -0.70, range: 0.15, description: '温和泄气' },
+  '傷': { base: -1.00, range: 0.20, description: '强烈泄气' },
+  '財': { base: -0.60, range: 0.12, description: '温和耗气' },
+  '才': { base: -0.80, range: 0.15, description: '强烈耗气' },
+  '官': { base: -0.90, range: 0.18, description: '约束克制' },
+  '殺': { base: -1.50, range: 0.30, description: '强烈克伐' },
+  '印': { base: 0.90, range: 0.18, description: '生扶持续' },
+  'ㄗ': { base: 1.00, range: 0.20, description: '生扶强烈' },
+};
+
+/**
+ * 十神相互作用矩阵（主文档《细节说明（参数公式与数据表）.md》16.3节）
+ *
+ * 矩阵值 `M[i][j]` 表示：**十神 i 对 十神 j 的直接作用系数**
+ * 顺序：比肩 劫财 食神 伤官 正财 偏财 正官 七杀 正印 偏印
+ */
+export const TEN_GOD_INTERACTION_MATRIX: number[][] = [
+  // 比肩 劫财 食神 伤官 正财 偏财 正官 七杀 正印 偏印
+  [+0.15, +0.10, -0.10, -0.15, -0.40, -0.50, -0.10, -0.30, -0.10, -0.08], // 比肩
+  [+0.10, +0.25, -0.15, -0.20, -0.60, -0.70, -0.15, -0.25, -0.08, -0.06], // 劫财
+  [-0.05, -0.10, +0.10, +0.05, +0.20, +0.15, -0.35, -0.45, -0.10, -0.15], // 食神
+  [-0.10, -0.15, +0.05, +0.20, +0.15, +0.20, -0.50, -0.60, -0.20, -0.25], // 伤官
+  [-0.15, -0.20, +0.15, +0.10, +0.12, +0.08, +0.15, +0.25, -0.08, -0.12], // 正财
+  [-0.25, -0.30, +0.10, +0.15, +0.08, +0.18, +0.25, +0.35, -0.12, -0.15], // 偏财
+  [-0.05, -0.08, -0.30, -0.40, +0.15, +0.20, +0.15, +0.05, +0.20, +0.10], // 正官
+  [-0.20, -0.22, -0.40, -0.50, +0.25, +0.30, +0.05, +0.30, +0.30, +0.20], // 七杀
+  [+0.40, +0.35, -0.12, -0.20, -0.08, -0.10, +0.20, +0.30, +0.20, +0.15], // 正印
+  [+0.30, +0.25, -0.25, -0.30, -0.10, -0.12, +0.10, +0.20, +0.15, +0.25], // 偏印
+];
+
+/**
+ * 十神索引映射（用于矩阵查找）
+ */
+const TEN_GOD_INDEX_MAP: Record<TenGodType, number> = {
+  '比': 0,
+  '劫': 1,
+  '食': 2,
+  '傷': 3,
+  '財': 4,
+  '才': 5,
+  '官': 6,
+  '殺': 7,
+  '印': 8,
+  'ㄗ': 9,
+};
+
+/**
+ * 特殊十神组合函数（主文档《细节说明（参数公式与数据表）.md》16.4节）
+ */
+export interface TenGodCombination {
+  name: string;
+  description: string;
+  check: (tenGods: Record<TenGodType, number>) => boolean;
+  apply: (tenGods: Record<TenGodType, number>) => Record<TenGodType, number>;
+}
+
+/**
+ * 杀印相生组合
+ * 条件：七杀与正印/偏印同时出现且能量足够
+ */
+export const KILL_PRINT_COMBINATION: TenGodCombination = {
+  name: '杀印相生',
+  description: '七杀与印星相生，化杀为权',
+  check: (tenGods) => {
+    const killEnergy = tenGods['殺'] || 0;
+    const printEnergy = (tenGods['印'] || 0) + (tenGods['ㄗ'] || 0);
+    return killEnergy > 0.8 && printEnergy > 0.6;
+  },
+  apply: (tenGods) => {
+    const killEnergy = tenGods['殺'] || 0;
+    const printEnergy = (tenGods['印'] || 0) + (tenGods['ㄗ'] || 0);
+    const gain = (killEnergy + printEnergy) * 0.3;
+    return {
+      ...tenGods,
+      '殺': killEnergy * 0.5, // 七杀系数减半
+      '印': (tenGods['印'] || 0) * 1.5 + gain * 0.6, // 正印系数增强
+      'ㄗ': (tenGods['ㄗ'] || 0) * 1.5 + gain * 0.4, // 偏印系数增强
+    };
+  },
+};
+
+/**
+ * 伤官配印组合
+ * 条件：伤官与正印同时出现且能量足够
+ */
+export const HURT_PRINT_COMBINATION: TenGodCombination = {
+  name: '伤官配印',
+  description: '伤官与正印相配，化伤为才',
+  check: (tenGods) => {
+    const hurtEnergy = tenGods['傷'] || 0;
+    const printEnergy = tenGods['印'] || 0;
+    return hurtEnergy > 0.7 && printEnergy > 0.5;
+  },
+  apply: (tenGods) => {
+    return {
+      ...tenGods,
+      '傷': (tenGods['傷'] || 0) * 0.6, // 伤官系数减弱
+      '印': (tenGods['印'] || 0) * 1.4, // 正印系数增强
+    };
+  },
+};
+
+/**
+ * 食神制杀组合
+ * 条件：七杀与食神同时出现且能量足够
+ */
+export const FOOD_KILL_COMBINATION: TenGodCombination = {
+  name: '食神制杀',
+  description: '食神制七杀，化杀为权',
+  check: (tenGods) => {
+    const killEnergy = tenGods['殺'] || 0;
+    const foodEnergy = tenGods['食'] || 0;
+    return killEnergy > 0.8 && foodEnergy > 0.6;
+  },
+  apply: (tenGods) => {
+    return {
+      ...tenGods,
+      '殺': (tenGods['殺'] || 0) * 0.7, // 七杀系数减弱
+      '食': (tenGods['食'] || 0) * 1.2, // 食神系数增强
+    };
+  },
+};
+
+/**
+ * 比劫夺财组合
+ * 条件：比肩/劫财与财星同时出现且能量足够
+ */
+export const COMPARE_WEALTH_COMBINATION: TenGodCombination = {
+  name: '比劫夺财',
+  description: '比劫夺财，耗力增加',
+  check: (tenGods) => {
+    const compareEnergy = (tenGods['比'] || 0) + (tenGods['劫'] || 0);
+    const wealthEnergy = (tenGods['財'] || 0) + (tenGods['才'] || 0);
+    return compareEnergy > 0.5 && wealthEnergy > 0.4;
+  },
+  apply: (tenGods) => {
+    return {
+      ...tenGods,
+      '財': (tenGods['財'] || 0) * 1.3, // 正财耗力增加
+      '才': (tenGods['才'] || 0) * 1.3, // 偏财耗力增加
+      '比': (tenGods['比'] || 0) * 0.9, // 比肩帮扶减弱
+      '劫': (tenGods['劫'] || 0) * 0.9, // 劫财帮扶减弱
+    };
+  },
+};
+
+/**
+ * 计算十神对日主的综合影响
+ *
+ * @param tenGods - 十神能量分布（归一化后的能量值，0-1范围）
+ * @param useInteractionMatrix - 是否使用相互作用矩阵（默认 true）
+ * @param useCombinations - 是否应用特殊组合函数（默认 true）
+ * @returns 日主综合影响值（正值为帮扶，负值为耗泄）
+ */
+export function calculateTenGodImpact(
+  tenGods: Record<TenGodType, number>,
+  useInteractionMatrix = true,
+  useCombinations = true,
+): {
+  totalImpact: number;
+  baseImpact: number;
+  interactionImpact: number;
+  combinationImpact: number;
+  appliedCombinations: string[];
+} {
+  // 1. 基础影响（一阶影响）
+  let baseImpact = 0;
+  (Object.keys(tenGods) as TenGodType[]).forEach((tenGod) => {
+    const energy = tenGods[tenGod] || 0;
+    const coeff = TEN_GOD_BASE_COEFFICIENTS[tenGod];
+    baseImpact += energy * coeff.base;
+  });
+
+  // 2. 相互作用矩阵影响（二阶影响）
+  let interactionImpact = 0;
+  if (useInteractionMatrix) {
+    (Object.keys(tenGods) as TenGodType[]).forEach((sourceTenGod) => {
+      const sourceEnergy = tenGods[sourceTenGod] || 0;
+      const sourceIndex = TEN_GOD_INDEX_MAP[sourceTenGod];
+      (Object.keys(tenGods) as TenGodType[]).forEach((targetTenGod) => {
+        const targetEnergy = tenGods[targetTenGod] || 0;
+        const targetIndex = TEN_GOD_INDEX_MAP[targetTenGod];
+        const interactionCoeff = TEN_GOD_INTERACTION_MATRIX[sourceIndex][targetIndex];
+        interactionImpact += sourceEnergy * targetEnergy * interactionCoeff;
+      });
+    });
+  }
+
+  // 3. 特殊组合函数影响
+  let combinationImpact = 0;
+  const appliedCombinations: string[] = [];
+  let adjustedTenGods = { ...tenGods };
+
+  if (useCombinations) {
+    const combinations = [
+      KILL_PRINT_COMBINATION,
+      HURT_PRINT_COMBINATION,
+      FOOD_KILL_COMBINATION,
+      COMPARE_WEALTH_COMBINATION,
+    ];
+
+    combinations.forEach((combination) => {
+      if (combination.check(adjustedTenGods)) {
+        adjustedTenGods = combination.apply(adjustedTenGods);
+        appliedCombinations.push(combination.name);
+
+        // 计算组合带来的影响变化
+        let beforeImpact = 0;
+        let afterImpact = 0;
+        (Object.keys(tenGods) as TenGodType[]).forEach((tenGod) => {
+          const coeff = TEN_GOD_BASE_COEFFICIENTS[tenGod];
+          beforeImpact += (tenGods[tenGod] || 0) * coeff.base;
+          afterImpact += (adjustedTenGods[tenGod] || 0) * coeff.base;
+        });
+        combinationImpact += afterImpact - beforeImpact;
+      }
+    });
+  }
+
+  const totalImpact = baseImpact + interactionImpact + combinationImpact;
+
+  return {
+    totalImpact,
+    baseImpact,
+    interactionImpact,
+    combinationImpact,
+    appliedCombinations,
+  };
 }
 
 // 导出单例

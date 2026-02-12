@@ -29,8 +29,9 @@ import { Link, useLocation } from 'react-router-dom';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import HomeIcon from '@mui/icons-material/Home';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import LinkIcon from '@mui/icons-material/Link';
+import BuildIcon from '@mui/icons-material/Build';
+import SchoolIcon from '@mui/icons-material/School';
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 
@@ -78,20 +79,30 @@ const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
       path: '/',
       icon: <HomeIcon />,
       children: [
+        { label: '功能介绍', path: '/' },
+        { label: '铸造NFT', path: '/connection-ceremony' },
         { label: '关于平台', path: '/about/intro' },
-        { label: '哲学理念', path: '/about/philosophy' },
-        { label: '体验与功能', path: '/experience' },
-        { label: '技术说明', path: '/technology' },
       ],
     },
     {
-      label: '外物连接仪式',
-      path: '/connection-ceremony',
-      icon: <AutoAwesomeIcon />,
+      label: '工具',
+      path: '/tools',
+      icon: <BuildIcon />,
       children: [
-        { label: '仪式流程', path: '/connection-ceremony?tab=0' },
-        { label: '定时任务管理', path: '/connection-ceremony?tab=1' },
-        { label: '仪式资源', path: '/connection-ceremony?tab=2' },
+        { label: '八字与十神', path: '/four-pillars' },
+        { label: '五行能量测算', path: '/energy-original' },
+        { label: 'AI图片编辑', path: '/tools' },
+        { label: '图片模板', path: '/tools' },
+        { label: '仪式资源', path: '/ceremony-resources' },
+      ],
+    },
+    {
+      label: '学习',
+      path: '/learning',
+      icon: <SchoolIcon />,
+      children: [
+        { label: '技术说明', path: '/learning/technology' },
+        { label: '其他', path: '/learning/other' },
       ],
     },
     {

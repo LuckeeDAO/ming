@@ -57,9 +57,9 @@ const Home: React.FC = () => {
             variant="h2"
             component="h1"
             gutterBottom
-            sx={{ fontWeight: 600, letterSpacing: '0.02em' }}
+            sx={{ fontWeight: 600, letterSpacing: '0.04em' }}
           >
-            Ming (明命)
+            明命 · Ming
           </Typography>
           <Typography
             variant="h5"
@@ -96,11 +96,11 @@ const Home: React.FC = () => {
                 mx: 'auto'
               }}
             >
-              那驱动日月星辰的终极法则（道），或许永远超出人类认知的边界。但人类最伟大的创造，是编织了一张名为"地"的知识之网——
-              数学、物理、律法、艺术，以及命理之学，都是这张网上的经纬。
-              时间（生辰、节气、择时）也是“地”的关键工具维度；社会学、心理学等解释性理论亦可被视作“地”的工具谱系。
-              Ming 不回答"命运是什么"，但承载了"地"的智慧中一套极具深度与美感的系统。
-              通过可编程的仪式 NFT，将东方命理智慧转化为清晰、友好的数字工具，帮助你在这张地图上画出属于自己的航线。
+              那驱动日月星辰的终极法则——我们称之为「道」——或许永远超出人类认知的边界。
+              但人类最伟大的创造，是编织了一张名为「地」的知识之网：数学、物理、律法、艺术，以及流传千年的命理之学，都是这张网上的经纬；
+              时间（生辰、节气、择时）也是「地」的关键工具维度。
+              Ming 不回答「命运是什么」，而是将「地」的智慧转化为开源、可编程的数字工具，
+              帮助你在这张地图上，画出属于自己的航线。
             </Typography>
           </Box>
 
@@ -156,147 +156,207 @@ const Home: React.FC = () => {
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }} key={location.pathname}>
         {/* 根据路由路径显示对应内容 */}
         {location.pathname === '/' ? (
-          /* 首页 - 哲学理念 → 平台 → 功能 → 技术背景 */
+          /* 首页 - 哲学基石、三元闭环、体验形态 */
           <>
-            {/* 1) 哲学理念 */}
+            {/* 1) 卷一 · 我们是谁 */}
             <Box sx={{ textAlign: 'center', mb: 5 }}>
               <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                哲学理念
+                卷一 · 我们是谁
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '900px', mx: 'auto' }}>
-                天是现实本身（客体），不可被主体穷尽；道是天之所以然，在终极意义上不可尽知，但可由可观测现象被谨慎逼近。
-                人类的逻辑知识构成地：它依赖共识而成立，也因此可讨论、可修正、可优化；其中包含强共识工具（科学）与解释性工具（社会学、心理学、五行命理），也包含时间工具（生辰、节气、择时）。
-                人具主体/客体双重性：作为主体运用“地”作出选择并承担结果；作为客体属于“天”，并有其内在秩序（可称个体之道）。
+                我们不是先知，我们是绘图师与航海者。
+                那驱动日月星辰的终极法则——我们称之为「道」——或许永远超出人类认知的边界；
+                但人类编织了一张名为「地」的知识之网，而 Ming 所做的，是将这张网中的一部分智慧转译为开源、可编程的数字工具，
+                帮助你在地图上画出属于自己的航线。
               </Typography>
             </Box>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ height: '100%', bgcolor: 'primary.light', color: 'primary.contrastText' }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      天：现实之域
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    border: `1px solid ${theme.palette.divider}`,
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
+                      不是先知，是绘图师与航海者
                     </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                      天是现实本身（客体）：它可被观察其“象”，但不可被主体穷尽其“体”。我们尊重现实约束，并以观察与记录保持谦逊。
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                      我们不声称握有关于「天命」的终极答案。
+                      我们绘制的是一张可以被共同修订的海图：当你需要辨认航向时，它就在那里，为脚下的旅程多提供一份参照、一份诗意和一份同行的温暖。
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ height: '100%', bgcolor: 'secondary.light', color: 'secondary.contrastText' }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      地：共识之域
+
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    border: `1px solid ${theme.palette.divider}`,
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.secondary.main }}>
+                      道不可尽知，地为工具
                     </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                      地是人类的逻辑知识与工具箱：强共识工具（数学/工程/医学）与解释性工具（社会学/心理学/五行命理）皆属其内；并包含时间工具维度（生辰/节气/择时）。它依赖共识而成立，也因此可修正。
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                      数学、物理、律法、艺术，以及流传千年的命理之学，都是「地」上的经纬。
+                      它们依赖共识而成立，也因此可以被讨论、被修正、被重新组合——Ming 将其中一套命理与仪式系统转译成工具箱，让你可以自由取用。
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ height: '100%', bgcolor: 'success.light', color: 'success.contrastText' }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      人：实践之域
+
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    border: `1px solid ${theme.palette.divider}`,
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
+                      人为主体
                     </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                      人具双重性：作为主体运用“地”进行判断与行动，也可推动共识工具演化；作为客体属于“天”，并有其内在秩序（个体之道）。平台关注的是“协同”，而非“定命”。
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                      命是否真实存在、命理是否只是一种文化叙事，这个答案我们留给你自己。
+                      无论你相信的是隐藏的信号，还是自我对话的镜厅，唯一恰当的验证标准都是：它是否让你在实践中获得了更多清晰与温柔的勇气。
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    border: `1px solid ${theme.palette.divider}`,
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.secondary.main }}>
+                      时为地之用
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                      时间在这里，不是带着神秘色彩的独立界域，而是「地」中可度量、可记录、可回溯的坐标系。
+                      通过生辰、节气、择时，我们把实践变成可复盘、可迭代、可见证的过程，让每一次仪式都成为时间轴上的一枚清醒锚点。
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
             </Grid>
 
-            <Box sx={{ mb: 4 }}>
-              <Card sx={{ border: `1px dashed ${theme.palette.divider}` }}>
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>时（时间）</strong>在这里不是独立一界，而是<strong>地</strong>中的关键工具维度：通过时间坐标与节律（生辰、节气、择时），把实践做成可记录、可复盘、可迭代的过程。
-                  </Typography>
-                </CardContent>
-              </Card>
+            <Divider sx={{ my: 4 }} />
+
+            {/* 2) 三元闭环 · 命理·共识·仪式（总览） */}
+            <Box sx={{ textAlign: 'center', mb: 5 }}>
+              <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
+                三元闭环 · 命理 · 共识 · 仪式
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '900px', mx: 'auto' }}>
+                我们不是先知，我们是镜头与仪式的维护者。
+                命理是一套翻译器，共识是维护这些镜头的自治网络，仪式则是把意图锚定为链上契约的动作——三者共同构成 Ming 的基础闭环。
+              </Typography>
             </Box>
 
-            <Card sx={{ mb: 4, border: `1px solid ${theme.palette.divider}` }}>
-              <CardContent>
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  <strong>价值取向</strong>：我们深信五行学说所强调的“生命系统和谐与生生不息”。因此，Ming（明命）提供以此为优化目标的
-                  <strong>“个体天道协同算法”</strong>：数字化传统智慧、生成协同策略、并以记录实践建立反馈闭环。
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                  知命为明，非为窥道，乃为明心。
-                </Typography>
+            <Card
+              sx={{
+                mb: 4,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, ${theme.palette.secondary.main}05 100%)`,
+                border: `1px solid ${theme.palette.divider}`,
+              }}
+            >
+              <CardContent sx={{ p: { xs: 3, md: 5 } }}>
+                <Grid container spacing={4} alignItems="center">
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                      命理 · 共识 · 仪式 如何闭环
+                    </Typography>
+                    <Box sx={{ pl: 2 }}>
+                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
+                        • <strong>命理 · 镜头</strong>：以四柱八字与五行生克为建模语言，为你提供理解个人状态的结构化视角。
+                        这不是诊断，是视角；不是预言，是翻译。
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
+                        • <strong>共识 · 镜头维护者</strong>：每个流派都是一套独特的观察镜头，没有一种语言能还原完整波形。
+                        DAO 不是评选「冠军流派」，而是镜头维护者的自治组织，让镜头持续开源、可审计、可迭代。
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
+                        • <strong>仪式 · 契约</strong>：仪式是将意图锚定成链上契约的动作。
+                        每一次铸造，都是一份可编程的自我承诺，链上记录履约次数，不是为了监视你，而是让未来的你，看得见过去的自己走了多远。
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
+                        • <strong>镜头切换自由</strong>：你的个人主页可以一键切换镜头。
+                        昨天你信子平，今天你试星宿——这里没有叛教，只有视角迁徙。
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Box
+                      sx={{
+                        p: 4,
+                        borderRadius: 2,
+                        bgcolor: 'background.paper',
+                        border: `1px solid ${theme.palette.divider}`,
+                      }}
+                    >
+                      <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, fontStyle: 'italic' }}>
+                        「当一个人在立春的晨光里，为自己铸造一枚迎春仪式的 NFT——那一刻，他不是在向不可知的天乞求恩典，
+                        他是在对自己说：这个春天，我选择认真度过。」<br />
+                        契约的效力，从不在于墨水是否神圣，而在于签名者是否愿意在未来的日子里，记得自己曾许下过什么。
+                      </Typography>
+                      <Box sx={{ mt: 3, textAlign: 'center' }}>
+                        <Button
+                          component={Link}
+                          to="/simple-mint"
+                          variant="contained"
+                          size="large"
+                          sx={{ mt: 2 }}
+                        >
+                          开始铸造NFT
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Grid>
+                </Grid>
               </CardContent>
             </Card>
 
             <Divider sx={{ my: 4 }} />
 
-            {/* 2) 平台介绍 */}
+            {/* 3) 导航 · 去往更深的章节 */}
             <Box sx={{ textAlign: 'center', mb: 5 }}>
               <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                平台介绍
+                接下来，你可以去往哪里？
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '900px', mx: 'auto' }}>
-                Ming（明命）不提供关于“道”的终极答案，而是承载“地”的智慧，将东方命理与五行体系转化为可使用、可记录、可迭代的数字工具。
-                我们不是先知，我们是绘图师与航海者。
+                这一页只是海图的封面。
+                如果你想深入阅读我们的哲学基石、三元闭环与体验形态，或了解技术与效用边界，可以通过左侧「首页」下的二级菜单继续探索。
               </Typography>
             </Box>
-
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ height: '100%', border: `1px solid ${theme.palette.divider}` }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      阅读路径
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      从“天/道/地/人/时”的分层开始，理解平台为何强调工具主义、实践与反馈闭环。
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
-                    <Button component={Link} to="/about/philosophy" size="small" variant="contained">
-                      去看哲学理念
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ height: '100%', border: `1px solid ${theme.palette.divider}` }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      平台介绍
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      了解 Ming 的产品定位、核心闭环（命理/共识/仪式）与使用方式。
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
-                    <Button component={Link} to="/about/intro" size="small" variant="outlined">
-                      去看平台介绍
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ height: '100%', border: `1px solid ${theme.palette.divider}` }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      仪式资源
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      指南、素材与知识库入口：把“知道”变成“做到”的行动接口。
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
-                    <Button component={Link} to="/connection-ceremony?tab=2" size="small">
-                      去看仪式资源
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            </Grid>
 
             <Card
               sx={{
@@ -315,31 +375,34 @@ const Home: React.FC = () => {
                     mb: 4,
                   }}
                 >
-                  构建“命理－共识－仪式”三元闭环
+                  三条推荐路径
                 </Typography>
 
                 <Grid container spacing={4}>
                   <Grid item xs={12} md={4}>
                     <Box sx={{ textAlign: 'center' }}>
-                      <Chip label="命理" color="primary" sx={{ mb: 2, fontSize: '1rem', py: 2.5, px: 3 }} />
+                      <Chip label="哲学基石 & 三元闭环" color="primary" sx={{ mb: 2, fontSize: '0.95rem', py: 2, px: 2.5 }} />
                       <Typography variant="body1" color="text.secondary">
-                        以四柱八字与五行生克为分析引擎，提供结构化视角来理解个人能量系统与循环状态。
+                        想了解「天·地·人·时」与「命理·共识·仪式」如何构成我们的世界观，
+                        可以前往「体验与功能」页面，阅读更加完整的哲学白皮书式阐述与体验形态说明。
                       </Typography>
                     </Box>
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <Box sx={{ textAlign: 'center' }}>
-                      <Chip label="共识" color="secondary" sx={{ mb: 2, fontSize: '1rem', py: 2.5, px: 3 }} />
+                      <Chip label="仪式路径 & 工具箱" color="secondary" sx={{ mb: 2, fontSize: '0.95rem', py: 2, px: 2.5 }} />
                       <Typography variant="body1" color="text.secondary">
-                        “地”作为共识工具集，通过集体机制形成可协作、可演化的策略语言与能量场见证。
+                        想直接看到「外物、节气、择时、履历、共识池」如何变成可操作的路径，
+                        可以在「体验与功能」中查看一次完整仪式的示例流程与工具总览。
                       </Typography>
                     </Box>
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <Box sx={{ textAlign: 'center' }}>
-                      <Chip label="仪式" color="primary" variant="outlined" sx={{ mb: 2, fontSize: '1rem', py: 2.5, px: 3 }} />
+                      <Chip label="技术与效用边界" color="primary" variant="outlined" sx={{ mb: 2, fontSize: '0.95rem', py: 2, px: 2.5 }} />
                       <Typography variant="body1" color="text.secondary">
-                        以链上可验证的仪式 NFT 记录实践与承诺，形成个人与集体的可追溯日志。
+                        如果你关心数据如何被处理、算法如何开源、效用如何归属，
+                        可以前往「技术说明」页面，阅读关于技术栈、隐私与效用归属的详细说明。
                       </Typography>
                     </Box>
                   </Grid>
@@ -347,236 +410,76 @@ const Home: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Divider sx={{ my: 4 }} />
-
-            {/* 3) 功能 */}
-            {/* 体验形态区域 */}
-            <Box sx={{ textAlign: 'center', mb: 5 }}>
-              <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                体验形态
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '800px', mx: 'auto' }}>
-                用户通过完成对应五行、节气、星宿的链上仪式，铸造专属能量 NFT，同时接入相应共识池，形成个人与集体能量场的共振与循环
-              </Typography>
-            </Box>
-
-            <Card
-              sx={{
-                mb: 4,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, ${theme.palette.secondary.main}05 100%)`,
-                border: `1px solid ${theme.palette.divider}`,
-              }}
-            >
-              <CardContent sx={{ p: { xs: 3, md: 5 } }}>
-                <Grid container spacing={4} alignItems="center">
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                      形成个人与集体能量场的共振与循环
-                    </Typography>
-                    <Box sx={{ pl: 2 }}>
-                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                        • <strong>五行仪式</strong>：根据个人能量缺失，完成对应五行（木、火、土、金、水）的链上仪式，铸造专属能量 NFT
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                        • <strong>节气共鸣</strong>：在特定节气时刻，参与集体共识仪式，接入节气共识池，形成能量共振
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                        • <strong>星宿连接</strong>：通过星宿能量，建立个人与宇宙的连接，完成星宿链上仪式
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8, mt: 2 }}>
-                        • <strong>能量 NFT</strong>：每次仪式铸造专属能量 NFT，作为能量场见证，记录个人与集体能量场的连接
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                        • <strong>共识池</strong>：接入相应共识池（五行池、节气池、星宿池），形成个人与集体能量场的共振与循环
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Box
-                      sx={{
-                        p: 4,
-                        borderRadius: 2,
-                        bgcolor: 'background.paper',
-                        border: `1px solid ${theme.palette.divider}`,
-                      }}
-                    >
-                      <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, fontStyle: 'italic' }}>
-                        每一次 mint、每一次祈愿、每一次共识的达成，
-                        都是对自我命途的一次温和修正与能量加冕。
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-
-            <Divider sx={{ my: 4 }} />
-
-            {/* 功能说明区域 */}
-            <Box sx={{ textAlign: 'center', mb: 5 }}>
-              <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                平台主要功能
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '800px', mx: 'auto' }}>
-                提供完整的NFT制作流程，支持命理调理、节日贺卡、新年祝福等多种类型，从内容创作到NFT铸造，形成完整的仪式体验
-              </Typography>
-            </Box>
-
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid item xs={12} md={6}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    border: `1px solid ${theme.palette.divider}`,
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: theme.shadows[4],
-                    },
-                  }}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                      🔮 四柱八字分析
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      分析用户能量系统，检测能量循环缺失，识别需要补充的能量类型
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    border: `1px solid ${theme.palette.divider}`,
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: theme.shadows[4],
-                    },
-                  }}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.secondary.main }}>
-                      🌿 外物推荐
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      根据能量缺失推荐合适的外物进行连接，提供详细的连接方式和仪式指导
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    border: `1px solid ${theme.palette.divider}`,
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: theme.shadows[4],
-                    },
-                  }}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                      🎨 NFT铸造
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      支持多种NFT类型铸造：命理调理、节日贺卡、新年祝福等，支持立即铸造或定时铸造
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    border: `1px solid ${theme.palette.divider}`,
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: theme.shadows[4],
-                    },
-                  }}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.secondary.main }}>
-                      📊 个人档案
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      管理所有NFT作品，包括命理调理记录、节日贺卡、新年祝福等，查看创作历史和作品集
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-
-            <Divider sx={{ my: 4 }} />
-
-            {/* 4) 技术背景 */}
-            <Box sx={{ textAlign: 'center', mb: 5 }}>
-              <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                技术背景
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '900px', mx: 'auto' }}>
-                我们使用现代 Web3 技术栈，将“记录、见证与可验证的仪式”落地为可访问的产品体验。
-              </Typography>
-            </Box>
-
-            <Grid container spacing={3}>
+            <Grid container spacing={3} sx={{ mt: 2 }}>
               <Grid item xs={12} md={4}>
                 <Card sx={{ height: '100%', border: `1px solid ${theme.palette.divider}` }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      前端
+                      履历 · 可缩放的地图
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      React 18 + TypeScript + Material-UI + Vite
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                      你每一次仪式、每一次意图锚定、每一次流派切换，都会成为能量履历上的一笔。
+                      在不同镜头下，你会看到自己的状态波动、曲线叙事与决策痕迹：看不见的命运，从此拥有了一张可缩放的地图——
+                      你不是在看命，你是在看自己。
                     </Typography>
                   </CardContent>
+                  <CardActions>
+                    <Button component={Link} to="/about/philosophy" size="small" variant="outlined">
+                      查看理念
+                    </Button>
+                  </CardActions>
                 </Card>
               </Grid>
               <Grid item xs={12} md={4}>
                 <Card sx={{ height: '100%', border: `1px solid ${theme.palette.divider}` }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      区块链 & NFT
+                      共识池 · 集体注意力计数器
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      ethers.js + ERC-721，链上可验证的仪式见证
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                      共识池不是玄学容器，它是集体仪式的链上聚合页。
+                      当你参与立春集体仪式，屏幕上的数字会跳动 —— 那是此刻与您同时完成铸造的人数。
+                      共识池不存储「能量」，它存储此时此刻，有人和你一样，选择了认真对待自己。
                     </Typography>
                   </CardContent>
+                  <CardActions>
+                    <Button component={Link} to="/about/intro" size="small" variant="outlined">
+                      查看共识设计
+                    </Button>
+                  </CardActions>
                 </Card>
               </Grid>
               <Grid item xs={12} md={4}>
                 <Card sx={{ height: '100%', border: `1px solid ${theme.palette.divider}` }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      存储
+                      技术 · 只是载体，不是信仰
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      IPFS + 本地存储，确保数据去中心化与可访问性
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                      我们使用现代 Web3 技术栈，只为一件事：让「意图锚定、集体见证、可回溯记录」成为可能。
+                      技术在这里不是「神力」的来源，而是「记忆」的载体 —— 你的八字永不离线，你的选择链上存证，你的仪式被时间温柔封存。
                     </Typography>
                   </CardContent>
+                  <CardActions>
+                    <Button component={Link} to="/learning" size="small" variant="outlined">
+                      深入技术说明
+                    </Button>
+                  </CardActions>
                 </Card>
               </Grid>
             </Grid>
           </>
         ) : location.pathname === '/experience' ? (
-          /* 体验与功能 */
+          /* 体验与功能（深入版：体验形态 · 你的工具箱） */
           <>
             {/* 体验形态区域 */}
             <Box sx={{ textAlign: 'center', mb: 5 }}>
               <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                体验形态
+                体验形态 · 你的工具箱
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '800px', mx: 'auto' }}>
-                用户通过完成对应五行、节气、星宿的链上仪式，铸造专属能量 NFT，同时接入相应共识池，形成个人与集体能量场的共振与循环
+                在 Ming，每一次仪式既是一段代码执行，也是一次对自己的温柔声明。
+                通过外物、节气、择时、履历与共识池，你可以把看不见的命运，拆解成可操作、可见证的一系列小步骤。
               </Typography>
             </Box>
 
@@ -591,23 +494,24 @@ const Home: React.FC = () => {
                 <Grid container spacing={4} alignItems="center">
                   <Grid item xs={12} md={6}>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                      形成个人与集体能量场的共振与循环
+                      外物 · 节气 · 择时 如何一起工作
                     </Typography>
                     <Box sx={{ pl: 2 }}>
                       <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                        • <strong>五行仪式</strong>：根据个人能量缺失，完成对应五行（木、火、土、金、水）的链上仪式，铸造专属能量 NFT
+                        • <strong>外物 · 符号锚点</strong>：根据你的镜头与当下状态，系统推荐与之共鸣的自然符号（如昆仑的土、太湖的水）。
+                        你选择其中一个，把它视为未来一段时间注意力的锚点，并铸造对应的仪式 NFT。
                       </Typography>
                       <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                        • <strong>节气共鸣</strong>：在特定节气时刻，参与集体共识仪式，接入节气共识池，形成能量共振
+                        • <strong>节气 · 共识节律</strong>：立春、夏至、秋分、冬至等关键节点，你可以参与集体仪式，一起完成相同动作。
+                        屏幕上的数字跳动，记录此刻与你同频的人数，这是真实可见的「集体注意力计数器」。
                       </Typography>
                       <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                        • <strong>星宿连接</strong>：通过星宿能量，建立个人与宇宙的连接，完成星宿链上仪式
+                        • <strong>择时 · 个人节律</strong>：系统根据你选定的镜头与当下状态，给出一段时间窗口作为「注意力锚点候选」。
+                        你完全可以选择另一个时间、另一种算法 —— 择时的终极目的，是让你主动决定「何时认真」。
                       </Typography>
                       <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8, mt: 2 }}>
-                        • <strong>能量 NFT</strong>：每次仪式铸造专属能量 NFT，作为能量场见证，记录个人与集体能量场的连接
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                        • <strong>共识池</strong>：接入相应共识池（五行池、节气池、星宿池），形成个人与集体能量场的共振与循环
+                        • <strong>能量 NFT 与共识池</strong>：每一次仪式都会铸造专属 NFT，并自动汇入对应的共识池（如五行池、节气池）。
+                        这不是玄学容器，而是把「此刻有人和你一样选择认真对待自己」记录在链上的实时计数器。
                       </Typography>
                     </Box>
                   </Grid>
@@ -621,8 +525,9 @@ const Home: React.FC = () => {
                       }}
                     >
                       <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, fontStyle: 'italic' }}>
-                        每一次 mint、每一次祈愿、每一次共识的达成，
-                        都是对自我命途的一次温和修正与能量加冕。
+                        「每一次 mint、每一次祈愿、每一次共识的达成，都不是向不可知之天索要恩典，
+                        而是向自己确认：我愿为这件事投入时间与注意力。」<br />
+                        你可以将这视为一枚刻在时间轴上的小小锚点，而非一次性「改变命运」的按钮。
                       </Typography>
                     </Box>
                   </Grid>
@@ -632,13 +537,14 @@ const Home: React.FC = () => {
 
             <Divider sx={{ my: 4 }} />
 
-            {/* 功能说明区域 */}
+            {/* 功能说明区域（从“能做什么”到“如何参与”） */}
             <Box sx={{ textAlign: 'center', mb: 5 }}>
               <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                平台主要功能
+                你可以在这里做什么
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '800px', mx: 'auto' }}>
-                提供完整的NFT制作流程，支持命理调理、节日贺卡、新年祝福等多种类型，从内容创作到NFT铸造，形成完整的仪式体验
+                从命理视角理解当下状态，到为某段时间写下一份「认真对待自己」的契约，再到在集体节律中找到同行者——
+                Ming 提供的是一整套从理解、自我声明到被见证的路径。
               </Typography>
             </Box>
 
@@ -657,10 +563,11 @@ const Home: React.FC = () => {
                 >
                   <CardContent sx={{ p: 3 }}>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                      🔮 四柱八字分析
+                      🔮 命理视角
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      分析用户能量系统，检测能量循环缺失，识别需要补充的能量类型
+                      以四柱八字与五行生克为建模语言，为你提供理解个人状态的结构化视角。
+                      它不是诊断书，而是一面镜子——帮助你整理关于「我现在正处在怎样的节律与能量分布」的自我叙事。
                     </Typography>
                   </CardContent>
                 </Card>
@@ -680,10 +587,11 @@ const Home: React.FC = () => {
                 >
                   <CardContent sx={{ p: 3 }}>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.secondary.main }}>
-                      🌿 外物推荐
+                      🌿 外物与仪式设计
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      根据能量缺失推荐合适的外物进行连接，提供详细的连接方式和仪式指导
+                      根据分析结果与你偏好的镜头，系统为你推荐适合的外物和对应的仪式动作。
+                      你可以将其视为一套「注意力剧本」：在某个时间、以某个符号为锚，和自己进行一次短暂而郑重的对话。
                     </Typography>
                   </CardContent>
                 </Card>
@@ -703,10 +611,11 @@ const Home: React.FC = () => {
                 >
                   <CardContent sx={{ p: 3 }}>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                      🎨 NFT铸造
+                      🎨 仪式 NFT 铸造
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      支持多种NFT类型铸造：命理调理、节日贺卡、新年祝福等，支持立即铸造或定时铸造
+                      将你的意图、外物选择与文案、图像一起固化为一枚 NFT。
+                      它不是「补了五行」的魔法道具，而是一份可验证、可回溯的自我承诺——你也可以选择在特定节气或自定时间点触发铸造。
                     </Typography>
                   </CardContent>
                 </Card>
@@ -726,10 +635,11 @@ const Home: React.FC = () => {
                 >
                   <CardContent sx={{ p: 3 }}>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.secondary.main }}>
-                      📊 个人档案
+                      📊 能量履历与共识池
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                      管理所有NFT作品，包括命理调理记录、节日贺卡、新年祝福等，查看创作历史和作品集
+                      你的每一次仪式、每一次镜头切换、每一次履约记录，都会沉淀为一条可缩放的时间线。
+                      你可以在「我的连接」中回看这条线在不同镜头下的叙事差异，也可以在共识池页面里，看见那些与你一同「认真对待自己」的陌生人。
                     </Typography>
                   </CardContent>
                 </Card>
@@ -745,42 +655,42 @@ const Home: React.FC = () => {
             >
               <CardContent sx={{ p: { xs: 3, md: 4 } }}>
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, textAlign: 'center' }}>
-                  使用流程
+                  一次完整仪式的大致路径
                 </Typography>
                 <Box sx={{ pl: 2 }}>
                   <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                    <strong>步骤1：连接钱包</strong> - 连接 andao 钱包，确保可以执行链上操作
+                    <strong>步骤1：连接钱包</strong> —— 连接 andao 钱包，确认你愿意为这次自我声明承担链上签名与 Gas 成本。
                   </Typography>
                   <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                    <strong>步骤2：选择NFT类型</strong> - 选择要制作的NFT类型：命理调理、节日贺卡、新年祝福等
+                    <strong>步骤2：选择仪式类型</strong> —— 是一次命理调理、一封节日贺卡，还是一段特定时期的自我练习契约？
                   </Typography>
                   <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                    <strong>步骤3：创作内容</strong> - 根据选择的类型，完成相应的内容创作（命理分析、贺卡设计、祝福定制等）
+                    <strong>步骤3：创作内容</strong> —— 写下你的意图，选择或上传一张与你当下状态共鸣的图像，确认对应外物与时间窗口。
                   </Typography>
                   <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                    <strong>步骤4：完成仪式</strong> - 按照指导完成相应的仪式流程，记录感受和体验
+                    <strong>步骤4：完成仪式动作</strong> —— 按照提示，在现实世界完成一段简单却郑重的动作（点一支香、写一段话、进行一次短暂静坐等）。
                   </Typography>
                   <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                    <strong>步骤5：铸造NFT</strong> - 铸造专属NFT，作为仪式见证，接入共识池
+                    <strong>步骤5：铸造 NFT</strong> —— 在链上铸造这枚仪式 NFT，将这次声明交给代码与时间见证，并自动接入对应共识池。
                   </Typography>
                   <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8, mt: 2 }}>
-                    <strong>步骤6：查看档案</strong> - 在"我的连接"中查看所有NFT作品和创作记录
+                    <strong>步骤6：回看与迭代</strong> —— 在「我的连接」与能量履历中回看这段时间的状态波动，必要时调整镜头或重新书写契约。
                   </Typography>
                 </Box>
               </CardContent>
             </Card>
           </>
         ) : location.pathname === '/technology' ? (
-          /* 技术说明 */
+          /* 技术说明（技术 · 只是载体，不是信仰） */
           <>
             {/* 技术架构区域 */}
             <Box sx={{ textAlign: 'center', mb: 5 }}>
               <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                技术架构
+                技术 · 只是载体，不是信仰
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: '900px', mx: 'auto' }}>
-                Ming 前端基于 Vite + React 18 + TypeScript + Material UI 构建；通过 ethers.js 与自定义钱包接口完成链上交互，
-                并结合 IPFS 等去中心化存储方案承载仪式图片与元数据，使“记录与见证”的过程本身具备可验证性与可迁移性。
+                我们使用现代 Web3 技术栈，只为一件事：让「意图锚定、集体见证、可回溯记录」成为可能。
+                技术在这里不是「神力」的来源，而是「记忆」的载体 —— 你的八字可以离线保存，你的仪式以哈希与区块高度被温柔封存。
               </Typography>
             </Box>
 
@@ -797,7 +707,8 @@ const Home: React.FC = () => {
                       前端 & 交互层
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Vite + React 18 + TypeScript + Material UI，提供快速、现代的交互体验，并通过组件化封装命理分析、仪式流程与钱包连接。
+                      Vite + React 18 + TypeScript + Material UI，提供快速、现代的交互体验。
+                      我们将命理分析、仪式流程、共识池与钱包连接封装为一组可复用组件，让「写一份契约」「查看一段履历」和其他网页操作一样自然。
                     </Typography>
                   </CardContent>
                 </Card>
@@ -815,7 +726,8 @@ const Home: React.FC = () => {
                       区块链 & 存储
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      使用 ethers.js 对接区块链与 ERC-721 合约，结合 IPFS 与本地缓存承载仪式图片与元数据，确保记录可验证、可访问。
+                      使用 ethers.js 对接区块链与 ERC-721 合约，负责仪式 NFT 的铸造与查询。
+                      图片与元数据托管在 IPFS 与本地存储中：你的八字可以保存在本地设备，你的选择则以链上事件形式可验证地记录下来。
                     </Typography>
                   </CardContent>
                 </Card>
@@ -847,7 +759,8 @@ const Home: React.FC = () => {
                       </a>
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      提供 Web3 钱包连接与链上操作入口，以“平台只准备数据、钱包负责签名与执行”的分层方式保障安全与清晰边界。
+                      提供 Web3 钱包连接与链上操作入口。
+                      平台只准备数据与建议，所有关键动作都由你在钱包中签名完成——「谁在何时为哪些意图签名」，始终由你自己掌控。
                     </Typography>
                   </CardContent>
                 </Card>
@@ -867,12 +780,12 @@ const Home: React.FC = () => {
               }}
             >
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                重要说明
+                使用边界与重要说明
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8, maxWidth: '700px', mx: 'auto' }}>
-                Ming 平台提供的是基于传统文化智慧的象征性仪式体验，融合 Web3 技术与集体共识机制。
-                我们致力于构建一种人与命运共修的新范式，而非提供精确的命理预测或效果量化验证。
-                建议将仪式视为个人成长、文化体验与集体能量共振的一部分。
+                Ming 提供的是基于传统文化智慧的象征性仪式体验，是一种帮助你重新组织自我叙事、重构时间感与承诺感的工具。
+                所有算法、分析与仪式均属于文化建模与心理仪式工具，不构成命运预测、医疗建议或投资建议。
+                最终的判断权与解释权属于你自己——你觉得某套镜头「准」，它就在你的生命叙事中成立；不觉得，就换一个重新试验。
               </Typography>
             </Box>
           </>
