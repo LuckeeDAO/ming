@@ -333,15 +333,21 @@ const Home: React.FC = () => {
             我们使用现代 Web3 技术栈，只为一件事：让「意图锚定、集体见证、可回溯记录」成为可能。
             前端基于 React 18 + TypeScript + Material-UI + Vite，区块链与 NFT 部分基于 ethers.js + ERC-721，存储部分结合 IPFS 与本地存储。
           </Typography>
-          <Box sx={{ my: 3, p: 3, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1, border: `1px solid ${theme.palette.primary.main}20` }}>
-            <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-              隐私与数据安全
+          <Box sx={{ my: 3, p: 3, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1, border: `2px solid ${theme.palette.primary.main}40` }}>
+            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, mb: 2, color: theme.palette.primary.main }}>
+              🔒 隐私与数据安全
             </Typography>
             <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-              <strong>您的八字在本地完成分析，仅存储于您自己的设备。</strong>您可以选择将其备份至去中心化存储网络，此时数据以加密形式传输与存储，Ming 不会主动收集或存储您的原始生辰数据。
+              <strong>您的八字在本地完成分析，仅存储于您自己的设备。</strong>
             </Typography>
             <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-              <strong>您通过钱包私钥控制访问权限——您的隐私，由您自己保管。</strong>
+              您可以选择将其备份至去中心化存储网络，此时数据以<strong>加密形式</strong>传输与存储。
+            </Typography>
+            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontWeight: 600, color: theme.palette.primary.main }}>
+              Ming 不会主动收集或存储您的原始生辰数据，<strong>Ming 无法读取您的八字信息</strong>。
+            </Typography>
+            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+              <strong>您通过钱包私钥完全控制访问权限——您的隐私，由您自己保管。</strong>
             </Typography>
           </Box>
         </>
@@ -536,7 +542,20 @@ const Home: React.FC = () => {
                 创世开发中 · Web3 仪式平台
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                我们正在构建一个开源、可编程的仪式平台。代码已托管于 GitHub，欢迎审阅、贡献与反馈。
+                我们正在构建一个开源、可编程的仪式平台。代码已托管于{' '}
+                <a 
+                  href="https://github.com/LuckeeDAO/ming" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ 
+                    color: theme.palette.primary.main, 
+                    textDecoration: 'none',
+                    fontWeight: 500
+                  }}
+                >
+                  GitHub
+                </a>
+                ，欢迎审阅、贡献与反馈。
               </Typography>
               <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Button
