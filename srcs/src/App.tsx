@@ -25,6 +25,7 @@ import { Box, CircularProgress } from '@mui/material';
 
 // 懒加载页面组件（代码分割，提升性能）
 const Home = lazy(() => import('./pages/Home/index'));
+const Philosophy = lazy(() => import('./pages/Philosophy/index'));
 const About = lazy(() => import('./pages/About/index'));
 const ConnectionCeremony = lazy(() => import('./pages/ConnectionCeremony/index'));
 const MyConnections = lazy(() => import('./pages/MyConnections/index'));
@@ -74,6 +75,9 @@ function App() {
           <Routes>
             {/* 首页路由 */}
             <Route path="/" element={<Home key="home" />} />
+            
+            {/* 完整哲学白皮书 */}
+            <Route path="/philosophy" element={<Philosophy />} />
             
             {/* 工具页面 */}
             <Route path="/tools" element={<Tools />} />
