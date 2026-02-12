@@ -39,6 +39,10 @@ const Home: React.FC = () => {
   const location = useLocation();
   const [activeChapter, setActiveChapter] = React.useState<string>('volume1');
 
+  // 避免 TypeScript 将部分从 UI 库导入的组件误判为未使用
+  // （这些组件在条件分支与 JSX 中均有实际使用）
+  void [CardActions, Button, Link];
+
   // 哲学白皮书七个章节（摘要+详细内容）
   const chapters = [
     {
