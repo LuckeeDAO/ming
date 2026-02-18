@@ -49,21 +49,25 @@ const Home: React.FC = () => {
       id: 'intro',
       title: '序 · 平台简介',
       tag: '平台简介',
-      summary: 'Ming 是一个以「道不可尽知、地为工具、人为主体、时为地之用」为内核的 Web3 仪式平台。我们不提供关于「天命」的终极答案，而是将人类长期积累的「地」之智慧——包括命理在内的诸多工具——转译为开源、可编程的数字组件，帮助你在现实约束之内，重新组织自我叙事与时间感。在这里，每一次仪式既是一段链上代码的执行，也是一次对自己的温柔声明：你可以选择外物作为符号锚点，以节气与择时作为时间坐标，通过可编程 NFT 把这些意图记录在链上。共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者轻轻见证。',
+      summary:
+        '明命 · Ming 是一个以「天不可尽知、地为共识理论、人为实践主体」为内核的 Web3 仪式平台。我们不替你回答「命运究竟是什么」，而是利用人类长期积累的「地」的智慧——包括命理在内的诸多工具——帮助你在现实约束条件之内，重新完成自我叙事的逻辑自洽。在这里，每一次仪式既是一段共识的确认，也是一次对自己的重重承诺：你可以选择具体特征外物作为符号锚点，择时进行 NFT 绑定，实现自我特征的铸造与完善。共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者见证。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
             序 · 平台简介
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            明命 · Ming 是一个以「道不可尽知、地为工具、人为主体、时为地之用」为内核的 Web3 仪式平台。
-            我们不替你回答「命运究竟是什么」，而是将人类长期积累的「地」之智慧——包括命理在内的诸多工具——转译为开源、可编程的数字组件，
-            帮助你在现实约束之内，重新组织自我叙事与时间感。
+            明命 · Ming 是一个以「天不可尽知、地为共识理论、人为实践主体」为内核的 Web3 仪式平台。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            在这里，每一次仪式既是一段链上代码的执行，也是一次对自己的温柔声明：
-            你可以选择外物作为符号锚点，以节气与择时作为时间坐标，通过可编程 NFT 把这些意图记录在链上。
-            共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者轻轻见证。
+            我们不替你回答「命运究竟是什么」，而是利用人类长期积累的「地」的智慧——包括命理在内的诸多工具——帮助你在现实约束条件之内，重新完成自我叙事的逻辑自洽。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            在这里，每一次仪式既是一段共识的确认，也是一次对自己的重重承诺：
+            你可以选择具体特征外物作为符号锚点，择时进行 NFT 绑定，实现自我特征的铸造与完善。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者见证。
           </Typography>
         </>
       ),
@@ -72,23 +76,25 @@ const Home: React.FC = () => {
       id: 'volume1',
       title: '卷一 · 我们是谁',
       tag: '我们是谁',
-      summary: '不是先知，是绘图师与航海者——我们不替你定义天命，只为你提供一张可共同修订的海图。',
+      summary:
+        '明命 · Ming 知命为明，非为窥道，乃为明心。我们不是先知，不是圣人，我们只是一个普通的匠人——帮助你在「地」的知识之网上绘制属于自己的航线。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
             卷一 · 我们是谁
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            明命 · Ming 知命为明，非为窥道，乃为明心。我们不自居为先知，而更愿意称自己为绘图师与航海者。
+            明命 · Ming 知命为明，非为窥道，乃为明心。我们不是先知，不是圣人，我们只是一个普通的匠人。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            那驱动日月星辰的终极法则——我们称之为「道」——或许永远超出人类认知的边界。但人类最伟大的创造，是编织了一张名为
-            「地」的知识之网：数学、物理、律法、艺术，以及流传千年的命理之学，都是这张网上的经纬；时间——生辰、节气、择时——也是
-            「地」的关键工具维度。
+            那驱动日月星辰的终极法则——我们称之为「道」——或许永远超出人类认知的边界。但人类最伟大的创造，是编织了一张名为「地」的知识之网：
+            数学、物理、律法、艺术，以及心理学、社会学、命理学等，全是这张网上的经纬；时间——生辰、节气、择时——也是「地」的关键工具。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             Ming 不回答「命运是什么」。Ming 将「地」的智慧转化为开源、可编程的数字工具，帮助你在这张地图上画出属于自己的航线。
-            我们绘制地图，不是为了定义星空，而是为了让脚下的旅程——多一份参照，多一份诗意，多一份同行的温暖。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            我们帮助你绘制地图，不是为了定义星空，而是为了让脚下的旅程——多一份勇气，多一份和谐，多一份同行的温暖。
           </Typography>
         </>
       ),
@@ -103,44 +109,47 @@ const Home: React.FC = () => {
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
             卷二 · 哲学基石 · 天·命·地·人·时
           </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            天是现实本身，是客体。它可被观察其「象」，但不可被主体穷尽其「体」。我们尊重现实的约束，并以观察与记录保持谦逊。
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main, mt: 2 }}>
+            天 · 客体之域
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们相信命真实存在，如同宇宙微波背景辐射——我们无法直接聆听它，它太微弱、太古老，超出一切仪器的分辨率；但我们相信它在那里。
+            天是客体。它可被观察其「象」，但不可被主体穷尽其「体」。我们尊重现实的约束，并以观察与记录保持谦逊。
+          </Typography>
+          <Divider sx={{ my: 3 }} />
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
+            命 · 隐藏的道
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            而我们可用不同的语言去转译它。四柱、星宿、紫微、五行……每一种命理流派，都是一套人类发明的建模语言。
+            我们相信命的存在，如同相信客体自身的运行规律。这种规律，或许就如同宇宙微波的背景辐射—— 我们无法直接聆听它，因为它太微弱、太古老，超出现有仪器的分辨率。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            我们可用不同的语言去描述它。四柱、星宿、紫微、五行……每一种命理流派，都是一套人类探索的建模语言。这些语言是否在言说同一个「命」？这个问题，Ming 留给你自己回答。
           </Typography>
           <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1, borderLeft: `3px solid ${theme.palette.primary.main}` }}>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic' }}>
-              <strong>这些语言是否在言说同一个「命」？这个问题，Ming 留给你自己回答。</strong>
-            </Typography>
             <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-              你可以相信是——相信有一个隐藏的信号等待被翻译；也可以相信否——相信命理是纯粹的文化叙事、自我对话的镜厅。两种立场都不影响你使用工具。
+              你可以认为是——命是一个等待逼近、发现的真相或者等待接收、翻译的信号；也可以认为否——命只是纯粹的文化叙事、自我对话的假定前提。两种立场都不影响你对工具的使用。
             </Typography>
           </Box>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            许多用户告诉我们：当你相信那个隐藏的信号存在时，共振更容易发生。
-            ——我们所说的「共振」，是指你读到命理解读时，产生 「这说的就是我」 的认同感。
+            现实的实践体验在于：当你相信那个隐藏的信号存在时，共振更容易发生。 ——我们所说的「共振」，是指你读到命理解读时，产生「历史就是这样发生的」确认感。
           </Typography>
           <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.secondary.main}08`, borderRadius: 1, borderLeft: `3px solid ${theme.palette.secondary.main}` }}>
             <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic' }}>
-              <strong>子平与星宿不是在测量同一信号的不同维度，而是在对同一个不可测信号——或各自定义的不同信号——进行截然不同的猜测。它们不可通约，无法转换，也无从比较谁更「客观正确」。这不是平台的谦逊，是认识论的边界。</strong>
+              <strong>子平或星宿，它们并不是在测量同一信号的不同维度，而是用不同的语言进行各自的建模分析，在没有量化处理之前，这些语言更多表现的是它们的不可通约性，无法转换，也无从比较谁更「客观」。或许这就是认识论的边界。</strong>
             </Typography>
           </Box>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            唯一能判断「准不准」的人，是你自己。你在生活中感受到的共振、自我理解中获得的清晰、未来回望时觉得「被说中了」的瞬间——这些才是验证的凭证。
+            事实上，唯一能判断存在性的人，是你自己。你在生活中感受到的共振、自我理解中获得的清晰、未来回望时感受到的确定性——这才是验证的凭证。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            Ming 只保证：你随时可以换一种翻译，重新为自己建模。
+            Ming 只保证：你随时可以换一种模型，重新为自己建模。
           </Typography>
           <Divider sx={{ my: 3 }} />
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
             地 · 共识之域
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            地是人类逻辑知识与工具箱的总和。它依赖共识而成立，也因此可讨论、可修正、可优化。强共识工具（数学、工程、医学）与解释性工具（社会学、心理学、五行命理）皆属其内；时间（生辰、节气、择时）亦是地中关键的工具维度。
+            地是人类逻辑知识与工具箱的理论总和。它依赖共识而成立，也因此可讨论、可修正、可优化。强共识工具（数学、工程、医学）与解释性工具（社会学、心理学、五行命理）皆属其内；时间（生辰、节气、择时）亦是地中关键的工具。
           </Typography>
           <Divider sx={{ my: 3 }} />
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
@@ -157,95 +166,66 @@ const Home: React.FC = () => {
             时 · 地之维度
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            时不是独立的一界。时间是「地」中可度量、可记录、可回溯的工具坐标。通过生辰、节气、择时，我们把实践变成可复盘、可迭代、可见证的过程。
+            时不是独立的一界。时间是「地」中可度量、可记录、可回溯的工具。通过生辰、节气、择时，我们构建了可复盘、可迭代、可见证的量化模型。
           </Typography>
         </>
       ),
     },
     {
       id: 'volume3',
-      title: '卷三 · 三元闭环 · 命理·共识·仪式',
-      tag: '三元闭环',
-      summary: '命理是镜头，共识是镜头维护者网络，仪式是意图被锚定为链上契约的方式。',
+      title: '卷三 · 多元闭环 · 命理共学·参数选择·仪式实践',
+      tag: '多元闭环',
+      summary: '命理是共学的视角，共识是协议参数的选择，仪式是意图被锚定为链上契约的方式。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            卷三 · 三元闭环 · 命理·共识·仪式
+            卷三 · 多元闭环 · 命理共学·参数选择·仪式实践
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🔮 命理 · 镜头：以你选择的命理流派为建模语言——四柱、星宿、紫微、五行……为你提供理解个人状态的结构化视角。
-            这不是诊断，这是视角；不是预言，是翻译。
+            🔮 命理 · 共学：选择的同频命理流派——奇门、太乙、四柱、六壬、紫微……为你提供理解个人状态的结构化视角。
+            注意，这不是诊断，只是视角；不是预言，只是解读。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🤝 共识 · 镜头维护者：每个流派都是一套独特的观察镜头。子平镜头下，你是日主强弱、格局高低；星宿镜头下，你是二十八宿分野；
-            五行镜头下，你是木火土金水的流动节律。没有镜头是「唯一真实的」——就像没有色温是「唯一正确的」。它们只是不同的猜测模型，
-            用来逼近，或用来对话那个不可穷尽的隐藏信号。
+            🤝 共识 · 协议参数：每个流派都是一套独特的观察视角。子平视角下，论述的是日主强弱、格局高低；紫微视角下，讲的是星曜分布。
+            在这里，没有哪个视角是「唯一正确的」解读。它们只是不同的猜测模型，用以逼近那个不可穷尽的信号本源。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            DAO 是镜头维护者的自治组织——他们负责让这套镜头持续开源、可审计、可迭代。
+            DAO 是视角维护的自治组织——他们负责让这套镜头持续开源、可审计、可迭代。
           </Typography>
           <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1 }}>
             <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-              镜头维护者的权力有明确边界：
+              维护者的权力有明确边界：
             </Typography>
             <Typography variant="body2" color="text.secondary" component="div" sx={{ lineHeight: 1.8 }}>
-              任何改变算法输出的修改，必须：
+              任何共识参数的修改，仅可以分叉，不可以删除。平台虽然不能裁决哪个 DAO 正确，但是可以确保每个版本的开源与可追溯性：
               <ol style={{ marginTop: '8px', paddingLeft: '24px' }}>
-                <li>发布为独立版本号（子平 v1.2、子平 v2.0）</li>
-                <li>与原版本长期并存，永不强制替换</li>
-                <li>在切换界面标明版本差异与演化历史</li>
+                <li>每个版本都以开源协议托管</li>
+                <li>历史版本长期可见，不被抹除</li>
+                <li>参数演化路径清晰可追溯</li>
               </ol>
             </Typography>
           </Box>
-          <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.secondary.main}08`, borderRadius: 1, borderLeft: `3px solid ${theme.palette.secondary.main}` }}>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic' }}>
-              <strong>DAO 不裁决「哪个版本正确」。它只确保每个版本都开源、可审计、可追溯。</strong>
-            </Typography>
-          </Box>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            你的个人主页可以一键切换镜头，并长期保留选择旧版本的权利。当某个版本因客观依赖无法继续维护时，DAO 会提前公告并提供迁移工具或存档快照。
+            用户可以选择不同的视角切换，只需加入不同的 DAO 即可。重要的问题在于，这里的切换没有叛教的伦理负担，只有工具的更替。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            昨天你信子平 v1.0，今天你试子平 v2.0，明天你切到星宿——这里没有叛教，只有视角迁徙。
+            我们将逐步开源所有流派算法的核心实现，以开源协议托管于 GitHub。创世期后，你便可以在 GitHub 审阅代码、提交提案，成为 DAO 维护者。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们将逐步开源所有流派算法的核心实现，以开源协议托管于 GitHub。创世期后，你便可以在 <a href="https://github.com/LuckeeDAO/ming" target="_blank" rel="noopener noreferrer" style={{ color: theme.palette.primary.main, textDecoration: 'none' }}>GitHub</a> 审阅代码、提交提案，甚至成为镜头维护者的一员——因为对「命」的建模，本就不该有终极权威。
+            🕯️ 仪式 · 契约：仪式是将意图锚定成链上契约的动作。每一次铸造，都是一份可编程的自我承诺。你可以这样为自我设定：
+            「未来 40 天，我将在晨间播放这段誓言」，也可以增加信息提示：「每当看到这枚 NFT，我都要提醒自己：像如流水一样谦逊」。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🎭 仪式 · 契约：仪式是将意图锚定成链上契约的动作。每一次铸造，都是一份可编程的自我承诺。你可以这样为自己写下契约：
-          </Typography>
-          <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.9, ml: 2, fontStyle: 'italic' }}>
-            「未来 40 天，我将在晨间播放这段誓言。」<br />
-            「每日静坐 10 分钟，持续 21 天。」<br />
-            「每当看到这枚 NFT，提醒自己：如山稳固。」
+            链上记录的每一次履约，都是为了让未来的自己，看得见过去的自己走了什么样的历程。
+            这种心路历程，既是个人的自我鉴定，也是后来人的参照。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            链上记录每一次履约，不是为了监视你——是为了让未来的你，看得见过去的自己走了多远。
-            当你完成第 40 次播放，NFT 将自动点亮一枚徽章。这不是平台的奖励，而是你自己兑现给自己的勋章。
+            如果你想放弃一段契约，你可以让它留在钱包里，作为温柔的提醒；也可以将它发送至黑洞地址，让链上时间帮你封印那段半途。
+            销毁不是删除记忆。销毁是一场关于放下的微型仪式。
           </Typography>
-          <Divider sx={{ my: 3 }} />
-          <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-            如果契约没有走完——
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            如果40天的誓言在第15天就悄然沉寂——
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            那枚NFT会永远停留在15/40。它不是耻辱柱，是未完成的路标。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            你可以让它留在钱包里，作为温柔的提醒；也可以将它发送至黑洞地址，让链上时间帮你封印那段半途。
-          </Typography>
-          <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.secondary.main}08`, borderRadius: 1, borderLeft: `3px solid ${theme.palette.secondary.main}` }}>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic' }}>
-              <strong>销毁不是删除记忆。销毁是一场关于放下的微型仪式。</strong>
-            </Typography>
-          </Box>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             无论你是否销毁，你永远有权铸造一枚新的契约。上一份誓言没有兑现，不剥夺你重新承诺的资格。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            你可以公开这份履约记录，作为链上简历；也可以永久私藏，作为无人知晓的骄傲。
+            你可以公开这份履约记录，作为链上历史；也可以永久私藏，作为无人知晓的纪念。
           </Typography>
         </>
       ),
@@ -452,7 +432,7 @@ const Home: React.FC = () => {
             gutterBottom
             sx={{ mt: 2, fontWeight: 400 }}
           >
-            基于天地人三才框架的"道不可尽知、地为共识理论、人为主体"的 Web3 仪式平台
+            基于天地人三才框架的Web3 仪式平台
           </Typography>
         </Container>
       </Box>
@@ -590,19 +570,33 @@ const Home: React.FC = () => {
               </Box>
             </Box>
 
-            {/* 附言和用户分层引导 */}
+            {/* 附录 · 白皮书摘要 */}
             <Box sx={{ mt: 6, mb: 4 }}>
               <Card sx={{ border: `1px solid ${theme.palette.divider}`, bgcolor: `${theme.palette.secondary.main}05` }}>
-                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                <CardContent
+                  sx={{
+                    p: { xs: 3, md: 4 },
+                    color: theme.palette.warning.main,
+                    fontFamily: `"Ma Shan Zheng","LXGW WenKai","STKaiti","KaiTi","cursive"`,
+                  }}
+                >
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-                    附：关于这份文本
+                    附：
                   </Typography>
-                  <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                    您刚刚阅读的是 Ming 的哲学摘要——它是我们关于「天地人三才共识」的核心思考。
+                  <Typography variant="body1" paragraph sx={{ lineHeight: 1.9 }}>
+                    您阅读的这份文本，是 Ming 的白皮书摘要——它是我们关于「天地人三才共识」的核心思考。
                   </Typography>
-                  <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic' }}>
-                    我们深知：不是所有人都需要读完一本宣言才肯扬帆。
-                    海图的价值，不在于被通读，而在于当你需要辨认航向时，它就在那里。
+                  <Typography variant="body1" paragraph sx={{ lineHeight: 1.9 }}>
+                    我们要这天，再不能以“不可知”为名，隐匿命运的源码；
+                  </Typography>
+                  <Typography variant="body1" paragraph sx={{ lineHeight: 1.9 }}>
+                    我们要这地，再不是少数先知垄断的海图，而是万人共撰的开源航道；
+                  </Typography>
+                  <Typography variant="body1" paragraph sx={{ lineHeight: 1.9 }}>
+                    我们要那所谓的“天命”，在人族共识面前，如诸佛般——烟消云散。
+                  </Typography>
+                  <Typography variant="body1" paragraph sx={{ lineHeight: 1.9, mt: 2 }}>
+                    明命 · Ming：以共识为笔，重铸每个人自己人生的剧本。
                   </Typography>
                   <Divider sx={{ my: 3 }} />
                   <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap', mt: 3 }}>

@@ -211,23 +211,22 @@ const Philosophy: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* 卷三 · 三元闭环 */}
+        {/* 卷三 · 多元闭环 · 命理共学 · 参数选择 · 仪式实践 */}
         <Card sx={{ mb: 4, border: `1px solid ${theme.palette.divider}` }}>
           <CardContent sx={{ p: { xs: 3, md: 4 } }}>
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-              卷三 · 三元闭环
+              卷三 · 多元闭环 · 命理共学 · 参数选择 · 仪式实践
             </Typography>
             
             <Box sx={{ mb: 3 }}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                🔮 命理 · 镜头
+                🔮 命理 · 共学
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                以您选择的命理流派为建模语言——四柱、星宿、紫微、五行……
-                为您提供理解个人状态的结构化视角。
+                选择的同频命理流派——奇门、太乙、四柱、六壬、紫微……为你提供理解个人状态的结构化视角。
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                这不是诊断，这是视角。不是预言，是翻译。
+                注意，这不是诊断，只是视角；不是预言，只是解读。
               </Typography>
             </Box>
 
@@ -235,44 +234,37 @@ const Philosophy: React.FC = () => {
 
             <Box sx={{ mb: 3 }}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                🤝 共识 · 镜头维护者
+                🤝 共识 · 协议参数
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                每个流派都是一套独特的观察镜头。
+                每个流派都是一套独特的观察视角。子平视角下，论述的是日主强弱、格局高低；紫微视角下，讲的是星曜分布。
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                子平镜头下，你是日主强弱、格局高低；星宿镜头下，你是二十八宿分野；五行镜头下，你是木火土金水的流动节律。
+                在这里，没有哪个视角是「唯一正确的」解读。它们只是不同的猜测模型，用以逼近那个不可穷尽的信号本源。
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                没有镜头是「唯一真实的」——就像没有色温是「唯一正确的」。它们只是不同的猜测模型，用来逼近——或用来对话——那个不可穷尽的隐藏信号。
-              </Typography>
-              <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                DAO 是镜头维护者的自治组织——他们负责让这套镜头持续开源、可审计、可迭代。
+                DAO 是视角维护的自治组织——他们负责让这套镜头持续开源、可审计、可迭代。
               </Typography>
               <Box sx={{ my: 3, p: 2, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1 }}>
                 <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-                  镜头维护者的权力有明确边界：
+                  维护者的权力有明确边界：
                 </Typography>
                 <Typography variant="body2" color="text.secondary" component="div" sx={{ lineHeight: 1.8 }}>
-                  任何改变算法输出的修改，必须：
+                  任何共识参数的修改，仅可以分叉，不可以删除。平台虽然不能裁决哪个 DAO 正确，但是可以确保每个版本的开源与可追溯性：
                   <ol style={{ marginTop: '8px', paddingLeft: '24px' }}>
-                    <li>发布为独立版本号（子平 v1.2、子平 v2.0）</li>
-                    <li>与原版本长期并存，永不强制替换</li>
-                    <li>在切换界面标明版本差异与演化历史</li>
+                    <li>每个版本都以开源协议托管</li>
+                    <li>历史版本长期可见，不被抹除</li>
+                    <li>参数演化路径清晰可追溯</li>
                   </ol>
                 </Typography>
               </Box>
-              <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic', pl: 2, borderLeft: `3px solid ${theme.palette.secondary.main}` }}>
-                <strong>DAO 不裁决「哪个版本正确」。它只确保每个版本都开源、可审计、可追溯。</strong>
+              <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+                用户可以选择不同的视角切换，只需加入不同的 DAO 即可。重要的问题在于，这里的切换没有叛教的伦理负担，只有工具的更替。
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                你的个人主页可以一键切换镜头，并长期保留选择旧版本的权利。当某个版本因客观依赖无法继续维护时，DAO 会提前公告并提供迁移工具或存档快照。
-              </Typography>
-              <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                昨天你信子平 v1.0，今天你试子平 v2.0，明天你切到星宿——这里没有叛教，只有视角迁徙。
-              </Typography>
-              <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                我们将逐步开源所有流派算法的核心实现，以开源协议托管于 GitHub。创世期后，你便可以在 <MuiLink href="https://github.com/LuckeeDAO/ming" target="_blank" rel="noopener noreferrer">GitHub</MuiLink> 审阅代码、提交提案，甚至成为镜头维护者的一员——因为对「命」的建模，本就不该有终极权威。
+                我们将逐步开源所有流派算法的核心实现，以开源协议托管于 GitHub。创世期后，你便可以在
+                <MuiLink href="https://github.com/LuckeeDAO/ming" target="_blank" rel="noopener noreferrer"> GitHub </MuiLink>
+                审阅代码、提交提案，成为 DAO 维护者。
               </Typography>
             </Box>
 
@@ -280,39 +272,23 @@ const Philosophy: React.FC = () => {
 
             <Box>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                🎭 仪式 · 契约
+                🕯️ 仪式 · 契约
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                仪式是将意图锚定成链上契约的动作。
-              </Typography>
-              <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                每一次铸造，都是一份可编程的自我承诺。
+                仪式是将意图锚定成链上契约的动作。每一次铸造，都是一份可编程的自我承诺。
               </Typography>
               <Box sx={{ my: 2, p: 2, bgcolor: 'background.paper', border: `1px solid ${theme.palette.divider}`, borderRadius: 1 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace', lineHeight: 1.8 }}>
-                  「未来40天，我将在晨间播放这段誓言。」<br />
-                  「每日静坐10分钟，持续21天。」<br />
-                  「每当看到这枚NFT，提醒自己：如山稳固。」
+                  「未来 40 天，我将在晨间播放这段誓言。」<br />
+                  「每当看到这枚 NFT，我都要提醒自己：像如流水一样谦逊」。
                 </Typography>
               </Box>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                链上记录每一次履约，不是为了监视你——是为了让未来的你，看得见过去的自己走了多远。
-              </Typography>
-              <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                当你完成第40次播放，NFT将自动点亮一枚徽章。这不是平台的奖励，是你自己兑现给自己的勋章。
+                链上记录的每一次履约，都是为了让未来的自己，看得见过去的自己走了什么样的历程，这种心路历程，既是个人的自我鉴定，也是后来人的参照。
               </Typography>
               <Divider sx={{ my: 3 }} />
-              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-                如果契约没有走完——
-              </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                如果40天的誓言在第15天就悄然沉寂——
-              </Typography>
-              <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                那枚NFT会永远停留在15/40。它不是耻辱柱，是未完成的路标。
-              </Typography>
-              <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                你可以让它留在钱包里，作为温柔的提醒；也可以将它发送至黑洞地址，让链上时间帮你封印那段半途。
+                如果你想放弃一段契约，你可以让它留在钱包里，作为温柔的提醒；也可以将它发送至黑洞地址，让链上时间帮你封印那段半途。
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic', pl: 2, borderLeft: `3px solid ${theme.palette.secondary.main}` }}>
                 <strong>销毁不是删除记忆。销毁是一场关于放下的微型仪式。</strong>
@@ -321,7 +297,7 @@ const Philosophy: React.FC = () => {
                 无论你是否销毁，你永远有权铸造一枚新的契约。上一份誓言没有兑现，不剥夺你重新承诺的资格。
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-                你可以公开这份履约记录，作为链上简历；也可以永久私藏，作为无人知晓的骄傲。
+                你可以公开这份履约记录，作为链上历史；也可以永久私藏，作为无人知晓的纪念。
               </Typography>
             </Box>
           </CardContent>
