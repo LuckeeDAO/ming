@@ -1,0 +1,8 @@
+[workspace]
+members = [
+  "programs/ming_connection"
+]
+resolver = "2"
+
+[profile.release]
+overflow-checks = true

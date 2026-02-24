@@ -17,12 +17,10 @@ srcs/
 │   ├── assets/           # 静态资源
 │   ├── App.tsx           # 根组件
 │   └── main.tsx          # 入口文件
-├── contracts/            # 智能合约
-│   ├── ConnectionNFT.sol
-│   └── interfaces/
 ├── package.json          # 项目配置
 ├── tsconfig.json         # TypeScript配置
 ├── vite.config.ts        # Vite配置
+├── env.example           # 环境变量模板（可跟踪）
 └── README.md             # 本文件
 ```
 
@@ -40,6 +38,20 @@ npm install
 npm run dev
 ```
 
+### 环境变量
+
+复制并编辑：
+
+```bash
+cp env.example .env
+```
+
+关键配置：
+
+- `VITE_CHAIN_FAMILY=evm|solana`
+- `VITE_CHAIN_NETWORK`（如 `sepolia` / `solana-devnet`）
+- `VITE_NFT_CONTRACT_ADDRESS`（EVM 合约地址或 Solana Program ID）
+
 ### 构建生产版本
 
 ```bash
@@ -54,11 +66,13 @@ npm test
 
 ## 📝 开发规范
 
-请参考 `/docs/04-开发指南/` 目录下的开发规范文档。
+请参考 `../docs/04-开发指南/` 目录下的开发规范文档。
 
 ## 🔗 相关文档
 
-- [项目概述](../../docs/01-项目概述/)
-- [概要设计](../../docs/02-概要设计/)
-- [详细设计](../../docs/03-详细设计/)
-- [开发指南](../../docs/04-开发指南/)
+- [项目概述](../docs/01-项目概述/)
+- [概要设计](../docs/02-概要设计/)
+- [详细设计](../docs/03-详细设计/)
+- [开发指南](../docs/04-开发指南/)
+- [钱包接口](../docs/钱包接口/)
+- [智能合约](../docs/智能合约/)

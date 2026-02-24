@@ -180,6 +180,15 @@ export interface NFTMetadata {
     scheduledTime: string;
     mintedTime?: string;
   };
+  /** 封局释放评价（可选） */
+  releaseEvaluation?: {
+    completionScore: number; // 履约完成度 1-5
+    resonanceScore: number; // 自我共振度 1-5
+    publicNarrative: string; // 公开叙事摘要
+    nextStageGoal: string; // 下一阶段意图
+    releasedAt: string; // 释放时间
+    version: '1.0';
+  };
   /** 能量场见证信息 */
   energyField: {
     consensusHash: string;

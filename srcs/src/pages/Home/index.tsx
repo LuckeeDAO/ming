@@ -35,6 +35,7 @@ import {
 } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import { getWhitepaperChapters } from '../../content/whitepaperChapters';
+import CapabilityStatusLegend from '../../components/common/CapabilityStatusLegend';
 
 const Home: React.FC = () => {
   const theme = useTheme();
@@ -201,6 +202,8 @@ const Home: React.FC = () => {
                   直接访问 <Link to="/philosophy" style={{ color: theme.palette.primary.main, textDecoration: 'none' }}>完整白皮书页面</Link> 查看全部内容。
                 </Typography>
               </Box>
+
+              <CapabilityStatusLegend maxWidth="1000px" compact />
 
               <Box sx={{ maxWidth: '1000px', mx: 'auto' }}>
                 {chapters.map((chapter, index) => {
@@ -520,6 +523,30 @@ const Home: React.FC = () => {
                   </CardContent>
                 </Card>
               </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    border: `1px solid ${theme.palette.divider}`,
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
+                      🎭 封局释放与评价归档
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                      当一段契约完成后，你可以发起封局释放：移除隐私字段，保留公开见证。
+                      同时填写履约完成度、自我共振度、公开叙事摘要与下一阶段意图，并写入 NFT 属性，形成可回看的“结项说明”。
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
 
             {/* 使用流程说明 */}
@@ -535,7 +562,7 @@ const Home: React.FC = () => {
                 </Typography>
                 <Box sx={{ pl: 2 }}>
                   <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                    <strong>步骤1：连接钱包</strong> —— 连接 andao 钱包，确认你愿意为这次自我声明承担链上签名与 Gas 成本。
+                    <strong>步骤1：连接钱包</strong> —— 连接 andao 钱包，确认你愿意为这次自我声明承担链上签名与手续费成本。
                   </Typography>
                   <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
                     <strong>步骤2：选择仪式类型</strong> —— 是一次命理调理、一封节日贺卡，还是一段特定时期的自我练习契约？
@@ -551,6 +578,9 @@ const Home: React.FC = () => {
                   </Typography>
                   <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8, mt: 2 }}>
                     <strong>步骤6：回看与迭代</strong> —— 在「我的连接」与能量履历中回看这段时间的状态波动，必要时调整镜头或重新书写契约。
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
+                    <strong>步骤7：封局释放与结项</strong> —— 当契约完成后，执行封局释放并填写评价参数，将这段实践归档为可验证、可回看的完成篇章。
                   </Typography>
                 </Box>
               </CardContent>
@@ -602,7 +632,7 @@ const Home: React.FC = () => {
                       区块链 & 存储
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      使用 ethers.js 对接区块链与 ERC-721 合约，负责仪式 NFT 的铸造与查询。
+                      区块链与 NFT 采用多链兼容接入架构，通过钱包消息协议（`MING_WALLET_*`）统一调用；当前已接入 Solana Program（Anchor），并预留其他链的接入能力。
                       图片与元数据托管在 IPFS 与本地存储中：你的八字可以保存在本地设备，你的选择则以链上事件形式可验证地记录下来。
                     </Typography>
                   </CardContent>

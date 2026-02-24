@@ -35,6 +35,12 @@ export interface WalletInfo {
   balance: string;
 }
 
+export interface ChainContext {
+  chainFamily: 'evm' | 'solana';
+  chainId: number; // EVM语义；Solana下用0兼容
+  network: string; // 如 sepolia / solana-devnet
+}
+
 class WalletService {
   private provider: ethers.BrowserProvider | null = null;
 
@@ -129,6 +135,30 @@ class WalletService {
       address,
       networkId,
       balance,
+    };
+  }
+
+  /**
+   * 获取当前链上下文（兼容EVM/Solana）
+   */
+  async getChainContext(): Promise<ChainContext> {
+    const chainFamily = (
+      import.meta.env.VITE_CHAIN_FAMILY || 'evm'
+    ).toLowerCase() as 'evm' | 'solana';
+
+    if (chainFamily === 'solana') {
+      return {
+        chainFamily,
+        chainId: 0,
+        network: import.meta.env.VITE_CHAIN_NETWORK || 'solana-devnet',
+      };
+    }
+
+    const chainId = await this.getNetworkId();
+    return {
+      chainFamily: 'evm',
+      chainId,
+      network: import.meta.env.VITE_CHAIN_NETWORK || '',
     };
   }
 }

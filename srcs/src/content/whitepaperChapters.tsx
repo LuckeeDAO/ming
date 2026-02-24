@@ -10,6 +10,23 @@ export interface WhitepaperChapter {
   detail: React.ReactNode;
 }
 
+const CHAPTER_STATUS: Record<string, string> = {
+  intro: '理念与定位口径（已上线）',
+  volume1: '团队定位与价值边界（已上线）',
+  volume2: '哲学框架与方法论（已上线）',
+  volume3: '共学/共识设定/铸造流程（已上线）；封局释放与评价参数（已上线）',
+  volume4: '外物/节气/择时/记录（已上线）；封局后履历沉淀与评价归档（已上线）',
+  volume5: '多链兼容链路与钱包协议（已上线）；封局隐私释放自动化（已上线）',
+  volume6: '方法论声明与风险边界（已上线）',
+  volume7: '行动主张与共识实践方向（已上线）',
+};
+
+const CapabilityStatusLine: React.FC<{ text: string }> = ({ text }) => (
+  <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: 1.5 }}>
+    能力状态：{text}
+  </Typography>
+);
+
 export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
   {
     id: 'intro',
@@ -22,6 +39,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
           第一节 · 平台缘起与定位
         </Typography>
+        <CapabilityStatusLine text={CHAPTER_STATUS.intro} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           明命 · Ming 是一个以「天不可尽知、地为共识理论、人为实践主体」为内核的 Web3 仪式平台。
         </Typography>
@@ -49,6 +67,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
           第二节 · 我们是谁
         </Typography>
+        <CapabilityStatusLine text={CHAPTER_STATUS.volume1} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           明命 · Ming 知命为明，非为窥道，乃为明心。我们不是先知，不是圣人，而是绘图师与航海者：以匠人般的耐心校准坐标、修补海图。
         </Typography>
@@ -75,6 +94,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
           第三节 · 哲学基石：天·命·地·人·时
         </Typography>
+        <CapabilityStatusLine text={CHAPTER_STATUS.volume2} />
         <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main, mt: 2 }}>
           天 · 客体之域
         </Typography>
@@ -147,6 +167,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
           第四节 · 三元闭环：共学·共识设定·仪式实践
         </Typography>
+        <CapabilityStatusLine text={CHAPTER_STATUS.volume3} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           🔮 命理共学 · 选择视角：你可选择同频流派——奇门、太乙、四柱、六壬、紫微……它们为你提供理解个人状态的结构化视角。注意：这不是诊断，只是视角；不是预言，只是解读。
         </Typography>
@@ -193,16 +214,19 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         </Typography>
         <Divider sx={{ my: 2 }} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-          🎭 仪式实践（续）· 封局归档：如果契约圆满达成——当一份契约完成了它的历史使命，无论是一段誓言被完整履行，还是一个阶段的自我叙事自然落幕——你可以选择为它举行「封局仪式」。
+          🎭 仪式实践 · 封局释放：如果契约圆满达成——当一份契约完成了它的历史使命，无论是一段誓言被完整履行，还是一个阶段的自我叙事自然落幕——你可以选择为它举行「封局仪式」。
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-          封局，如同奇门遁甲中的局终之仪，是对这段经历的郑重告别与归档。发起封局后，该 NFT 将自动移除或隐藏其绑定的个人隐私数据（如生辰哈希），仅保留公开元数据与链上见证记录。
+          封局，是对这段经历的郑重告别与归档。发起封局后，该 NFT 将自动移除或隐藏其绑定的个人隐私数据（如生辰哈希），仅保留公开元数据与链上见证记录。
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+          在封局流程中，你还需要填写一组评价参数：履约完成度、自我共振度、公开叙事摘要、下一阶段意图。系统会将这些参数写入 NFT 的公开属性，作为这段契约周期的可验证结项说明。
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           封局之后的 NFT，不再承载你的隐私承诺，但依然铭刻那段时光的存在。你可以将其永久珍藏，作为自我历史的纪念章；也可以让它进入市场流转，成为可被他人见证的匿名共识凭证。
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-          封局不是销毁，而是转化——从私密契约，转化为可公开的叙事碎片。你始终拥有对自我历史如何被展示的决定权。
+          封局不是销毁，而是「释放」——让一段私密契约进入公开见证，宣告该契约周期已完成，并可进入市场流通。你始终拥有对自我历史如何被展示的决定权。
         </Typography>
       </>
     ),
@@ -217,6 +241,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
           第五节 · 体验形态：你的工具箱
         </Typography>
+        <CapabilityStatusLine text={CHAPTER_STATUS.volume4} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           🌿 外物 · 符号锚点：根据你选择的视角，挑选与之适配的自然符号——昆仑的土、太湖的水、长白山的木、罗浮山的火、华山的金，甚至你自创的物象。
           它不是神秘替代，而是你为自己设定的注意力锚点。完成链上铸造后，这枚 NFT 会持续提醒你：「接下来，我要像山一样稳固。」或「接下来，我要像水一样谦逊。」
@@ -232,6 +257,9 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           每一次切换共识视角，过去的时光都会被新的语言重新诉说——昨天的「火旺」可能变成今天的「燥土」。这不是记忆被篡改，这是你对历史共识的重新解读。完成封局后的 NFT，也会在履历中沉淀为一个「已完成篇章」。
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+          这枚「已完成篇章」不仅记录“完成”本身，也记录你对这一阶段的自评参数，使后续回看时既有事实轨迹，也有当时的主观标注。
         </Typography>
         <Divider sx={{ my: 3 }} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
@@ -253,9 +281,11 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
           第六节 · 技术实现：载体，不是信仰
         </Typography>
+        <CapabilityStatusLine text={CHAPTER_STATUS.volume5} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           我们使用现代 Web3 技术栈，只为一件事：让「意图锚定、集体见证、可追溯记录」成为可能。
-          前端基于 React 18 + TypeScript + Material-UI + Vite；区块链与 NFT 基于 ethers.js + ERC-721；存储结合 IPFS 与本地存储。
+          前端基于 React 18 + TypeScript + Material-UI + Vite；区块链与 NFT 采用多链兼容的合约接入方式（当前已接入 Solana Program / Anchor），通过钱包消息协议（`MING_WALLET_*`）统一调用；
+          链族由 `chainFamily` 参数选择（如 `solana` / `evm`）；存储结合 IPFS 与本地存储。
         </Typography>
         <Box sx={{ my: 3, p: 3, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1, border: `2px solid ${theme.palette.primary.main}40` }}>
           <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, mb: 2, color: theme.palette.primary.main }}>
@@ -268,7 +298,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
             你通过钱包私钥完全控制隐私数据。Ming 不会主动收集或存储你的原始数据；没有私钥，Ming 无法解析你的八字信息。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            当你发起封局仪式时，系统会更新链上关联的元数据引用（如新的 IPFS 哈希），将隐私字段移除或转为不可逆摘要，仅保留公开可验证信息。
+            当你发起封局仪式时，系统将按封局规则进入“隐私释放”流程：更新链上关联元数据引用（如新的 IPFS 哈希），将隐私字段移除或转为不可逆摘要，仅保留公开可验证信息。
           </Typography>
         </Box>
       </>
@@ -284,6 +314,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
           第七节 · 效用归属：验证在实践
         </Typography>
+        <CapabilityStatusLine text={CHAPTER_STATUS.volume6} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           在 Ming 平台，没有人能替你确认某个流派的解读是否「对」。
         </Typography>
@@ -325,6 +356,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
           第八节 · 行动宣言：明其心，知其地，行其路，续其明
         </Typography>
+        <CapabilityStatusLine text={CHAPTER_STATUS.volume7} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           我们不知道天命的运行规律究竟是什么；但我们知道，人类始终可以在实践中持续逼近它。
         </Typography>

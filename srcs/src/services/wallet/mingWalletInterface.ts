@@ -25,14 +25,19 @@ import {
   GetScheduledTasksByWalletResponse,
   CancelScheduledTaskRequest,
   CancelScheduledTaskResponse,
+  ReleaseConnectionRequest,
+  ReleaseConnectionResponse,
   WalletErrorCode,
+  WALLET_PROTOCOL_VERSION,
 } from '../../types/wallet';
+import { isValidContractAddress, isValidTokenURI } from '../../utils/validation';
 
 /**
  * 钱包接口服务类
  */
 class MingWalletInterface {
   private readonly MESSAGE_TYPE_PREFIX = 'MING_WALLET_';
+  private readonly PROTOCOL_VERSION = WALLET_PROTOCOL_VERSION;
   private readonly REQUEST_TIMEOUT = 300000; // 5分钟超时
   private readonly targetOrigin: string =
     import.meta.env.VITE_WALLET_TARGET_ORIGIN || window.location.origin;
@@ -47,6 +52,15 @@ class MingWalletInterface {
     // 默认允许同源与目标源，兼容本地联调
     return new Set([window.location.origin, this.targetOrigin, ...configured]);
   })();
+
+  private readonly CONSENSUS_HASH_PATTERN = /^0x[a-fA-F0-9]{64}$/;
+
+  private withProtocolVersion<T extends object>(payload: T): T & { protocolVersion: string } {
+    return {
+      ...payload,
+      protocolVersion: this.PROTOCOL_VERSION,
+    };
+  }
 
   /**
    * 发送消息到钱包并等待响应
@@ -130,16 +144,17 @@ class MingWalletInterface {
       // 发送请求到钱包
       const response = await this.sendMessage<MintNFTResponse>(
         'MINT_NFT',
-        request
+        this.withProtocolVersion(request)
       );
 
       return response;
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
         error: {
-          code: WalletErrorCode.NETWORK_ERROR,
-          message: error instanceof Error ? error.message : 'Unknown error',
+          code: this.mapErrorCode(message),
+          message,
         },
       };
     }
@@ -161,16 +176,17 @@ class MingWalletInterface {
       // 发送请求到钱包
       const response = await this.sendMessage<CreateScheduledTaskResponse>(
         'CREATE_SCHEDULED_TASK',
-        request
+        this.withProtocolVersion(request)
       );
 
       return response;
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
         error: {
-          code: WalletErrorCode.NETWORK_ERROR,
-          message: error instanceof Error ? error.message : 'Unknown error',
+          code: this.mapErrorCode(message),
+          message,
         },
       };
     }
@@ -190,16 +206,17 @@ class MingWalletInterface {
 
       const response = await this.sendMessage<GetScheduledTaskResponse>(
         'GET_SCHEDULED_TASK',
-        { taskId }
+        this.withProtocolVersion({ taskId })
       );
 
       return response;
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
         error: {
-          code: WalletErrorCode.NETWORK_ERROR,
-          message: error instanceof Error ? error.message : 'Unknown error',
+          code: this.mapErrorCode(message),
+          message,
         },
       };
     }
@@ -215,22 +232,24 @@ class MingWalletInterface {
     request: GetScheduledTasksByWalletRequest
   ): Promise<GetScheduledTasksByWalletResponse> {
     try {
+      this.validateProtocolVersion(request.protocolVersion);
       if (!request.walletAddress) {
         throw new Error('Wallet address is required');
       }
 
       const response = await this.sendMessage<GetScheduledTasksByWalletResponse>(
         'GET_SCHEDULED_TASKS_BY_WALLET',
-        request
+        this.withProtocolVersion(request)
       );
 
       return response;
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
         error: {
-          code: WalletErrorCode.NETWORK_ERROR,
-          message: error instanceof Error ? error.message : 'Unknown error',
+          code: this.mapErrorCode(message),
+          message,
         },
       };
     }
@@ -246,22 +265,54 @@ class MingWalletInterface {
     request: CancelScheduledTaskRequest
   ): Promise<CancelScheduledTaskResponse> {
     try {
+      this.validateProtocolVersion(request.protocolVersion);
       if (!request.taskId) {
         throw new Error('Task ID is required');
       }
 
       const response = await this.sendMessage<CancelScheduledTaskResponse>(
         'CANCEL_SCHEDULED_TASK',
-        request
+        this.withProtocolVersion(request)
       );
 
       return response;
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
         error: {
-          code: WalletErrorCode.NETWORK_ERROR,
-          message: error instanceof Error ? error.message : 'Unknown error',
+          code: this.mapErrorCode(message),
+          message,
+        },
+      };
+    }
+  }
+
+  /**
+   * 封局释放连接NFT
+   *
+   * @param request - 封局释放请求参数
+   * @returns 释放结果
+   */
+  async releaseConnectionNFT(
+    request: ReleaseConnectionRequest
+  ): Promise<ReleaseConnectionResponse> {
+    try {
+      this.validateReleaseRequest(request);
+
+      const response = await this.sendMessage<ReleaseConnectionResponse>(
+        'RELEASE_CONNECTION_NFT',
+        this.withProtocolVersion(request)
+      );
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return {
+        success: false,
+        error: {
+          code: this.mapErrorCode(message),
+          message,
         },
       };
     }
@@ -271,20 +322,29 @@ class MingWalletInterface {
    * 验证铸造请求参数
    */
   private validateMintRequest(request: MintNFTRequest): void {
+    this.validateProtocolVersion(request.protocolVersion);
     if (!request.ipfs) {
       throw new Error('IPFS data is required');
     }
     if (!request.ipfs.imageHash || !request.ipfs.metadataHash) {
       throw new Error('IPFS hash is required');
     }
-    if (!request.consensusHash) {
-      throw new Error('Consensus hash is required');
-    }
+    this.validateConsensusHash(request.consensusHash);
     if (!request.contract || !request.contract.address) {
       throw new Error('Contract address is required');
     }
     if (!request.params || !request.params.to) {
       throw new Error('Recipient address is required');
+    }
+    this.validateTiming(request.timing, 'immediate');
+
+    const chainFamily = request.contract.chainFamily || 'evm';
+    this.validateChainContext(request.contract, chainFamily);
+    if (!isValidContractAddress(request.contract.address, chainFamily)) {
+      throw new Error(`Invalid contract address for chain family: ${chainFamily}`);
+    }
+    if (!isValidContractAddress(request.params.to, chainFamily)) {
+      throw new Error(`Invalid recipient address for chain family: ${chainFamily}`);
     }
   }
 
@@ -294,6 +354,7 @@ class MingWalletInterface {
   private validateScheduledTaskRequest(
     request: CreateScheduledTaskRequest
   ): void {
+    this.validateProtocolVersion(request.protocolVersion);
     if (!request.scheduledTime) {
       throw new Error('Scheduled time is required');
     }
@@ -304,6 +365,11 @@ class MingWalletInterface {
     if (scheduledTime <= now) {
       throw new Error('Scheduled time must be in the future');
     }
+    this.validateTiming(request.timing, 'scheduled');
+    const timingExecuteAt = new Date(request.timing.executeAt);
+    if (Math.abs(timingExecuteAt.getTime() - scheduledTime.getTime()) > 1000) {
+      throw new Error('timing.executeAt must equal scheduledTime');
+    }
 
     if (!request.ipfs) {
       throw new Error('IPFS data is required');
@@ -311,12 +377,127 @@ class MingWalletInterface {
     if (!request.ipfs.imageHash || !request.ipfs.metadataHash) {
       throw new Error('IPFS hash is required');
     }
-    if (!request.consensusHash) {
-      throw new Error('Consensus hash is required');
-    }
+    this.validateConsensusHash(request.consensusHash);
     if (!request.contract || !request.contract.address) {
       throw new Error('Contract address is required');
     }
+
+    const chainFamily = request.contract.chainFamily || 'evm';
+    this.validateChainContext(request.contract, chainFamily);
+    if (!isValidContractAddress(request.contract.address, chainFamily)) {
+      throw new Error(`Invalid contract address for chain family: ${chainFamily}`);
+    }
+    if (!request.params || !request.params.to) {
+      throw new Error('Recipient address is required');
+    }
+    if (!isValidContractAddress(request.params.to, chainFamily)) {
+      throw new Error(`Invalid recipient address for chain family: ${chainFamily}`);
+    }
+  }
+
+  /**
+   * 验证封局释放请求参数
+   */
+  private validateReleaseRequest(request: ReleaseConnectionRequest): void {
+    this.validateProtocolVersion(request.protocolVersion);
+    if (!request.contract || !request.contract.address) {
+      throw new Error('Contract address is required');
+    }
+    if (!request.params || !request.params.tokenId) {
+      throw new Error('Token ID is required');
+    }
+    if (!request.params.releasedTokenURI) {
+      throw new Error('Released token URI is required');
+    }
+    if (!isValidTokenURI(request.params.releasedTokenURI)) {
+      throw new Error('Invalid token URI protocol: only ipfs:// or https:// is allowed');
+    }
+
+    const chainFamily = request.contract.chainFamily || 'evm';
+    this.validateChainContext(request.contract, chainFamily);
+    if (!isValidContractAddress(request.contract.address, chainFamily)) {
+      throw new Error(`Invalid contract address for chain family: ${chainFamily}`);
+    }
+  }
+
+  private validateConsensusHash(consensusHash: string): void {
+    if (!consensusHash) {
+      throw new Error('Consensus hash is required');
+    }
+    if (!this.CONSENSUS_HASH_PATTERN.test(consensusHash)) {
+      throw new Error('Consensus hash must be 0x-prefixed 32-byte hex string');
+    }
+  }
+
+  private validateProtocolVersion(protocolVersion: string): void {
+    if (!protocolVersion) {
+      throw new Error('protocolVersion is required');
+    }
+    if (protocolVersion !== this.PROTOCOL_VERSION) {
+      throw new Error(`Unsupported protocolVersion: ${protocolVersion}`);
+    }
+  }
+
+  private validateChainContext(
+    contract: MintNFTRequest['contract'] | CreateScheduledTaskRequest['contract'],
+    chainFamily: 'evm' | 'solana'
+  ): void {
+    if (chainFamily === 'solana') {
+      if (!contract.network || contract.network.trim().length === 0) {
+        throw new Error('Solana contract.network is required');
+      }
+      return;
+    }
+
+    if (!Number.isFinite(contract.chainId) || contract.chainId <= 0) {
+      throw new Error('EVM contract.chainId must be a positive number');
+    }
+  }
+
+  private validateTiming(
+    timing: MintNFTRequest['timing'] | CreateScheduledTaskRequest['timing'],
+    expectedStrategy: 'immediate' | 'scheduled'
+  ): void {
+    if (!timing) {
+      throw new Error('Timing is required');
+    }
+    if (!timing.requestedAt || Number.isNaN(new Date(timing.requestedAt).getTime())) {
+      throw new Error('Invalid timing.requestedAt');
+    }
+    if (!timing.executeAt || Number.isNaN(new Date(timing.executeAt).getTime())) {
+      throw new Error('Invalid timing.executeAt');
+    }
+    if (timing.strategy !== expectedStrategy) {
+      throw new Error(`Invalid timing.strategy: expected ${expectedStrategy}`);
+    }
+    if (expectedStrategy === 'scheduled') {
+      const executeAt = new Date(timing.executeAt);
+      if (executeAt <= new Date()) {
+        throw new Error('timing.executeAt must be in the future');
+      }
+    }
+  }
+
+  private mapErrorCode(message: string): WalletErrorCode {
+    const lower = message.toLowerCase();
+
+    if (lower.includes('scheduled time must be in the future')) {
+      return WalletErrorCode.INVALID_SCHEDULED_TIME;
+    }
+    if (
+      lower.includes('contract.network is required') ||
+      lower.includes('chainid must be a positive number')
+    ) {
+      return WalletErrorCode.CHAIN_NOT_SUPPORTED;
+    }
+    if (
+      lower.includes('invalid') ||
+      lower.includes('required') ||
+      lower.includes('consensus hash must')
+    ) {
+      return WalletErrorCode.INVALID_PARAMS;
+    }
+    return WalletErrorCode.NETWORK_ERROR;
   }
 }
 

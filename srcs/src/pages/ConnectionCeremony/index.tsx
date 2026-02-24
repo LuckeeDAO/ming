@@ -85,6 +85,8 @@ import DateTimePicker from '../../components/ceremony/DateTimePicker';
 import { energyAnalysisService } from '../../services/energy/energyAnalysisService';
 import { externalObjectService } from '../../services/energy/externalObjectService';
 import { formatDate } from '../../utils/format';
+import { isValidContractAddress } from '../../utils/validation';
+import { WALLET_PROTOCOL_VERSION } from '../../types/wallet';
 
 /**
  * NFT铸造表单数据接口
@@ -485,8 +487,9 @@ const ConnectionCeremony: React.FC = () => {
       // 注意：IPFS哈希不是16进制字符串，需要使用keccak256进行哈希处理
       const consensusHash = ethers.keccak256(ethers.toUtf8Bytes(metadataHash));
 
-      // 5. 获取合约配置
-      const chainId = await walletService.getNetworkId();
+      // 5. 获取合约配置（兼容EVM/Solana）
+      const chainContext = await walletService.getChainContext();
+      const { chainFamily, chainId, network } = chainContext;
       const contractAddress = import.meta.env.VITE_NFT_CONTRACT_ADDRESS;
       
       // 验证合约地址配置
@@ -494,16 +497,23 @@ const ConnectionCeremony: React.FC = () => {
         throw new Error('NFT合约地址未配置，请检查环境变量VITE_NFT_CONTRACT_ADDRESS');
       }
       
-      // 验证合约地址格式
-      if (!/^0x[a-fA-F0-9]{40}$/.test(contractAddress)) {
-        throw new Error('NFT合约地址格式无效');
+      if (!isValidContractAddress(contractAddress, chainFamily)) {
+        throw new Error(`NFT合约地址格式无效（chain family: ${chainFamily}）`);
       }
 
       // 6. 根据铸造类型选择处理方式
       if (mintType === 'scheduled') {
+        const nowIso = new Date().toISOString();
         // 定时铸造：调用钱包接口创建定时任务
         const taskResponse = await mingWalletInterface.createScheduledTask({
+          protocolVersion: WALLET_PROTOCOL_VERSION,
           scheduledTime: formData.scheduledTime!,
+          timing: {
+            requestedAt: nowIso,
+            executeAt: formData.scheduledTime!,
+            strategy: 'scheduled',
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
           ipfs: {
             imageHash,
             metadataHash,
@@ -514,6 +524,8 @@ const ConnectionCeremony: React.FC = () => {
           contract: {
             address: contractAddress,
             chainId,
+            chainFamily,
+            ...(network ? { network } : {}),
           },
           params: {
             to: walletAddress,
@@ -539,8 +551,16 @@ const ConnectionCeremony: React.FC = () => {
           tokenURI,
         });
       } else {
+        const nowIso = new Date().toISOString();
         // 立即铸造：调用钱包接口铸造NFT
         const mintResponse = await mingWalletInterface.mintNFT({
+          protocolVersion: WALLET_PROTOCOL_VERSION,
+          timing: {
+            requestedAt: nowIso,
+            executeAt: nowIso,
+            strategy: 'immediate',
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
           ipfs: {
             imageHash,
             metadataHash,
@@ -551,6 +571,8 @@ const ConnectionCeremony: React.FC = () => {
           contract: {
             address: contractAddress,
             chainId,
+            chainFamily,
+            ...(network ? { network } : {}),
           },
           params: {
             to: walletAddress,

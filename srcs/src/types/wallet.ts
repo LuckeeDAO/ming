@@ -9,7 +9,17 @@
 /**
  * NFT铸造请求参数（方案A：Ming平台完成IPFS上传）
  */
+export const WALLET_PROTOCOL_VERSION = '1.0.0';
+
+export interface MintTiming {
+  requestedAt: string; // 请求发起时间（ISO）
+  executeAt: string;   // 期望执行时间（ISO）
+  strategy: 'immediate' | 'scheduled';
+  timezone?: string;
+}
+
 export interface MintNFTRequest {
+  protocolVersion: string; // 协议版本标识，当前固定为 WALLET_PROTOCOL_VERSION
   // IPFS哈希（Ming平台已上传）
   ipfs: {
     imageHash: string;          // 图片IPFS哈希
@@ -20,11 +30,16 @@ export interface MintNFTRequest {
   
   // 共识哈希（Ming平台已生成）
   consensusHash: string;        // bytes32格式的共识哈希
+
+  // 时间语义（钱包用于延时策略与审计）
+  timing: MintTiming;
   
   // 合约调用参数
   contract: {
     address: string;            // NFT合约地址
-    chainId: number;            // 链ID
+    chainId: number;            // 链ID（EVM语义；Solana可传0用于兼容）
+    chainFamily?: 'evm' | 'solana'; // 链族标识（推荐）
+    network?: string;           // 网络标识（如 sepolia / solana-devnet）
   };
   
   // 合约方法参数（用于mintConnection方法）
@@ -59,7 +74,9 @@ export interface MintNFTResponse {
  * 创建定时任务请求参数（方案A：Ming平台完成IPFS上传）
  */
 export interface CreateScheduledTaskRequest {
+  protocolVersion: string; // 协议版本标识，当前固定为 WALLET_PROTOCOL_VERSION
   scheduledTime: string;        // ISO格式时间
+  timing: MintTiming;
   
   // IPFS哈希（Ming平台已上传）
   ipfs: {
@@ -75,7 +92,9 @@ export interface CreateScheduledTaskRequest {
   // 合约调用参数
   contract: {
     address: string;            // NFT合约地址
-    chainId: number;            // 链ID
+    chainId: number;            // 链ID（EVM语义；Solana可传0用于兼容）
+    chainFamily?: 'evm' | 'solana'; // 链族标识（推荐）
+    network?: string;           // 网络标识（如 sepolia / solana-devnet）
   };
   
   // 合约方法参数
@@ -158,6 +177,7 @@ export interface WalletScheduledTaskData {
  * 按钱包地址查询定时任务请求参数
  */
 export interface GetScheduledTasksByWalletRequest {
+  protocolVersion: string; // 协议版本标识，当前固定为 WALLET_PROTOCOL_VERSION
   walletAddress: string;
 }
 
@@ -179,6 +199,7 @@ export interface GetScheduledTasksByWalletResponse {
  * 取消定时任务请求参数
  */
 export interface CancelScheduledTaskRequest {
+  protocolVersion: string; // 协议版本标识，当前固定为 WALLET_PROTOCOL_VERSION
   taskId: string;
 }
 
@@ -187,9 +208,50 @@ export interface CancelScheduledTaskRequest {
  */
 export interface CancelScheduledTaskResponse {
   success: boolean;
+  data?: {
+    taskId?: string;
+    cancelled?: boolean;
+  };
   error?: {
     code: string;
     message: string;
+  };
+}
+
+/**
+ * 封局释放请求参数
+ */
+export interface ReleaseConnectionRequest {
+  protocolVersion: string; // 协议版本标识，当前固定为 WALLET_PROTOCOL_VERSION
+  contract: {
+    address: string;
+    chainId: number; // EVM语义；Solana可传0用于兼容
+    chainFamily?: 'evm' | 'solana';
+    network?: string; // 如 sepolia / solana-devnet
+  };
+  params: {
+    tokenId: string; // 业务标识（EVM tokenId / Solana connection_id）
+    releasedTokenURI: string; // 去隐私后的公开URI（ipfs:// 或 https://）
+    removePrivateData?: boolean; // 默认true
+  };
+}
+
+/**
+ * 封局释放响应结果
+ */
+export interface ReleaseConnectionResponse {
+  success: boolean;
+  data?: {
+    tokenId: string;
+    txHash: string;
+    blockNumber?: number;
+    releasedTokenURI?: string;
+    timestamp?: number;
+  };
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
   };
 }
 

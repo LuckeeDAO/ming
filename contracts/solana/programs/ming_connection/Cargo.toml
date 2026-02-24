@@ -1,0 +1,20 @@
+[package]
+name = "ming_connection"
+version = "0.1.0"
+description = "Ming Connection NFT program on Solana"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "ming_connection"
+
+[features]
+default = []
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+
+[dependencies]
+anchor-lang = "0.32.1"
+anchor-spl = { version = "0.32.1", features = ["metadata"] }

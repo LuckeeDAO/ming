@@ -6,6 +6,7 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "test:coverage": "hardhat coverage",
+    "check:mint-permission:local": "hardhat run scripts/check_mint_permission.js --network localhost",
     "deploy:local": "hardhat run scripts/deploy.js --network localhost",
     "deploy:goerli": "hardhat run scripts/deploy.js --network goerli",
     "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",

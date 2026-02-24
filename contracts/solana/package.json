@@ -1,0 +1,13 @@
+{
+  "name": "ming-solana-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "anchor build",
+    "test": "anchor test"
+  },
+  "devDependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "typescript": "^5.6.3"
+  }
+}

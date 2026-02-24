@@ -1,8 +1,9 @@
 /**
  * 直接铸造NFT服务
  * 
- * 使用ethers.js直接调用合约，不通过钱包接口
- * 适用于外部钱包（如MetaMask）直接连接
+ * @deprecated
+ * 当前项目已统一采用钱包消息协议进行铸造（mingWalletInterface）。
+ * 本服务保留为历史参考，不建议在现行流程中使用。
  * 
  * 功能：
  * - 直接调用合约的mintConnection方法

@@ -47,8 +47,12 @@ deployments/
 Thumbs.db
 .DS_Store
 
-# Documentation (excluded from GitHub)
-docs/
+# Documentation (default excluded from GitHub; allow key specs)
+docs/*
+!docs/智能合约/
+!docs/智能合约/**
+!docs/钱包接口/
+!docs/钱包接口/**
 
 # Reference files (excluded from GitHub)
 ref/

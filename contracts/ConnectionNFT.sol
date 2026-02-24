@@ -20,7 +20,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
  * 安全特性：
  * - 使用OpenZeppelin的安全库
  * - 重入攻击防护
- * - 权限控制（仅所有者可铸造）
+ * - 权限控制（治理操作仅所有者可执行）
  * - 输入验证
  * 
  * @author Ming Platform Team
@@ -115,7 +115,7 @@ contract ConnectionNFT is ERC721URIStorage, Ownable, ReentrancyGuard {
      * - 更新用户Token列表
      * - 触发ConnectionMinted事件
      * 
-     * 权限：仅合约所有者可调用
+     * 权限：公开可调用（任意用户可发起铸造）
      * 
      * @param to - NFT接收地址
      * @param tokenURI - IPFS元数据URI
@@ -132,7 +132,6 @@ contract ConnectionNFT is ERC721URIStorage, Ownable, ReentrancyGuard {
         bytes32 consensusHash
     ) 
         public 
-        onlyOwner 
         nonReentrant 
         returns (uint256) 
     {

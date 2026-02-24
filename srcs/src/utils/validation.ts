@@ -11,13 +11,40 @@
  */
 
 /**
- * 验证以太坊地址格式
- * 
- * @param address - 地址字符串
- * @returns 是否为有效的以太坊地址
+ * 验证EVM地址格式（0x + 40 hex）
+ */
+export function isValidEvmAddress(address: string): boolean {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
+}
+
+/**
+ * 验证Solana地址格式（Base58，通常32~44位）
+ */
+export function isValidSolanaAddress(address: string): boolean {
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+}
+
+/**
+ * 向后兼容：默认按EVM地址验证。
  */
 export function isValidAddress(address: string): boolean {
-  return /^0x[a-fA-F0-9]{40}$/.test(address);
+  return isValidEvmAddress(address);
+}
+
+/**
+ * 按链族验证合约地址。
+ *
+ * @param address - 合约地址
+ * @param chainFamily - evm | solana
+ */
+export function isValidContractAddress(
+  address: string,
+  chainFamily: string = 'evm'
+): boolean {
+  if (chainFamily.toLowerCase() === 'solana') {
+    return isValidSolanaAddress(address);
+  }
+  return isValidEvmAddress(address);
 }
 
 /**
@@ -128,6 +155,16 @@ export function isValidIpfsHash(hash: string): boolean {
   // IPFS哈希通常是Base58编码，长度约46字符
   // 简化验证：检查是否为非空字符串且不包含特殊字符
   return /^[a-zA-Z0-9]{30,60}$/.test(hash);
+}
+
+/**
+ * 验证可用于NFT元数据的Token URI（当前仅允许 ipfs:// 或 https://）
+ */
+export function isValidTokenURI(uri: string): boolean {
+  if (!uri || typeof uri !== 'string') {
+    return false;
+  }
+  return uri.startsWith('ipfs://') || uri.startsWith('https://');
 }
 
 /**

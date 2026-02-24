@@ -16,7 +16,6 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { ethers } from 'ethers';
 import { useAppSelector } from '../store/hooks';
 import { nftContractService, ConnectionNFTConfig } from '../services/contract/nftContract';
 import { NFTOnChain, NFTMetadata } from '../types/nft';
@@ -134,64 +133,21 @@ export const useNFT = (contractConfig?: ConnectionNFTConfig): UseNFTReturn => {
   }, []);
   
   /**
-   * 铸造NFT
-   * 
-   * @param tokenURI - IPFS元数据URI
-   * @param externalObjectId - 外物ID
-   * @param element - 能量类型
-   * @param consensusHash - 共识哈希
-   * @returns 铸造结果（包含tokenId和txHash）
+   * 铸造NFT（已废弃）
+   *
+   * 当前项目的铸造路径已迁移到钱包消息协议（mingWalletInterface.mintNFT）。
+   * 本方法保留仅用于兼容历史调用方，统一返回明确错误，避免误用旧的直连合约路径。
    */
   const mintNFT = useCallback(async (
-    tokenURI: string,
-    externalObjectId: string,
-    element: string,
-    consensusHash: string
+    _tokenURI: string,
+    _externalObjectId: string,
+    _element: string,
+    _consensusHash: string
   ): Promise<{ tokenId: string; txHash: string }> => {
-    if (!walletAddress) {
-      throw new Error('Wallet not connected');
-    }
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      await initContract();
-      
-      // 将共识哈希转换为bytes32
-      // 如果已经是32字节的十六进制字符串，直接使用；否则进行格式化
-      let hashBytes: string;
-      if (consensusHash.startsWith('0x') && consensusHash.length === 66) {
-        hashBytes = consensusHash;
-      } else {
-        // 使用keccak256哈希函数处理字符串
-        hashBytes = ethers.keccak256(ethers.toUtf8Bytes(consensusHash));
-      }
-      
-      // 调用合约铸造NFT
-      const txHash = await nftContractService.mintConnection(
-        walletAddress,
-        tokenURI,
-        externalObjectId,
-        element,
-        hashBytes
-      );
-      
-      // 从交易中获取Token ID
-      const tokenId = await nftContractService.getTokenIdFromTransaction(txHash);
-      
-      // 刷新NFT列表
-      await loadNFTs();
-      
-      return { tokenId, txHash };
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to mint NFT';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [walletAddress, initContract, loadNFTs]);
+    const message = 'useNFT.mintNFT() is deprecated. Please use mingWalletInterface.mintNFT() via ceremony flow.';
+    setError(message);
+    throw new Error(message);
+  }, []);
   
   /**
    * 刷新NFT列表

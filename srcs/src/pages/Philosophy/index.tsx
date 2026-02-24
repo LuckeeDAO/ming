@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { getWhitepaperChapters } from '../../content/whitepaperChapters';
+import CapabilityStatusLegend from '../../components/common/CapabilityStatusLegend';
 
 const Philosophy: React.FC = () => {
   const theme = useTheme();
@@ -72,6 +73,8 @@ const Philosophy: React.FC = () => {
       <Divider sx={{ my: 0 }} />
 
       <Container maxWidth="lg" sx={{ py: { xs: 3, md: 6 } }}>
+        <CapabilityStatusLegend mb={3} />
+
         {sections.map((section) => (
           <Card key={section.id} sx={{ mb: { xs: 2, md: 4 }, border: `1px solid ${theme.palette.divider}` }}>
             <CardContent sx={{ p: { xs: 2.25, md: 4 } }}>

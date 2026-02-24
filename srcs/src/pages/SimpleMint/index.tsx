@@ -31,6 +31,8 @@ import { useAppSelector } from '../../store/hooks';
 import { ipfsService } from '../../services/ipfs/ipfsService';
 import { walletService } from '../../services/wallet/walletService';
 import { mingWalletInterface } from '../../services/wallet/mingWalletInterface';
+import { isValidContractAddress } from '../../utils/validation';
+import { WALLET_PROTOCOL_VERSION } from '../../types/wallet';
 
 const SimpleMint: React.FC = () => {
   const navigate = useNavigate();
@@ -114,16 +116,21 @@ const SimpleMint: React.FC = () => {
         throw new Error('NFT合约地址未配置，请检查环境变量VITE_NFT_CONTRACT_ADDRESS');
       }
       
-      // 验证合约地址格式
-      if (!/^0x[a-fA-F0-9]{40}$/.test(contractAddress)) {
-        throw new Error('NFT合约地址格式无效');
+      const chainContext = await walletService.getChainContext();
+      const { chainFamily, chainId, network } = chainContext;
+      if (!isValidContractAddress(contractAddress, chainFamily)) {
+        throw new Error(`NFT合约地址格式无效（chain family: ${chainFamily}）`);
       }
-
-      // 6. 获取网络ID
-      const chainId = await walletService.getNetworkId();
 
       // 7. 调用钱包接口铸造NFT（统一链路）
       const mintResponse = await mingWalletInterface.mintNFT({
+        protocolVersion: WALLET_PROTOCOL_VERSION,
+        timing: {
+          requestedAt: new Date().toISOString(),
+          executeAt: new Date().toISOString(),
+          strategy: 'immediate',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
         ipfs: {
           imageHash,
           metadataHash,
@@ -134,6 +141,8 @@ const SimpleMint: React.FC = () => {
         contract: {
           address: contractAddress,
           chainId,
+          chainFamily,
+          ...(network ? { network } : {}),
         },
         params: {
           to: walletAddress,

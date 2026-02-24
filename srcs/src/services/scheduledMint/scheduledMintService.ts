@@ -20,7 +20,7 @@
  */
 
 import { ExternalObject } from '../../types/energy';
-import { WalletScheduledTaskData } from '../../types/wallet';
+import { WalletScheduledTaskData, WALLET_PROTOCOL_VERSION } from '../../types/wallet';
 import { mingWalletInterface } from '../wallet/mingWalletInterface';
 import { ipfsService } from '../ipfs/ipfsService';
 import { walletService } from '../wallet/walletService';
@@ -324,8 +324,9 @@ class ScheduledMintService {
     // 5. 生成共识哈希
     const consensusHash = ethers.keccak256(ethers.toUtf8Bytes(metadataHash));
 
-    // 6. 获取合约配置
-    const chainId = await walletService.getNetworkId();
+    // 6. 获取合约配置（兼容EVM/Solana）
+    const chainContext = await walletService.getChainContext();
+    const { chainId, chainFamily, network } = chainContext;
     const contractAddress = import.meta.env.VITE_NFT_CONTRACT_ADDRESS;
     
     if (!contractAddress) {
@@ -334,7 +335,14 @@ class ScheduledMintService {
 
     // 7. 调用钱包接口创建定时任务
     const response = await mingWalletInterface.createScheduledTask({
+      protocolVersion: WALLET_PROTOCOL_VERSION,
       scheduledTime: taskData.scheduledTime,
+      timing: {
+        requestedAt: new Date().toISOString(),
+        executeAt: taskData.scheduledTime,
+        strategy: 'scheduled',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
       ipfs: {
         imageHash,
         metadataHash,
@@ -345,6 +353,8 @@ class ScheduledMintService {
       contract: {
         address: contractAddress,
         chainId,
+        chainFamily,
+        ...(network ? { network } : {}),
       },
       params: {
         to: taskData.walletAddress,
@@ -407,7 +417,10 @@ class ScheduledMintService {
       throw new Error('Wallet address is required');
     }
 
-    const response = await mingWalletInterface.getScheduledTasksByWallet({ walletAddress });
+    const response = await mingWalletInterface.getScheduledTasksByWallet({
+      protocolVersion: WALLET_PROTOCOL_VERSION,
+      walletAddress,
+    });
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || '获取定时任务列表失败');
     }
@@ -442,7 +455,10 @@ class ScheduledMintService {
    * @param taskId - 任务ID
    */
   async cancelTask(taskId: string): Promise<void> {
-    const response = await mingWalletInterface.cancelScheduledTask({ taskId });
+    const response = await mingWalletInterface.cancelScheduledTask({
+      protocolVersion: WALLET_PROTOCOL_VERSION,
+      taskId,
+    });
     if (!response.success) {
       throw new Error(response.error?.message || '取消定时任务失败');
     }

@@ -7,7 +7,7 @@
  * - 用户Token查询
  * - 连接信息查询
  * - 共识哈希更新
- * - 权限控制
+ * - 铸造权限模型
  * - 错误处理
  * 
  * @module test/ConnectionNFT.test
@@ -49,7 +49,7 @@ describe('ConnectionNFT', function () {
   });
 
   describe('铸造NFT', function () {
-    it('应该允许所有者铸造NFT', async function () {
+    it('应该允许任意用户铸造NFT（owner账户）', async function () {
       const tx = await connectionNFT.mintConnection(
         user1.address,
         tokenURI,
@@ -85,16 +85,17 @@ describe('ConnectionNFT', function () {
         .withArgs(1, user1.address, tokenURI, anyValue, externalObjectId, element);
     });
 
-    it('应该拒绝非所有者铸造NFT', async function () {
-      await expect(
-        connectionNFT.connect(user1).mintConnection(
-          user1.address,
-          tokenURI,
-          externalObjectId,
-          element,
-          consensusHash
-        )
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+    it('应该允许非所有者铸造NFT（用户账户）', async function () {
+      const tx = await connectionNFT.connect(user1).mintConnection(
+        user1.address,
+        tokenURI,
+        externalObjectId,
+        element,
+        consensusHash
+      );
+
+      await tx.wait();
+      expect(await connectionNFT.ownerOf(1)).to.equal(user1.address);
     });
 
     it('应该拒绝无效地址', async function () {

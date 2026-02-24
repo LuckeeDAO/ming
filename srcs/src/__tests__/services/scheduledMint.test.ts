@@ -13,6 +13,7 @@ import {
 import { mingWalletInterface } from '../../services/wallet/mingWalletInterface';
 import { ipfsService } from '../../services/ipfs/ipfsService';
 import { walletService } from '../../services/wallet/walletService';
+import { WALLET_PROTOCOL_VERSION } from '../../types/wallet';
 
 // Mock dependencies
 vi.mock('../../services/wallet/mingWalletInterface');
@@ -36,7 +37,11 @@ describe('scheduledMintService', () => {
     (ipfsService.uploadFile as any) = vi.fn().mockResolvedValue('QmImageHash');
     (ipfsService.uploadJSON as any) = vi.fn().mockResolvedValue('QmMetadataHash');
     (ipfsService.getAccessUrl as any) = vi.fn((hash: string) => `https://ipfs.io/ipfs/${hash}`);
-    (walletService.getNetworkId as any) = vi.fn().mockResolvedValue(1);
+    (walletService.getChainContext as any) = vi.fn().mockResolvedValue({
+      chainFamily: 'evm',
+      chainId: 1,
+      network: 'sepolia',
+    });
     (mingWalletInterface.createScheduledTask as any) = vi.fn().mockResolvedValue({
       success: true,
       data: {
@@ -122,6 +127,48 @@ describe('scheduledMintService', () => {
 
       await expect(scheduledMintService.createTask(taskData)).rejects.toThrow('定时时间不能是过去的时间');
     });
+
+    it('solana链族应透传chainFamily与network到钱包请求', async () => {
+      (walletService.getChainContext as any) = vi.fn().mockResolvedValue({
+        chainFamily: 'solana',
+        chainId: 0,
+        network: 'solana-devnet',
+      });
+
+      const taskData = {
+        walletAddress: '8J8W1ahh6Y1cM1k8oYyU7F2jmYb5x1p6DYk7tV4hyU2S',
+        selectedObject: {
+          id: 'test-object',
+          name: '测试外物',
+          element: 'wood' as const,
+          category: 'nature' as const,
+          description: '测试描述',
+          image: '/images/test/wood_0.jpg',
+          connectionMethods: [],
+          recommendedFor: [],
+        },
+        imageData: 'data:image/png;base64,test',
+        imageFileName: 'test.png',
+        connectionType: 'symbolic',
+        blessing: '测试祝福',
+        feelingsBefore: '测试前感受',
+        feelingsDuring: '测试中感受',
+        feelingsAfter: '测试后感受',
+        scheduledTime: new Date(Date.now() + 86400000).toISOString(),
+      };
+
+      await scheduledMintService.createTask(taskData);
+
+      expect(mingWalletInterface.createScheduledTask).toHaveBeenCalledWith(
+        expect.objectContaining({
+          contract: expect.objectContaining({
+            chainFamily: 'solana',
+            chainId: 0,
+            network: 'solana-devnet',
+          }),
+        })
+      );
+    });
   });
 
   describe('getAllTasks', () => {
@@ -191,7 +238,10 @@ describe('scheduledMintService', () => {
       expect(walletTasks[0].id).toBe('task-1');
       expect(walletTasks[0].status).toBe('processing');
       expect(walletTasks[0].selectedObject.name).toBe('测试外物');
-      expect(mingWalletInterface.getScheduledTasksByWallet).toHaveBeenCalledWith({ walletAddress });
+      expect(mingWalletInterface.getScheduledTasksByWallet).toHaveBeenCalledWith({
+        protocolVersion: WALLET_PROTOCOL_VERSION,
+        walletAddress,
+      });
     });
   });
 
@@ -235,7 +285,10 @@ describe('scheduledMintService', () => {
     it('应该调用cancelTask取消任务', async () => {
       const taskId = 'test-task-id-123';
       await scheduledMintService.deleteTask(taskId);
-      expect(mingWalletInterface.cancelScheduledTask).toHaveBeenCalledWith({ taskId });
+      expect(mingWalletInterface.cancelScheduledTask).toHaveBeenCalledWith({
+        protocolVersion: WALLET_PROTOCOL_VERSION,
+        taskId,
+      });
     });
   });
 
@@ -243,7 +296,10 @@ describe('scheduledMintService', () => {
     it('应该取消待执行的任务', async () => {
       const taskId = 'test-task-id-123';
       await scheduledMintService.cancelTask(taskId);
-      expect(mingWalletInterface.cancelScheduledTask).toHaveBeenCalledWith({ taskId });
+      expect(mingWalletInterface.cancelScheduledTask).toHaveBeenCalledWith({
+        protocolVersion: WALLET_PROTOCOL_VERSION,
+        taskId,
+      });
     });
 
     it('应该在取消失败时抛出错误', async () => {

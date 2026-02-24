@@ -5,6 +5,10 @@
 
 > **明其命，修其明。共识成仪，天人共续。**
 
+> **现行口径说明**  
+> 本 README 为项目总览。设计与实现的现行标准以 `docs/00-现行口径基线.md` 为准。
+> 历史文案（如早期“改命”措辞、旧路由示例）如与基线冲突，以基线为最终口径。
+
 ---
 
 ## 📋 项目简介
@@ -33,7 +37,7 @@ Ming（明命）是一个基于东方命理哲学与集体意识共识的 Web3 �
 
 - **命（先天框架）**: 命不仅包括个人命理（四柱八字），还包括自然规律（节气、星宿、五行循环）与社会规律（共识、集体意识），这些构成了不可修改的先天框架
 - **明（知命）**: 通过分析了解自己的能量系统，同时认知自然规律与社会规律，明白命的全貌
-- **改命（借物改命）**: 通过外物连接，借助公网共识能量场，在顺应自然与社会规律的基础上，达成生命的疏通与升华
+- **协同调节（借物调运）**: 通过外物连接，借助公网共识见证，在顺应自然与社会规律的基础上，优化个人选择与行动节律
 - **共识成仪**: 通过集体意识共识机制，形成个人与自然规律、社会规律的共振与循环
 
 ---
@@ -46,7 +50,7 @@ Ming（明命）是一个基于东方命理哲学与集体意识共识的 Web3 �
 - **构建工具**: Vite 4.1.0
 - **UI组件**: Material-UI 5.11+
 - **状态管理**: Redux Toolkit + Zustand
-- **区块链**: ethers.js + Solidity
+- **区块链**: Solana Program (Anchor) + 钱包消息协议
 - **存储**: IPFS (Pinata)
 - **动画**: Framer Motion
 - **国际化**: react-i18next
@@ -56,15 +60,16 @@ Ming（明命）是一个基于东方命理哲学与集体意识共识的 Web3 �
 ```
 ming/
 ├── docs/                    # 项目文档
+│   ├── 00-现行口径基线.md
 │   ├── 01-项目概述/
 │   ├── 02-概要设计/
 │   ├── 03-详细设计/
 │   ├── 04-开发指南/
 │   ├── 05-部署运维/
-│   └── 06-其他/
+│   └── temp/               # 临时/历史文档（非现行规范）
 ├── contracts/               # 智能合约
-│   ├── ConnectionNFT.sol
-│   └── interfaces/
+│   ├── ConnectionNFT.sol    # 历史EVM合约（兼容参考）
+│   └── solana/              # 现行Solana合约工程（Anchor）
 ├── srcs/                    # 源代码（前端）
 │   ├── src/
 │   │   ├── components/     # React组件
@@ -121,13 +126,24 @@ npm run preview                # 预览构建结果
 # 代码质量
 npm run lint                   # 代码检查
 npm run format                 # 代码格式化
-npm run type-check             # 类型检查（通过tsc）
 
 # 测试
 npm run test                   # 单元测试
+npm run test:ci                # CI模式测试（无交互）
 npm run test:ui                # 测试UI
 npm run test:e2e               # 端到端测试
 ```
+
+Solana 合约（Anchor）验证：
+
+```bash
+cd contracts/solana
+npm install
+anchor build
+anchor test
+```
+
+说明：`anchor build/test` 需要可访问 crates.io 与 Solana 依赖源的网络环境。
 
 ---
 
@@ -195,14 +211,16 @@ npm run test:e2e               # 端到端测试
 
 ```
 ming.cdao.online/
-├── /                     # 首页：仪式连接总览
-├── /concept              # 核心概念定性介绍
-├── /connection-guide     # 外物连接指导
-├── /nft-ceremony         # NFT仪式制作流程
+├── /                     # 首页：白皮书摘要与章节导航
+├── /philosophy           # 完整白皮书
+├── /connection-ceremony  # 统一仪式页（含流程/定时任务/资源）
 ├── /my-connections       # 我的连接记录
-├── /ceremony-resources   # 仪式资源支持
-└── /about                # 关于仪式平台
+├── /about                # 关于平台
+├── /tools                # 工具页
+└── /learning             # 学习页
 ```
+
+历史兼容路由（重定向，不作为主入口）：`/concept`、`/ceremony-resources`、`/connection-guide`、`/nft-ceremony`、`/scheduled-mints`
 
 ### 核心流程
 
