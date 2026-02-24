@@ -75,13 +75,6 @@ const Philosophy: React.FC = () => {
         {sections.map((section) => (
           <Card key={section.id} sx={{ mb: { xs: 2, md: 4 }, border: `1px solid ${theme.palette.divider}` }}>
             <CardContent sx={{ p: { xs: 2.25, md: 4 } }}>
-              <Typography
-                variant="h4"
-                gutterBottom
-                sx={{ fontWeight: 600, mb: { xs: 2, md: 3 }, fontSize: { xs: '1.3rem', sm: '1.6rem', md: '2rem' } }}
-              >
-                {section.title}
-              </Typography>
               {section.detail}
             </CardContent>
           </Card>
