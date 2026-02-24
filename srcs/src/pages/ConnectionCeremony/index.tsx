@@ -57,6 +57,8 @@ import {
   DialogActions,
   LinearProgress,
   IconButton,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -164,9 +166,13 @@ const ConnectionCeremony: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
   
-  // 从URL query参数读取tab，如果没有则默认为0
+  // 从URL query参数读取tab，如果没有或非法则默认为0
   const tabFromUrl = searchParams.get('tab');
-  const initialTab = tabFromUrl ? parseInt(tabFromUrl, 10) : 0;
+  const parsedInitialTab = tabFromUrl ? parseInt(tabFromUrl, 10) : 0;
+  const initialTab =
+    !isNaN(parsedInitialTab) && parsedInitialTab >= 0 && parsedInitialTab <= 2
+      ? parsedInitialTab
+      : 0;
   const [activeTab, setActiveTab] = useState(initialTab); // 0: 仪式流程, 1: 定时任务管理, 2: 仪式资源
 
   // 当URL query参数变化时，更新activeTab
@@ -176,9 +182,21 @@ const ConnectionCeremony: React.FC = () => {
       const tabValue = parseInt(tabFromUrl, 10);
       if (!isNaN(tabValue) && tabValue >= 0 && tabValue <= 2) {
         setActiveTab(tabValue);
+      } else {
+        setActiveTab(0);
       }
+    } else {
+      setActiveTab(0);
     }
   }, [searchParams]);
+
+  /**
+   * 切换顶部标签页并同步到URL
+   */
+  const handleTabChange = (_event: React.SyntheticEvent, newTab: number) => {
+    setActiveTab(newTab);
+    navigate(`/connection-ceremony?tab=${newTab}`);
+  };
 
   // 统一流程步骤
   const steps = [
@@ -628,6 +646,15 @@ const ConnectionCeremony: React.FC = () => {
           <Typography variant="body1" color="text.secondary" paragraph sx={{ textAlign: 'left' }}>
             完成从能量分析到NFT铸造的完整外物连接仪式流程
           </Typography>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            sx={{ borderBottom: 1, borderColor: 'divider' }}
+          >
+            <Tab label="仪式流程" />
+            <Tab label="定时任务管理" />
+            <Tab label="仪式资源" />
+          </Tabs>
         </Box>
 
         {/* 内容区域 */}

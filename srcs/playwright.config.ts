@@ -36,7 +36,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev',
+    command: 'VITE_PINATA_API_KEY=e2e VITE_PINATA_SECRET_KEY=e2e npm run dev -- --host 127.0.0.1 --port 5173',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
   },

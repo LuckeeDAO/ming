@@ -17,7 +17,7 @@
  * @module App
  */
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 // 定时MINT功能已迁移到钱包，不再需要初始化
@@ -32,7 +32,6 @@ const MyConnections = lazy(() => import('./pages/MyConnections/index'));
 const FourPillarsConverter = lazy(() => import('./pages/FourPillarsConverter/index'));
 const EnergyOriginal = lazy(() => import('./pages/EnergyOriginal/index'));
 const FortuneFlow = lazy(() => import('./pages/FortuneFlow/index'));
-const CeremonyResources = lazy(() => import('./pages/CeremonyResources/index'));
 const CeremonyResourceDetail = lazy(() => import('./pages/CeremonyResourceDetail/index'));
 const Tools = lazy(() => import('./pages/Tools/index'));
 const Learning = lazy(() => import('./pages/Learning/index'));
@@ -92,7 +91,7 @@ function App() {
             <Route path="/learning" element={<Learning />} />
             <Route path="/learning/technology" element={<Technology />} />
             <Route path="/learning/other" element={<Learning />} />
-            <Route path="/ceremony-resources" element={<CeremonyResources />} />
+            <Route path="/ceremony-resources" element={<Navigate to="/connection-ceremony?tab=2" replace />} />
             <Route path="/ceremony-resources/:id" element={<CeremonyResourceDetail />} />
             
             {/* 关于平台路由 */}
@@ -110,9 +109,9 @@ function App() {
             <Route path="/experience" element={<Home key="experience" />} />
             <Route path="/technology" element={<Home key="technology" />} />
             <Route path="/concept" element={<About key="about-philosophy" />} />
-            <Route path="/connection-guide" element={<ConnectionCeremony />} />
-            <Route path="/nft-ceremony" element={<ConnectionCeremony />} />
-            <Route path="/scheduled-mints" element={<ConnectionCeremony />} />
+            <Route path="/connection-guide" element={<Navigate to="/connection-ceremony?tab=0" replace />} />
+            <Route path="/nft-ceremony" element={<Navigate to="/connection-ceremony?tab=0" replace />} />
+            <Route path="/scheduled-mints" element={<Navigate to="/connection-ceremony?tab=1" replace />} />
           </Routes>
         </Suspense>
       </Layout>

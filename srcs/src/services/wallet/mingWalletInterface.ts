@@ -21,6 +21,8 @@ import {
   CreateScheduledTaskRequest,
   CreateScheduledTaskResponse,
   GetScheduledTaskResponse,
+  GetScheduledTasksByWalletRequest,
+  GetScheduledTasksByWalletResponse,
   CancelScheduledTaskRequest,
   CancelScheduledTaskResponse,
   WalletErrorCode,
@@ -32,6 +34,19 @@ import {
 class MingWalletInterface {
   private readonly MESSAGE_TYPE_PREFIX = 'MING_WALLET_';
   private readonly REQUEST_TIMEOUT = 300000; // 5分钟超时
+  private readonly targetOrigin: string =
+    import.meta.env.VITE_WALLET_TARGET_ORIGIN || window.location.origin;
+  private readonly allowedOrigins: Set<string> = (() => {
+    const raw = import.meta.env.VITE_WALLET_ALLOWED_ORIGINS;
+    const configured = raw
+      ? raw
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean)
+      : [];
+    // 默认允许同源与目标源，兼容本地联调
+    return new Set([window.location.origin, this.targetOrigin, ...configured]);
+  })();
 
   /**
    * 发送消息到钱包并等待响应
@@ -57,17 +72,32 @@ class MingWalletInterface {
 
       // 监听响应
       const handler = (event: MessageEvent) => {
+        const data = event.data as {
+          type?: string;
+          messageId?: string;
+          payload?: { success?: boolean; error?: { message?: string } };
+        } | null;
+
+        if (!data || typeof data !== 'object') {
+          return;
+        }
+        if (event.source !== window) {
+          return;
+        }
+        if (!this.allowedOrigins.has(event.origin)) {
+          return;
+        }
         if (
-          event.data.type === responseType &&
-          event.data.messageId === messageId
+          data.type === responseType &&
+          data.messageId === messageId
         ) {
           clearTimeout(timeout);
           window.removeEventListener('message', handler);
           
-          if (event.data.payload.success) {
-            resolve(event.data.payload as T);
+          if (data.payload?.success) {
+            resolve(data.payload as T);
           } else {
-            reject(new Error(event.data.payload.error?.message || 'Wallet request failed'));
+            reject(new Error(data.payload?.error?.message || 'Wallet request failed'));
           }
         }
       };
@@ -81,7 +111,7 @@ class MingWalletInterface {
           messageId,
           payload,
         },
-        '*' // 注意：生产环境应该指定具体的目标源
+        this.targetOrigin
       );
     });
   }
@@ -161,6 +191,37 @@ class MingWalletInterface {
       const response = await this.sendMessage<GetScheduledTaskResponse>(
         'GET_SCHEDULED_TASK',
         { taskId }
+      );
+
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: WalletErrorCode.NETWORK_ERROR,
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
+      };
+    }
+  }
+
+  /**
+   * 根据钱包地址查询定时任务列表
+   *
+   * @param request - 查询请求参数
+   * @returns 任务列表
+   */
+  async getScheduledTasksByWallet(
+    request: GetScheduledTasksByWalletRequest
+  ): Promise<GetScheduledTasksByWalletResponse> {
+    try {
+      if (!request.walletAddress) {
+        throw new Error('Wallet address is required');
+      }
+
+      const response = await this.sendMessage<GetScheduledTasksByWalletResponse>(
+        'GET_SCHEDULED_TASKS_BY_WALLET',
+        request
       );
 
       return response;

@@ -80,7 +80,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
       icon: <HomeIcon />,
       children: [
         { label: '功能介绍', path: '/' },
-        { label: '铸造NFT', path: '/connection-ceremony' },
+        { label: '仪式流程', path: '/connection-ceremony?tab=0' },
+        { label: '定时任务', path: '/connection-ceremony?tab=1' },
+        { label: '仪式资源（仪式页）', path: '/connection-ceremony?tab=2' },
         { label: '关于平台', path: '/about/intro' },
       ],
     },
@@ -93,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
         { label: '五行能量测算', path: '/energy-original' },
         { label: 'AI图片编辑', path: '/tools' },
         { label: '图片模板', path: '/tools' },
-        { label: '仪式资源', path: '/ceremony-resources' },
+        { label: '仪式资源', path: '/connection-ceremony?tab=2' },
       ],
     },
     {

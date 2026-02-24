@@ -20,6 +20,7 @@
  */
 
 import { ExternalObject } from '../../types/energy';
+import { WalletScheduledTaskData } from '../../types/wallet';
 import { mingWalletInterface } from '../wallet/mingWalletInterface';
 import { ipfsService } from '../ipfs/ipfsService';
 import { walletService } from '../wallet/walletService';
@@ -145,6 +146,88 @@ export interface ScheduledMintTask {
  * 定时MINT服务类（方案B：钱包管理定时任务）
  */
 class ScheduledMintService {
+  /**
+   * 将钱包状态映射为前端任务状态
+   */
+  private normalizeStatus(status: string): ScheduledMintTaskStatus {
+    switch (status) {
+      case 'pending':
+        return 'pending';
+      case 'executing':
+      case 'processing':
+        return 'processing';
+      case 'completed':
+        return 'completed';
+      case 'failed':
+        return 'failed';
+      case 'cancelled':
+        return 'cancelled';
+      default:
+        return 'pending';
+    }
+  }
+
+  /**
+   * 钱包任务数据转换为前端任务结构
+   */
+  private mapWalletTask(
+    task: WalletScheduledTaskData,
+    walletAddressFallback: string
+  ): ScheduledMintTask {
+    const rawElement = task.selectedObject?.element;
+    const normalizedElement: ExternalObject['element'] =
+      rawElement === 'wood' ||
+      rawElement === 'fire' ||
+      rawElement === 'earth' ||
+      rawElement === 'metal' ||
+      rawElement === 'water'
+        ? rawElement
+        : 'wood';
+
+    const rawCategory = task.selectedObject?.category;
+    const normalizedCategory: ExternalObject['category'] =
+      rawCategory === 'nature' ||
+      rawCategory === 'mineral' ||
+      rawCategory === 'plant' ||
+      rawCategory === 'water' ||
+      rawCategory === 'fire' ||
+      rawCategory === 'other'
+        ? rawCategory
+        : 'other';
+
+    return {
+      id: task.taskId,
+      walletAddress: task.walletAddress || walletAddressFallback,
+      selectedObject: {
+        id: task.selectedObject?.id || 'unknown',
+        name: task.selectedObject?.name || '未知外物',
+        element: normalizedElement,
+        category: normalizedCategory,
+        description: task.selectedObject?.description || '钱包未返回外物描述',
+        image: task.selectedObject?.image || '',
+        connectionMethods: [],
+        recommendedFor: [],
+      },
+      imageData: '',
+      imageFileName: '',
+      connectionType: task.connectionType || '',
+      location: task.location,
+      duration: task.duration,
+      blessing: task.blessing || '',
+      feelingsBefore: task.feelingsBefore || '',
+      feelingsDuring: task.feelingsDuring || '',
+      feelingsAfter: task.feelingsAfter || '',
+      scheduledTime: task.scheduledTime,
+      status: this.normalizeStatus(task.status),
+      createdAt: task.createdAt || task.scheduledTime,
+      mintedAt: task.mintedAt,
+      txHash: task.result?.txHash,
+      tokenId: task.result?.tokenId,
+      tokenURI: task.ipfs?.tokenURI,
+      error: task.result?.error,
+    };
+  }
+
   /**
    * 初始化服务（已废弃，定时任务由钱包管理）
    * 
@@ -281,33 +364,17 @@ class ScheduledMintService {
 
   /**
    * 获取所有任务（从钱包查询）
-   * 
-   * 注意：此方法需要钱包提供查询所有任务的接口。
-   * 当前钱包接口只支持按taskId查询单个任务，不支持批量查询。
-   * 
-   * 实现方案：
-   * 1. 钱包需要提供 getAllScheduledTasks(walletAddress) 接口
-   * 2. 或者钱包需要提供 getTaskIdsByWallet(walletAddress) 接口，然后逐个查询
-   * 
-   * @param _walletAddress - 钱包地址（可选，如果不提供则使用当前连接的钱包）
+   *
+   * 注意：钱包侧通常按地址查询任务，因此此方法要求传入钱包地址。
+   *
+   * @param walletAddress - 钱包地址
    * @returns 任务数组（从钱包获取）
-   * 
-   * @deprecated 此方法需要钱包提供查询接口，当前返回空数组
-   * 实际实现需要钱包提供查询所有任务的接口
    */
-  async getAllTasks(_walletAddress?: string): Promise<ScheduledMintTask[]> {
-    // TODO: 实现从钱包查询所有定时任务的接口
-    // 方案1：钱包提供 getAllScheduledTasks(walletAddress) 接口
-    // 方案2：钱包提供 getTaskIdsByWallet(walletAddress) 接口，然后使用 getTask() 逐个查询
-    
-    // 当前钱包接口只支持按taskId查询，需要钱包提供查询所有任务的接口
-    console.warn(
-      'getAllTasks() needs wallet API to query all tasks. ' +
-      'Please implement wallet.getAllScheduledTasks() or wallet.getTaskIdsByWallet() interface.'
-    );
-    
-    // 返回空数组，避免调用方出错
-    return [];
+  async getAllTasks(walletAddress?: string): Promise<ScheduledMintTask[]> {
+    if (!walletAddress) {
+      return [];
+    }
+    return this.getTasksByWallet(walletAddress);
   }
 
   /**
@@ -322,27 +389,7 @@ class ScheduledMintService {
       if (!response.success || !response.data) {
         return null;
       }
-
-      // 将钱包返回的数据转换为ScheduledMintTask格式
-      // 注意：钱包返回的数据格式可能与ScheduledMintTask不完全一致
-      // 需要根据实际钱包接口返回格式进行调整
-      return {
-        id: response.data.taskId,
-        walletAddress: '', // 钱包接口可能不返回此字段
-        selectedObject: {} as ExternalObject, // 需要从其他地方获取
-        imageData: '',
-        imageFileName: '',
-        connectionType: '',
-        blessing: '',
-        feelingsBefore: '',
-        feelingsDuring: '',
-        feelingsAfter: '',
-        scheduledTime: response.data.scheduledTime,
-        status: response.data.status as ScheduledMintTaskStatus,
-        createdAt: '',
-        txHash: response.data.result?.txHash,
-        tokenId: response.data.result?.tokenId,
-      };
+      return this.mapWalletTask(response.data, '');
     } catch (error) {
       console.error('Error getting scheduled task:', error);
       return null;
@@ -351,34 +398,23 @@ class ScheduledMintService {
 
   /**
    * 根据钱包地址获取任务列表（从钱包查询）
-   * 
-   * 注意：此方法需要钱包提供按地址查询任务的接口。
-   * 
-   * 实现方案：
-   * 1. 钱包需要提供 getScheduledTasksByWallet(walletAddress) 接口
-   * 2. 或者使用 getAllTasks(walletAddress) 方法（如果钱包支持）
-   * 
+   *
    * @param walletAddress - 钱包地址
    * @returns 任务数组
-   * 
-   * @deprecated 此方法需要钱包提供按地址查询的接口
    */
   async getTasksByWallet(walletAddress: string): Promise<ScheduledMintTask[]> {
-    // TODO: 实现从钱包按地址查询任务的接口
-    // 方案1：钱包提供 getScheduledTasksByWallet(walletAddress) 接口
-    // 方案2：使用 getAllTasks(walletAddress) 方法（如果钱包支持）
-    
     if (!walletAddress) {
       throw new Error('Wallet address is required');
     }
-    
-    console.warn(
-      'getTasksByWallet() needs wallet API to query tasks by address. ' +
-      'Please implement wallet.getScheduledTasksByWallet() interface.'
+
+    const response = await mingWalletInterface.getScheduledTasksByWallet({ walletAddress });
+    if (!response.success || !response.data) {
+      throw new Error(response.error?.message || '获取定时任务列表失败');
+    }
+
+    return (response.data.tasks || []).map((task) =>
+      this.mapWalletTask(task, walletAddress)
     );
-    
-    // 返回空数组，避免调用方出错
-    return [];
   }
 
   /**

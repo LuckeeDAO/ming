@@ -8,6 +8,8 @@ interface ImportMetaEnv {
   readonly VITE_IPFS_GATEWAY?: string;
   readonly VITE_PINATA_API_KEY?: string;
   readonly VITE_PINATA_SECRET_KEY?: string;
+  readonly VITE_WALLET_TARGET_ORIGIN?: string;
+  readonly VITE_WALLET_ALLOWED_ORIGINS?: string;
   // 更多环境变量...
 }
 

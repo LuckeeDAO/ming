@@ -29,7 +29,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { ipfsService } from '../../services/ipfs/ipfsService';
-import { directMintService } from '../../services/contract/directMintService';
+import { walletService } from '../../services/wallet/walletService';
+import { mingWalletInterface } from '../../services/wallet/mingWalletInterface';
 
 const SimpleMint: React.FC = () => {
   const navigate = useNavigate();
@@ -118,21 +119,38 @@ const SimpleMint: React.FC = () => {
         throw new Error('NFT合约地址格式无效');
       }
 
-      // 6. 初始化直接铸造服务
-      await directMintService.init(contractAddress);
+      // 6. 获取网络ID
+      const chainId = await walletService.getNetworkId();
 
-      // 7. 直接调用合约铸造NFT
-      const mintResult = await directMintService.mintNFT({
-        to: walletAddress,
-        tokenURI,
-        externalObjectId: '',
-        element: '',
+      // 7. 调用钱包接口铸造NFT（统一链路）
+      const mintResponse = await mingWalletInterface.mintNFT({
+        ipfs: {
+          imageHash,
+          metadataHash,
+          imageURI: ipfsService.getAccessUrl(imageHash),
+          tokenURI,
+        },
         consensusHash,
+        contract: {
+          address: contractAddress,
+          chainId,
+        },
+        params: {
+          to: walletAddress,
+          tokenURI,
+          externalObjectId: '',
+          element: '',
+          consensusHash,
+        },
       });
 
+      if (!mintResponse.success || !mintResponse.data) {
+        throw new Error(mintResponse.error?.message || 'NFT铸造失败');
+      }
+
       setSuccess({
-        tokenId: mintResult.tokenId,
-        txHash: mintResult.txHash,
+        tokenId: mintResponse.data.tokenId,
+        txHash: mintResponse.data.txHash,
         tokenURI,
       });
     } catch (error) {

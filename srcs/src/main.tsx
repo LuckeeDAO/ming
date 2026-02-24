@@ -20,12 +20,25 @@ import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
 import { store } from './store/store';
 import { theme } from './styles/theme';
+import { ipfsService } from './services/ipfs/ipfsService';
 import './styles/global.css';
 
 // 兼容部分依赖中使用的 Node.js `process` 对象（例如 chinese-lunar 的打包代码）
 // 在浏览器环境中注入一个最小的 polyfill，避免运行时报 `process is not defined`
 if (typeof (globalThis as any).process === 'undefined') {
   (globalThis as any).process = { env: {} };
+}
+
+// 初始化 IPFS 服务（用于 NFT 图片和元数据上传）
+ipfsService.init({
+  pinataApiKey: import.meta.env.VITE_PINATA_API_KEY,
+  pinataSecretApiKey: import.meta.env.VITE_PINATA_SECRET_KEY,
+});
+
+if (!import.meta.env.VITE_PINATA_API_KEY || !import.meta.env.VITE_PINATA_SECRET_KEY) {
+  console.warn(
+    'IPFS service initialized without Pinata keys. Upload features will fail until env vars are configured.'
+  );
 }
 
 /**

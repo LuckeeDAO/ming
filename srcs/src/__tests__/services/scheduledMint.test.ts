@@ -56,6 +56,12 @@ describe('scheduledMintService', () => {
     (mingWalletInterface.cancelScheduledTask as any) = vi.fn().mockResolvedValue({
       success: true,
     });
+    (mingWalletInterface.getScheduledTasksByWallet as any) = vi.fn().mockResolvedValue({
+      success: true,
+      data: {
+        tasks: [],
+      },
+    });
   });
 
   describe('createTask', () => {
@@ -133,6 +139,7 @@ describe('scheduledMintService', () => {
       expect(foundTask).toBeDefined();
       expect(foundTask?.id).toBe(taskId);
       expect(foundTask?.status).toBe('pending');
+      expect(foundTask?.selectedObject.name).toBe('未知外物');
       expect(mingWalletInterface.getScheduledTask).toHaveBeenCalled();
     });
 
@@ -151,10 +158,40 @@ describe('scheduledMintService', () => {
   });
 
   describe('getTasksByWallet', () => {
-    it('应该根据钱包地址获取任务（当前返回空数组，因为钱包接口未实现）', async () => {
+    it('应该根据钱包地址获取任务', async () => {
       const walletAddress = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0';
+      (mingWalletInterface.getScheduledTasksByWallet as any) = vi.fn().mockResolvedValue({
+        success: true,
+        data: {
+          tasks: [
+            {
+              taskId: 'task-1',
+              scheduledTime: new Date(Date.now() + 86400000).toISOString(),
+              status: 'executing',
+              walletAddress,
+              createdAt: new Date().toISOString(),
+              selectedObject: {
+                id: 'obj-1',
+                name: '测试外物',
+                element: 'fire',
+                category: 'nature',
+                description: '描述',
+                image: '/images/test.jpg',
+              },
+              result: {
+                txHash: '0xtx',
+              },
+            },
+          ],
+        },
+      });
+
       const walletTasks = await scheduledMintService.getTasksByWallet(walletAddress);
-      expect(walletTasks).toEqual([]);
+      expect(walletTasks).toHaveLength(1);
+      expect(walletTasks[0].id).toBe('task-1');
+      expect(walletTasks[0].status).toBe('processing');
+      expect(walletTasks[0].selectedObject.name).toBe('测试外物');
+      expect(mingWalletInterface.getScheduledTasksByWallet).toHaveBeenCalledWith({ walletAddress });
     });
   });
 
@@ -219,7 +256,7 @@ describe('scheduledMintService', () => {
       });
 
       const taskId = 'non-existent-task';
-      await expect(scheduledMintService.cancelTask(taskId)).rejects.toThrow('取消定时任务失败');
+      await expect(scheduledMintService.cancelTask(taskId)).rejects.toThrow('Task not found');
     });
   });
 

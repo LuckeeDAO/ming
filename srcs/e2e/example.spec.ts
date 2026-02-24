@@ -19,21 +19,38 @@ test('首页应该正常加载', async ({ page }) => {
   await expect(header).toBeVisible();
 });
 
-test('导航应该正常工作', async ({ page }) => {
-  await page.goto('/');
-  
-  // 点击导航链接
-  await page.click('text=连接指导');
-  await expect(page).toHaveURL(/connection-guide/);
-  
-  await page.click('text=NFT仪式');
-  await expect(page).toHaveURL(/nft-ceremony/);
+test('兼容路由应该重定向到统一仪式页面', async ({ page }) => {
+  await page.goto('/scheduled-mints');
+  await expect(page).toHaveURL(/connection-ceremony\?tab=1/);
 });
 
-test('钱包连接功能应该显示', async ({ page }) => {
+test('仪式页标签切换应该同步URL', async ({ page }) => {
+  await page.goto('/connection-ceremony?tab=0');
+  await page.getByRole('tab', { name: '仪式资源' }).click();
+  await expect(page).toHaveURL(/connection-ceremony\?tab=2/);
+});
+
+test('钱包连接后应显示缩略地址', async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as any).ethereum = {
+      request: async ({ method }: { method: string }) => {
+        if (method === 'eth_requestAccounts') {
+          return ['0x1234567890123456789012345678901234567890'];
+        }
+        if (method === 'eth_chainId') {
+          return '0xa869';
+        }
+        return null;
+      },
+      on: () => {},
+      removeListener: () => {},
+    };
+  });
+
   await page.goto('/');
-  
-  // 检查钱包连接按钮是否存在
-  const walletButton = page.locator('button:has-text("连接钱包")');
-  await expect(walletButton).toBeVisible();
+  const connectButton = page.getByRole('button', { name: '连接钱包' });
+  await expect(connectButton).toBeVisible();
+  await connectButton.click();
+
+  await expect(page.getByRole('button', { name: /0x1234...7890/i })).toBeVisible();
 });

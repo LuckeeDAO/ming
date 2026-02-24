@@ -110,15 +110,64 @@ export interface CreateScheduledTaskResponse {
  */
 export interface GetScheduledTaskResponse {
   success: boolean;
+  data?: WalletScheduledTaskData;
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+
+/**
+ * 钱包返回的定时任务数据（兼容扩展字段）
+ */
+export interface WalletScheduledTaskData {
+  taskId: string;
+  scheduledTime: string;
+  status: string;
+  walletAddress?: string;
+  createdAt?: string;
+  mintedAt?: string;
+  connectionType?: string;
+  blessing?: string;
+  feelingsBefore?: string;
+  feelingsDuring?: string;
+  feelingsAfter?: string;
+  location?: string;
+  duration?: string;
+  selectedObject?: {
+    id?: string;
+    name?: string;
+    element?: string;
+    category?: string;
+    description?: string;
+    image?: string;
+  };
+  ipfs?: {
+    tokenURI?: string;
+    imageURI?: string;
+  };
+  result?: {
+    tokenId?: string;
+    txHash?: string;
+    error?: string;
+  };
+  [key: string]: unknown;
+}
+
+/**
+ * 按钱包地址查询定时任务请求参数
+ */
+export interface GetScheduledTasksByWalletRequest {
+  walletAddress: string;
+}
+
+/**
+ * 按钱包地址查询定时任务响应结果
+ */
+export interface GetScheduledTasksByWalletResponse {
+  success: boolean;
   data?: {
-    taskId: string;
-    scheduledTime: string;
-    status: string;
-    result?: {
-      tokenId?: string;
-      txHash?: string;
-      error?: string;
-    };
+    tasks: WalletScheduledTaskData[];
   };
   error?: {
     code: string;
