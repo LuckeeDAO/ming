@@ -31,8 +31,10 @@ import {
   useTheme,
   Chip,
   Button,
+  Tooltip,
 } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
+import { getWhitepaperChapters } from '../../content/whitepaperChapters';
 
 const Home: React.FC = () => {
   const theme = useTheme();
@@ -43,335 +45,7 @@ const Home: React.FC = () => {
   // （这些组件在条件分支与 JSX 中均有实际使用）
   void [CardActions, Button, Link];
 
-  // 平台简介 + 哲学白皮书七个章节（摘要+详细内容）
-  const chapters = [
-    {
-      id: 'intro',
-      title: '第一节 · 平台缘起与定位',
-      tag: '平台简介',
-      summary:
-        '明命 · Ming 是一个以「天不可尽知、地为共识理论、人为实践主体」为内核的 Web3 仪式平台。我们不替你回答「命运究竟是什么」，而是利用人类长期积累的「地」的智慧——包括命理在内的诸多工具——帮助你在现实约束条件之内，重新完成自我叙事的逻辑自洽。在这里，每一次仪式既是一段共识的确认，也是一次对自己的重重承诺：你可以选择具体特征外物作为符号锚点，择时进行 NFT 绑定，实现自我特征的铸造与完善。共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者见证。',
-      detail: (
-        <>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            第一节 · 平台缘起与定位
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            明命 · Ming 是一个以「天不可尽知、地为共识理论、人为实践主体」为内核的 Web3 仪式平台。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们不替你回答「命运究竟是什么」，而是利用人类长期积累的「地」的智慧——包括命理在内的诸多工具——帮助你在现实约束条件之内，重新完成自我叙事的逻辑自洽。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            在这里，每一次仪式既是一段共识的确认，也是一次对自己的重重承诺：
-            你可以选择具体特征外物作为符号锚点，择时进行 NFT 绑定，实现自我特征的铸造与完善。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者见证。
-          </Typography>
-        </>
-      ),
-    },
-    {
-      id: 'volume1',
-      title: '第二节 · 我们是谁',
-      tag: '我们是谁',
-      summary:
-        '明命 · Ming 知命为明，非为窥道，乃为明心。我们不是先知，不是圣人，我们只是一个普通的匠人——帮助你在「地」的知识之网上绘制属于自己的航线。',
-      detail: (
-        <>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            第二节 · 我们是谁
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            明命 · Ming 知命为明，非为窥道，乃为明心。我们不是先知，不是圣人，我们只是一个普通的匠人。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            那驱动日月星辰的终极法则——我们称之为「道」——或许永远超出人类认知的边界。但人类最伟大的创造，是编织了一张名为「地」的知识之网：
-            数学、物理、律法、艺术，以及心理学、社会学、命理学等，全是这张网上的经纬；时间——生辰、节气、择时——也是「地」的关键工具。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            Ming 不回答「命运是什么」。Ming 将「地」的智慧转化为开源、可编程的数字工具，帮助你在这张地图上画出属于自己的航线。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们帮助你绘制地图，不是为了定义星空，而是为了让脚下的旅程——多一份勇气，多一份和谐，多一份同行的温暖。
-          </Typography>
-        </>
-      ),
-    },
-    {
-      id: 'volume2',
-      title: '第三节 · 哲学基石：天·命·地·人·时',
-      tag: '哲学基石',
-      summary: '以「天·命·地·人·时」为骨架，为 Ming 构建一套自洽的世界观与实践框架。',
-      detail: (
-        <>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            第三节 · 哲学基石：天·命·地·人·时
-          </Typography>
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main, mt: 2 }}>
-            天 · 客体之域
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            天是客体。它可被观察其「象」，但不可被主体穷尽其「体」。我们尊重现实的约束，并以观察与记录保持谦逊。
-          </Typography>
-          <Divider sx={{ my: 3 }} />
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-            命 · 隐藏的道
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们相信命的存在，如同相信客体自身的运行规律。这种规律，或许就如同宇宙微波的背景辐射—— 我们无法直接聆听它，因为它太微弱、太古老，超出现有仪器的分辨率。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们可用不同的语言去描述它。四柱、星宿、紫微、五行……每一种命理流派，都是一套人类探索的建模语言。这些语言是否在言说同一个「命」？这个问题，Ming 留给你自己回答。
-          </Typography>
-          <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1, borderLeft: `3px solid ${theme.palette.primary.main}` }}>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-              你可以认为是——命是一个等待逼近、发现的真相或者等待接收、翻译的信号；也可以认为否——命只是纯粹的文化叙事、自我对话的假定前提。两种立场都不影响你对工具的使用。
-            </Typography>
-          </Box>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            现实的实践体验在于：当你相信那个隐藏的信号存在时，共振更容易发生。 ——我们所说的「共振」，是指你读到命理解读时，产生「历史就是这样发生的」确认感。
-          </Typography>
-          <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.secondary.main}08`, borderRadius: 1, borderLeft: `3px solid ${theme.palette.secondary.main}` }}>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic' }}>
-              <strong>子平或星宿，它们并不是在测量同一信号的不同维度，而是用不同的语言进行各自的建模分析，在没有量化处理之前，这些语言更多表现的是它们的不可通约性，无法转换，也无从比较谁更「客观」。或许这就是认识论的边界。</strong>
-            </Typography>
-          </Box>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            事实上，唯一能判断存在性的人，是你自己。你在生活中感受到的共振、自我理解中获得的清晰、未来回望时感受到的确定性——这才是验证的凭证。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            Ming 只保证：你随时可以换一种模型，重新为自己建模。
-          </Typography>
-          <Divider sx={{ my: 3 }} />
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-            地 · 共识之域
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            地是人类逻辑知识与工具箱的理论总和。它依赖共识而成立，也因此可讨论、可修正、可优化。强共识工具（数学、工程、医学）与解释性工具（社会学、心理学、五行命理）皆属其内；时间（生辰、节气、择时）亦是地中关键的工具。
-          </Typography>
-          <Divider sx={{ my: 3 }} />
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-            人 · 实践之域
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            人具双重性：作为主体，运用「地」进行判断与行动，亦可推动共识工具的演化；作为客体，属于「天」，并有其内在秩序——那是个体之道。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            Ming 关注的从来不是「定命」，而是人与工具的协同实践。
-          </Typography>
-          <Divider sx={{ my: 3 }} />
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-            时 · 地之维度
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            时不是独立的一界。时间是「地」中可度量、可记录、可回溯的工具。通过生辰、节气、择时，我们构建了可复盘、可迭代、可见证的量化模型。
-          </Typography>
-        </>
-      ),
-    },
-    {
-      id: 'volume3',
-      title: '第四节 · 多元闭环：共学·参数·仪式',
-      tag: '多元闭环',
-      summary: '命理是共学的视角，共识是协议参数的选择，仪式是意图被锚定为链上契约的方式。',
-      detail: (
-        <>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            第四节 · 多元闭环：共学·参数·仪式
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🔮 命理 · 共学：选择的同频命理流派——奇门、太乙、四柱、六壬、紫微……为你提供理解个人状态的结构化视角。
-            注意，这不是诊断，只是视角；不是预言，只是解读。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🤝 共识 · 协议参数：每个流派都是一套独特的观察视角。子平视角下，论述的是日主强弱、格局高低；紫微视角下，讲的是星曜分布。
-            在这里，没有哪个视角是「唯一正确的」解读。它们只是不同的猜测模型，用以逼近那个不可穷尽的信号本源。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            DAO 是视角维护的自治组织——他们负责让这套镜头持续开源、可审计、可迭代。
-          </Typography>
-          <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1 }}>
-            <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-              维护者的权力有明确边界：
-            </Typography>
-            <Typography variant="body2" color="text.secondary" component="div" sx={{ lineHeight: 1.8 }}>
-              任何共识参数的修改，仅可以分叉，不可以删除。平台虽然不能裁决哪个 DAO 正确，但是可以确保每个版本的开源与可追溯性：
-              <ol style={{ marginTop: '8px', paddingLeft: '24px' }}>
-                <li>每个版本都以开源协议托管</li>
-                <li>历史版本长期可见，不被抹除</li>
-                <li>参数演化路径清晰可追溯</li>
-              </ol>
-            </Typography>
-          </Box>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            用户可以选择不同的视角切换，只需加入不同的 DAO 即可。重要的问题在于，这里的切换没有叛教的伦理负担，只有工具的更替。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们将逐步开源所有流派算法的核心实现，以开源协议托管于 GitHub。创世期后，你便可以在 GitHub 审阅代码、提交提案，成为 DAO 维护者。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🕯️ 仪式 · 契约：仪式是将意图锚定成链上契约的动作。每一次铸造，都是一份可编程的自我承诺。你可以这样为自我设定：
-            「未来 40 天，我将在晨间播放这段誓言」，也可以增加信息提示：「每当看到这枚 NFT，我都要提醒自己：像如流水一样谦逊」。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            链上记录的每一次履约，都是为了让未来的自己，看得见过去的自己走了什么样的历程。
-            这种心路历程，既是个人的自我鉴定，也是后来人的参照。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            如果你想放弃一段契约，你可以让它留在钱包里，作为温柔的提醒；也可以将它发送至黑洞地址，让链上时间帮你封印那段半途。
-            销毁不是删除记忆。销毁是一场关于放下的微型仪式。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            无论你是否销毁，你永远有权铸造一枚新的契约。上一份誓言没有兑现，不剥夺你重新承诺的资格。
-            你可以公开这份履约记录，作为链上历史；也可以永久私藏，作为无人知晓的纪念。
-          </Typography>
-        </>
-      ),
-    },
-    {
-      id: 'volume4',
-      title: '第五节 · 体验形态：你的工具箱',
-      tag: '体验形态',
-      summary: '外物、节气、择时、履历、共识池，共同构成你与自己对话的一整套工具箱。',
-      detail: (
-        <>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            第五节 · 体验形态：你的工具箱
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🌿 外物 · 符号锚点：根据你选择的视角，挑选与之适配的自然符号——昆仑的土、太湖的水、长白山的木、罗浮山的火、华山的金……甚至是你自创的物象。
-            这不仅是「借用能量」的自我暗示，更是主观能量的培植：为接下来一段时间设定一个注意力锚点。完成链上铸造后，这枚 NFT 就与你完成契约仪式，
-            它会持续提醒你自己：「接下来，我要像山一样稳固。」或者，「接下来，我要像水一样谦逊。」
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🌍 节气 · 共识节律：立春、夏至、秋分、冬至……这些周期信号，是共识与道共鸣的关键里程碑。Ming 选择节气仪式，正是基于这些古老且稳定的共识基础。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            ⏳ 择时 · 个人节律：时间，是你与外界对话的坐标系。共识节律是集体选择；这种选择与对错无关，你随时可以切换到另一个逻辑自洽的共识系统。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            📈 记录 · 可回放的历史：你每一次仪式、每一次意图锚定、每一次流派切换，都是个人履历上的一份档案材料。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            每一次切换共识视角，过去的时光都会被新的语言重新诉说——昨天的「火旺」可能变成今天的「燥土」。这不是记忆被篡改，这是你对历史共识的重新解读。
-          </Typography>
-          <Divider sx={{ my: 3 }} />
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            📊 共识池 · 集体注意力的实时显示屏：共识池是集体仪式的链上聚合页。它借助数字签名，在满足个体隐私保护的同时，展示可验证的共识契约。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            共识池不存储「能量」，它存储的是：此时此刻，有多少人和你一样，选择认真面对并修正自身的不足。
-          </Typography>
-        </>
-      ),
-    },
-    {
-      id: 'volume5',
-      title: '第六节 · 技术实现：载体，不是信仰',
-      tag: '技术与隐私',
-      summary: '技术栈只负责「记录与见证」，不负责给出命运答案——你的隐私由你自己保管。',
-      detail: (
-        <>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            第六节 · 技术实现：载体，不是信仰
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们使用现代 Web3 技术栈，只为一件事：让「意图锚定、集体见证、可回溯记录」成为可能。
-            前端基于 React 18 + TypeScript + Material-UI + Vite，区块链与 NFT 部分基于 ethers.js + ERC-721，存储部分结合 IPFS 与本地存储。
-          </Typography>
-          <Box sx={{ my: 3, p: 3, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1, border: `2px solid ${theme.palette.primary.main}40` }}>
-            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, mb: 2, color: theme.palette.primary.main }}>
-              🔒 隐私与数据安全
-            </Typography>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-              NFT 中的八字数据可分为明文与哈希两部分，用户可自行选择公开范围。极端情况下，你可以将全部数据以哈希形式存储（即不公开任何原文），也可以选择全部公开。
-            </Typography>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-              你通过钱包私钥完全控制隐私数据。Ming 不会主动收集或存储你的原始数据；没有私钥，Ming 无法解析你的八字信息。
-            </Typography>
-          </Box>
-        </>
-      ),
-    },
-    {
-      id: 'volume6',
-      title: '第七节 · 效用归属：验证在实践',
-      tag: '效用的归属',
-      summary: '命理的效用不在算法或投票里，而在你日复一日使用它理解自己的过程中。',
-      detail: (
-        <>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            第七节 · 效用归属：验证在实践
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            在 Ming 平台，没有人能替你确认某个流派的解读是否「对」。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            因为答案不在算法里，不在社区投票里，而在你日常使用与实践中。这里没有客观真理，只有主观共振。我们所说的「共振」，是指你读到某段解读时，
-            产生「历史恰恰如此发生」的认同感。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            共振本身，就是真实效用的确认。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            当你感觉某种命理描述不符合历史经历时，可以尝试变更参数，或切换到新的流派，进行视角迁徙。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            Ming 从不替你做决定。它只是一个工具箱；借助它，你随时拥有更换视角的权利。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            注：本平台所有算法、分析、仪式均为文化建模与心理仪式工具，不构成命运预测、医疗建议或投资建议。
-          </Typography>
-        </>
-      ),
-    },
-    {
-      id: 'volume7',
-      title: '第八节 · 行动宣言：明其心，知其地，行其路，续其明',
-      tag: '起点与宣言',
-      summary: '当你在立春晨光里说出「这个春天，我选择认真度过」时，一切已经不同。',
-      detail: (
-        <>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            第八节 · 行动宣言：明其心，知其地，行其路，续其明
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们不知道天命运行规律究竟是什么。但我们知道，无论其运转函数如何，我们都有能力持续逼近它。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            周期性是一切天道规律存在的直接证据。利用基础周期函数叠加以逼近规律，是人类长期实践形成的共识结论。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            在天地人的框架下，人类用共识验证天道，也用共识改善自身生活。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            当一个人在立春的晨光里，为自己铸造一枚迎春仪式 NFT 的那一刻，他不是在向不可知的天乞求恩典，而是在对自己说：「这个春天，我选择认真度过。」从这一刻起，他进入春天的复苏模式。
-            这不是写给天的奏章，这是写给自己的契约。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            契约的效力来自人类自身的共识，这是人类得以利用天道的方式。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们提供地图，你来定义终点；
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们提供视角，你选择代入方式；
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们提供契约模板，你决定履约的内容；
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们提供人族共识的达成与验证工具，你决定共识逻辑本身的自洽与可靠。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            这就是「人定胜天」的全部含义。
-          </Typography>
-        </>
-      ),
-    },
-  ];
+  const chapters = getWhitepaperChapters(theme);
 
   // 判断是否显示Hero区域（只在路径为 / 时显示）
   const showHero = location.pathname === '/';
@@ -385,6 +59,11 @@ const Home: React.FC = () => {
   const handleChapterNavigate = (chapterId: string) => {
     setActiveChapter(chapterId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getNavTitle = (title: string) => {
+    const parts = title.split('·');
+    return parts.length > 1 ? parts.slice(1).join('·').trim() : title;
   };
 
   return (
@@ -453,7 +132,7 @@ const Home: React.FC = () => {
                       const currentChapter = chapters.find((c) => c.id === activeChapter);
                       return currentChapter?.detail || (
                         <Typography variant="body1" color="text.secondary">
-                          正在加载章节内容...
+                          正在加载当前节内容...
                         </Typography>
                       );
                     })()}
@@ -463,37 +142,55 @@ const Home: React.FC = () => {
                         pt: 2,
                         borderTop: `1px solid ${theme.palette.divider}`,
                         display: 'flex',
-                        justifyContent: 'space-between',
+                        justifyContent: { xs: 'flex-start', sm: 'space-between' },
+                        alignItems: { xs: 'stretch', sm: 'center' },
+                        flexDirection: { xs: 'column', sm: 'row' },
                         gap: 2,
-                        flexWrap: 'wrap',
+                        flexWrap: 'nowrap',
                       }}
                     >
                       {prevChapter ? (
-                        <Button
-                          variant="outlined"
-                          onClick={() => handleChapterNavigate(prevChapter.id)}
-                          sx={{ textTransform: 'none' }}
-                        >
-                          上一章：{prevChapter.tag}
-                        </Button>
-                      ) : (
-                        <Box />
-                      )}
+                        <Tooltip title={`上一节：${getNavTitle(prevChapter.title)}`} arrow>
+                          <Button
+                            variant="outlined"
+                            onClick={() => handleChapterNavigate(prevChapter.id)}
+                            sx={{
+                              textTransform: 'none',
+                              maxWidth: { xs: '100%', sm: '48%' },
+                              alignSelf: { xs: 'stretch', sm: 'flex-start' },
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            上一节：{getNavTitle(prevChapter.title)}
+                          </Button>
+                        </Tooltip>
+                      ) : null}
                       {nextChapter && (
-                        <Button
-                          variant="contained"
-                          onClick={() => handleChapterNavigate(nextChapter.id)}
-                          sx={{ textTransform: 'none' }}
-                        >
-                          下一章：{nextChapter.tag}
-                        </Button>
+                        <Tooltip title={`下一节：${getNavTitle(nextChapter.title)}`} arrow>
+                          <Button
+                            variant="contained"
+                            onClick={() => handleChapterNavigate(nextChapter.id)}
+                            sx={{
+                              textTransform: 'none',
+                              maxWidth: { xs: '100%', sm: '48%' },
+                              alignSelf: { xs: 'stretch', sm: 'flex-end' },
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            下一节：{getNavTitle(nextChapter.title)}
+                          </Button>
+                        </Tooltip>
                       )}
                     </Box>
                   </CardContent>
                 </Card>
               </Box>
 
-            {/* 第二部分：八个顺序章节（平台简介 + 七个章节） */}
+            {/* 第二部分：八个顺序节（第一节到第八节） */}
             <Box>
               <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Typography
@@ -514,7 +211,7 @@ const Home: React.FC = () => {
                       key={chapter.id}
                       onClick={() => setActiveChapter(chapter.id)}
                       sx={{
-                        mb: 2,
+                        mb: { xs: 1.5, sm: 2 },
                         border: selected
                           ? `2px solid ${theme.palette.primary.main}`
                           : `1px solid ${theme.palette.divider}`,
@@ -522,18 +219,18 @@ const Home: React.FC = () => {
                         transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
                         backgroundColor: selected ? `${theme.palette.primary.main}08` : 'background.paper',
                         '&:hover': {
-                          transform: 'translateX(4px)',
+                          transform: { xs: 'none', sm: 'translateX(4px)' },
                           boxShadow: theme.shadows[4],
                         },
                       }}
                     >
-                      <CardContent sx={{ p: 3 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: { xs: 1.25, sm: 2 } }}>
                           {/* 序号标识 */}
                           <Box
                             sx={{
-                              minWidth: 48,
-                              height: 48,
+                              minWidth: { xs: 36, sm: 48 },
+                              height: { xs: 36, sm: 48 },
                               borderRadius: '50%',
                               bgcolor: selected ? theme.palette.primary.main : theme.palette.grey[200],
                               color: selected ? 'white' : theme.palette.text.secondary,
@@ -541,7 +238,7 @@ const Home: React.FC = () => {
                               alignItems: 'center',
                               justifyContent: 'center',
                               fontWeight: 600,
-                              fontSize: '1.2rem',
+                              fontSize: { xs: '1rem', sm: '1.2rem' },
                               flexShrink: 0,
                             }}
                           >
@@ -549,7 +246,7 @@ const Home: React.FC = () => {
                           </Box>
                           {/* 内容区域 */}
                           <Box sx={{ flex: 1 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.75, flexWrap: 'wrap' }}>
                               <Chip
                                 label={chapter.tag}
                                 size="small"
@@ -567,14 +264,20 @@ const Home: React.FC = () => {
                             <Typography
                               variant="h6"
                               gutterBottom
-                              sx={{ fontWeight: 600, mb: 1.5 }}
+                              sx={{ fontWeight: 600, mb: 0.75, fontSize: { xs: '1rem', sm: '1.25rem' } }}
                             >
                               {chapter.title}
                             </Typography>
                             <Typography
                               variant="body2"
                               color="text.secondary"
-                              sx={{ lineHeight: 1.7 }}
+                              sx={{
+                                lineHeight: 1.6,
+                                display: '-webkit-box',
+                                WebkitLineClamp: { xs: 2, sm: 3 },
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                              }}
                             >
                               {chapter.summary}
                             </Typography>
@@ -598,7 +301,7 @@ const Home: React.FC = () => {
                   }}
                 >
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-                    附：
+                    附：我们的共识宣言
                   </Typography>
                   <Typography variant="body1" paragraph sx={{ lineHeight: 1.9 }}>
                     您阅读的这份文本，是 Ming 的白皮书摘要——它是我们关于「天地人三才共识」的核心思考。
@@ -610,7 +313,7 @@ const Home: React.FC = () => {
                     我们要这地，再不是少数先知垄断的海图，而是万人共撰的开源航道；
                   </Typography>
                   <Typography variant="body1" paragraph sx={{ lineHeight: 1.9 }}>
-                    我们要那所谓的“天命”，在人族共识面前，如诸佛般——烟消云散。
+                    我们要那所谓的“天命”，在人类共识面前，如诸佛般——烟消云散。
                   </Typography>
                   <Typography variant="body1" paragraph sx={{ lineHeight: 1.9, mt: 2 }}>
                     明命 · Ming：以共识为笔，重铸每个人自己人生的剧本。

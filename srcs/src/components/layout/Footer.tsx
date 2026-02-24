@@ -36,7 +36,7 @@ const Footer: React.FC = () => {
           © {new Date().getFullYear()} Ming Platform. All rights reserved.
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1 }}>
-          基于四柱八字能量循环理论的Web3改命平台
+          基于四柱八字能量循环理论的 Web3 仪式平台
         </Typography>
       </Container>
     </Box>
