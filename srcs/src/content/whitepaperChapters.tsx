@@ -191,6 +191,19 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
           无论你是否销毁，你永远有权铸造一枚新的契约。上一份誓言没有兑现，不剥夺你重新承诺的资格。
           你可以公开这份履约记录，作为链上历史；也可以永久私藏，作为无人知晓的纪念。
         </Typography>
+        <Divider sx={{ my: 2 }} />
+        <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+          🎭 仪式实践（续）· 封局归档：如果契约圆满达成——当一份契约完成了它的历史使命，无论是一段誓言被完整履行，还是一个阶段的自我叙事自然落幕——你可以选择为它举行「封局仪式」。
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+          封局，如同奇门遁甲中的局终之仪，是对这段经历的郑重告别与归档。发起封局后，该 NFT 将自动移除或隐藏其绑定的个人隐私数据（如生辰哈希），仅保留公开元数据与链上见证记录。
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+          封局之后的 NFT，不再承载你的隐私承诺，但依然铭刻那段时光的存在。你可以将其永久珍藏，作为自我历史的纪念章；也可以让它进入市场流转，成为可被他人见证的匿名共识凭证。
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+          封局不是销毁，而是转化——从私密契约，转化为可公开的叙事碎片。你始终拥有对自我历史如何被展示的决定权。
+        </Typography>
       </>
     ),
   },
@@ -218,7 +231,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
           📈 记录 · 可缩放的地图：你每一次仪式、每一次意图锚定、每一次流派切换，都会成为个人履历上的一份档案材料。
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-          每一次切换共识视角，过去的时光都会被新的语言重新诉说——昨天的「火旺」可能变成今天的「燥土」。这不是记忆被篡改，这是你对历史共识的重新解读。
+          每一次切换共识视角，过去的时光都会被新的语言重新诉说——昨天的「火旺」可能变成今天的「燥土」。这不是记忆被篡改，这是你对历史共识的重新解读。完成封局后的 NFT，也会在履历中沉淀为一个「已完成篇章」。
         </Typography>
         <Divider sx={{ my: 3 }} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
@@ -253,6 +266,9 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             你通过钱包私钥完全控制隐私数据。Ming 不会主动收集或存储你的原始数据；没有私钥，Ming 无法解析你的八字信息。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            当你发起封局仪式时，系统会更新链上关联的元数据引用（如新的 IPFS 哈希），将隐私字段移除或转为不可逆摘要，仅保留公开可验证信息。
           </Typography>
         </Box>
       </>
