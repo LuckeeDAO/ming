@@ -241,60 +241,28 @@ const Home: React.FC = () => {
             卷四 · 体验形态 · 你的工具箱
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🌿 外物 · 符号锚点：根据你选择的镜头，系统会推荐与之共鸣的自然符号——昆仑的土、太湖的水、长白山的木、罗浮山的火、华山的金……
-            这不是「借能量」，而是选择一个符号，作为你接下来一段时间注意力投向的锚点。
-            完成链上仪式，铸造仪式 NFT。这枚 NFT 不是「补了五行」，它是你对自己说：「接下来，我要像山一样稳固，像水一样流动。」
+            🌿 外物 · 符号锚点：根据你选择的视角，挑选与之适配的自然符号——昆仑的土、太湖的水、长白山的木、罗浮山的火、华山的金……甚至是你自创的物象。
+            这不仅是「借用能量」的自我暗示，更是主观能量的培植：为接下来一段时间设定一个注意力锚点。完成链上铸造后，这枚 NFT 就与你完成契约仪式，
+            它会持续提醒你自己：「接下来，我要像山一样稳固。」或者，「接下来，我要像水一样谦逊。」
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            🌍 节气 · 共识节律：立春、夏至、秋分、冬至……终有一天，会有成千上万人在同一时刻完成同一套仪式动作。
-            而在创世第一年，共识池可能还很稀疏——但你点亮的那个光点，永远不是孤岛。
-            千百年来，人类围火而坐、击节而歌，那不是迷信，是我们的大脑天生会为「同频」奖励自己。Ming 的节气仪式，只是让这份古老的奖赏，有了链上的回响。
+            🌍 节气 · 共识节律：立春、夏至、秋分、冬至……这些周期信号，是共识与道共鸣的关键里程碑。Ming 选择节气仪式，正是基于这些古老且稳定的共识基础。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            ⏳ 择时 · 个人节律：时间，是你与自我对话的坐标系。共识节律，是与千万人同步，感受共识的温度；
-            个人节律，则是你选定的镜头为你标记出理论上下游刃有余的时间窗口。这不是「吉凶神煞」，而是系统根据你当下的状态转译，为你推荐的注意力锚点候选。
-            你完全可以选择另一个时间，另一种算法——择时的最终目的，是让你主动决定「何时认真」。
+            ⏳ 择时 · 个人节律：时间，是你与外界对话的坐标系。共识节律是集体选择；这种选择与对错无关，你随时可以切换到另一个逻辑自洽的共识系统。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            📈 履历 · 可缩放的地图：你每一次仪式、每一次意图锚定、每一次流派切换，都会成为能量履历上的一笔。
+            📈 记录 · 可回放的历史：你每一次仪式、每一次意图锚定、每一次流派切换，都是个人履历上的一份档案材料。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            系统根据你当前选定的镜头，将你的状态波动绘制成一条曲线：
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            它不是体检报告，它是你选择的语言，对你当下状态的实时转译。
-          </Typography>
-          <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.secondary.main}08`, borderRadius: 1, borderLeft: `3px solid ${theme.palette.secondary.main}` }}>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic' }}>
-              <strong>这条曲线有一个重要的性质：它不是胶片，是实时显影液。</strong>
-            </Typography>
-          </Box>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            每一次切换镜头，过去的日子都会被新的语言重新诉说——昨天的「火旺」可能变成今天的「燥土」。不是记忆被篡改，是你拥有了重新理解记忆的权利。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            你也可以锁定某个镜头，让履历从此固定用这种语言讲述。锁定不是封印，是暂停自动重译。就像选定一本不再修订的史书——你可以随时解锁，让过去重新开口。
+            每一次切换共识视角，过去的时光都会被新的语言重新诉说——昨天的「火旺」可能变成今天的「燥土」。这不是记忆被篡改，这是你对历史共识的重新解读。
           </Typography>
           <Divider sx={{ my: 3 }} />
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            📊 共识池 · 集体注意力的实时计数器：共识池不是玄学容器。它是集体仪式的链上聚合页。
+            📊 共识池 · 集体注意力的实时显示屏：共识池是集体仪式的链上聚合页。它借助数字签名，在满足个体隐私保护的同时，展示可验证的共识契约。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            当你参与立春集体仪式，你会看到屏幕上的光点开始汇聚——此刻，和你同时完成铸造的人，正化作一个个光点，在地图上缓缓点亮。
-          </Typography>
-          <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.secondary.main}08`, borderRadius: 1, borderLeft: `3px solid ${theme.palette.secondary.main}` }}>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic' }}>
-              <strong>共识池不承诺规模，它只承诺真实。可能是几十人，可能是几千人，也可能是未来的成千上万人——每一个光点背后，都是一枚真实铸造的链上契约。</strong>
-            </Typography>
-          </Box>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            你可以查看历史累计次数、地域分布、节气共鸣峰值。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            这不是为了炫耀，这是为了让孤独的自我承诺，被千万个陌生的同频者轻轻见证。
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            共识池不存储「能量」，它存储此时此刻，有人和你一样，选择了认真对待自己。
+            共识池不存储「能量」，它存储的是：此时此刻，有多少人和你一样，选择认真面对并修正自身的不足。
           </Typography>
         </>
       ),
@@ -318,16 +286,10 @@ const Home: React.FC = () => {
               🔒 隐私与数据安全
             </Typography>
             <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-              <strong>您的八字在本地完成分析，仅存储于您自己的设备。</strong>
+              NFT 中的八字数据可分为明文与哈希两部分，用户可自行选择公开范围。极端情况下，你可以将全部数据以哈希形式存储（即不公开任何原文），也可以选择全部公开。
             </Typography>
             <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-              您可以选择将其备份至去中心化存储网络，此时数据以<strong>加密形式</strong>传输与存储。
-            </Typography>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontWeight: 600, color: theme.palette.primary.main }}>
-              Ming 不会主动收集或存储您的原始生辰数据，<strong>Ming 无法读取您的八字信息</strong>。
-            </Typography>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-              <strong>您通过钱包私钥完全控制访问权限——您的隐私，由您自己保管。</strong>
+              你通过钱包私钥完全控制隐私数据。Ming 不会主动收集或存储你的原始数据；没有私钥，Ming 无法解析你的八字信息。
             </Typography>
           </Box>
         </>
@@ -344,23 +306,23 @@ const Home: React.FC = () => {
             卷六 · 效用的归属
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            没有人能替你确认，某个流派的解读是否「对」。
+            在 Ming 平台，没有人能替你确认某个流派的解读是否「对」。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            因为答案不在算法里，不在社群投票里——在你日复一日使用它理解自己的过程里。
-          </Typography>
-          <Box sx={{ my: 2, p: 2, bgcolor: `${theme.palette.secondary.main}08`, borderRadius: 1, borderLeft: `3px solid ${theme.palette.secondary.main}` }}>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, fontStyle: 'italic' }}>
-              <strong>你觉得准，它就是对你而言准的。这不是客观真理，是主观共振——我们所说的「共振」，是指你读到某段解读时，产生 「这说的就是我」 的认同感。</strong>
-            </Typography>
-          </Box>
-          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            而共振本身就是真实的效用。
+            因为答案不在算法里，不在社区投票里，而在你日常使用与实践中。这里没有客观真理，只有主观共振。我们所说的「共振」，是指你读到某段解读时，
+            产生「历史恰恰如此发生」的认同感。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            你觉得不准，换一个流派再试。这里没有「伪命理」的审判，只有「不适合我」的视角迁徙。Ming 从不替你做决定，
-            我们只保证：你随时拥有更换视角的权利。本平台所有算法、分析、仪式均为文化建模与心理仪式工具，不构成命运预测、
-            医疗建议或投资建议。
+            共振本身，就是真实效用的确认。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            当你感觉某种命理描述不符合历史经历时，可以尝试变更参数，或切换到新的流派，进行视角迁徙。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            Ming 从不替你做决定。它只是一个工具箱；借助它，你随时拥有更换视角的权利。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            注：本平台所有算法、分析、仪式均为文化建模与心理仪式工具，不构成命运预测、医疗建议或投资建议。
           </Typography>
         </>
       ),
@@ -376,23 +338,35 @@ const Home: React.FC = () => {
             卷七 · 明其心，知其地，行其路，续其明
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们不知道天命是什么。但我们知道一件事：当一个人在立春的晨光里，为自己铸造一枚迎春仪式的 NFT——
-            那一刻，他不是在向不可知的天乞求恩典，他是在对自己说：「这个春天，我选择认真度过。」
-            这一声低语，被代码接住，被哈希见证，被时间封存。
+            我们不知道天命运行规律究竟是什么。但我们知道，无论其运转函数如何，我们都有能力持续逼近它。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            它不是写给天的奏章，它是写给自己的契约。而契约的效力，从来不在于墨水是否神圣，而在于签名者是否愿意，
-            在未来的日子里，记得自己曾许下过什么。
+            周期性是一切天道规律存在的直接证据。利用基础周期函数叠加以逼近规律，是人类长期实践形成的共识结论。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们不知道天命是什么。但我们知道，所有地图、镜头、契约，都只是渡河的筏子。
-            当你开始认真对待自己——用什么工具、信什么流派、是否兑现契约，都已不是最初的问题。
-            重要的是：那个在立春晨光里说「这个春天我选择认真度过」的人，已经不一样了。
+            在天地人的框架下，人类用共识验证天道，也用共识改善自身生活。
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
-            我们提供地图，你定义目的地；我们提供镜头，你选择对焦方式；
-            我们提供契约，你决定履约的节奏；我们提供可重译的履历，你保留重新翻译的权利；
-            我们提供失败，你持有放下的仪式。这就是「人为主体」的全部含义。
+            当一个人在立春的晨光里，为自己铸造一枚迎春仪式 NFT 的那一刻，他不是在向不可知的天乞求恩典，而是在对自己说：「这个春天，我选择认真度过。」从这一刻起，他进入春天的复苏模式。
+            这不是写给天的奏章，这是写给自己的契约。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            契约的效力来自人类自身的共识，这是人类得以利用天道的方式。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            我们提供地图，你来定义终点；
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            我们提供视角，你选择代入方式；
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            我们提供契约模板，你决定履约的内容；
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            我们提供人族共识的达成与验证工具，你决定共识逻辑本身的自洽与可靠。
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+            这就是「人定胜天」的全部含义。
           </Typography>
         </>
       ),
@@ -401,6 +375,17 @@ const Home: React.FC = () => {
 
   // 判断是否显示Hero区域（只在路径为 / 时显示）
   const showHero = location.pathname === '/';
+  const activeChapterIndex = chapters.findIndex((chapter) => chapter.id === activeChapter);
+  const prevChapter = activeChapterIndex > 0 ? chapters[activeChapterIndex - 1] : null;
+  const nextChapter =
+    activeChapterIndex >= 0 && activeChapterIndex < chapters.length - 1
+      ? chapters[activeChapterIndex + 1]
+      : null;
+
+  const handleChapterNavigate = (chapterId: string) => {
+    setActiveChapter(chapterId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <Box>
@@ -472,6 +457,38 @@ const Home: React.FC = () => {
                         </Typography>
                       );
                     })()}
+                    <Box
+                      sx={{
+                        mt: 3,
+                        pt: 2,
+                        borderTop: `1px solid ${theme.palette.divider}`,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        gap: 2,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      {prevChapter ? (
+                        <Button
+                          variant="outlined"
+                          onClick={() => handleChapterNavigate(prevChapter.id)}
+                          sx={{ textTransform: 'none' }}
+                        >
+                          上一章：{prevChapter.tag}
+                        </Button>
+                      ) : (
+                        <Box />
+                      )}
+                      {nextChapter && (
+                        <Button
+                          variant="contained"
+                          onClick={() => handleChapterNavigate(nextChapter.id)}
+                          sx={{ textTransform: 'none' }}
+                        >
+                          下一章：{nextChapter.tag}
+                        </Button>
+                      )}
+                    </Box>
                   </CardContent>
                 </Card>
               </Box>
