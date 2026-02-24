@@ -47,14 +47,14 @@ const Home: React.FC = () => {
   const chapters = [
     {
       id: 'intro',
-      title: '序 · 平台简介',
+      title: '第一节 · 平台缘起与定位',
       tag: '平台简介',
       summary:
         '明命 · Ming 是一个以「天不可尽知、地为共识理论、人为实践主体」为内核的 Web3 仪式平台。我们不替你回答「命运究竟是什么」，而是利用人类长期积累的「地」的智慧——包括命理在内的诸多工具——帮助你在现实约束条件之内，重新完成自我叙事的逻辑自洽。在这里，每一次仪式既是一段共识的确认，也是一次对自己的重重承诺：你可以选择具体特征外物作为符号锚点，择时进行 NFT 绑定，实现自我特征的铸造与完善。共识池负责汇聚这些契约，让孤独的自我承诺，被千万个陌生的同频者见证。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            序 · 平台简介
+            第一节 · 平台缘起与定位
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             明命 · Ming 是一个以「天不可尽知、地为共识理论、人为实践主体」为内核的 Web3 仪式平台。
@@ -74,14 +74,14 @@ const Home: React.FC = () => {
     },
     {
       id: 'volume1',
-      title: '卷一 · 我们是谁',
+      title: '第二节 · 我们是谁',
       tag: '我们是谁',
       summary:
         '明命 · Ming 知命为明，非为窥道，乃为明心。我们不是先知，不是圣人，我们只是一个普通的匠人——帮助你在「地」的知识之网上绘制属于自己的航线。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            卷一 · 我们是谁
+            第二节 · 我们是谁
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             明命 · Ming 知命为明，非为窥道，乃为明心。我们不是先知，不是圣人，我们只是一个普通的匠人。
@@ -101,13 +101,13 @@ const Home: React.FC = () => {
     },
     {
       id: 'volume2',
-      title: '卷二 · 哲学基石 · 天·命·地·人·时',
+      title: '第三节 · 哲学基石：天·命·地·人·时',
       tag: '哲学基石',
       summary: '以「天·命·地·人·时」为骨架，为 Ming 构建一套自洽的世界观与实践框架。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            卷二 · 哲学基石 · 天·命·地·人·时
+            第三节 · 哲学基石：天·命·地·人·时
           </Typography>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main, mt: 2 }}>
             天 · 客体之域
@@ -173,13 +173,13 @@ const Home: React.FC = () => {
     },
     {
       id: 'volume3',
-      title: '卷三 · 多元闭环 · 命理共学·参数选择·仪式实践',
+      title: '第四节 · 多元闭环：共学·参数·仪式',
       tag: '多元闭环',
       summary: '命理是共学的视角，共识是协议参数的选择，仪式是意图被锚定为链上契约的方式。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            卷三 · 多元闭环 · 命理共学·参数选择·仪式实践
+            第四节 · 多元闭环：共学·参数·仪式
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             🔮 命理 · 共学：选择的同频命理流派——奇门、太乙、四柱、六壬、紫微……为你提供理解个人状态的结构化视角。
@@ -232,13 +232,13 @@ const Home: React.FC = () => {
     },
     {
       id: 'volume4',
-      title: '卷四 · 体验形态 · 你的工具箱',
+      title: '第五节 · 体验形态：你的工具箱',
       tag: '体验形态',
       summary: '外物、节气、择时、履历、共识池，共同构成你与自己对话的一整套工具箱。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            卷四 · 体验形态 · 你的工具箱
+            第五节 · 体验形态：你的工具箱
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             🌿 外物 · 符号锚点：根据你选择的视角，挑选与之适配的自然符号——昆仑的土、太湖的水、长白山的木、罗浮山的火、华山的金……甚至是你自创的物象。
@@ -269,13 +269,13 @@ const Home: React.FC = () => {
     },
     {
       id: 'volume5',
-      title: '卷五 · 技术 · 只是载体，不是信仰',
+      title: '第六节 · 技术实现：载体，不是信仰',
       tag: '技术与隐私',
       summary: '技术栈只负责「记录与见证」，不负责给出命运答案——你的隐私由你自己保管。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            卷五 · 技术 · 只是载体，不是信仰
+            第六节 · 技术实现：载体，不是信仰
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             我们使用现代 Web3 技术栈，只为一件事：让「意图锚定、集体见证、可回溯记录」成为可能。
@@ -297,13 +297,13 @@ const Home: React.FC = () => {
     },
     {
       id: 'volume6',
-      title: '卷六 · 效用的归属',
+      title: '第七节 · 效用归属：验证在实践',
       tag: '效用的归属',
       summary: '命理的效用不在算法或投票里，而在你日复一日使用它理解自己的过程中。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            卷六 · 效用的归属
+            第七节 · 效用归属：验证在实践
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             在 Ming 平台，没有人能替你确认某个流派的解读是否「对」。
@@ -329,13 +329,13 @@ const Home: React.FC = () => {
     },
     {
       id: 'volume7',
-      title: '卷七 · 明其心，知其地，行其路，续其明',
+      title: '第八节 · 行动宣言：明其心，知其地，行其路，续其明',
       tag: '起点与宣言',
       summary: '当你在立春晨光里说出「这个春天，我选择认真度过」时，一切已经不同。',
       detail: (
         <>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            卷七 · 明其心，知其地，行其路，续其明
+            第八节 · 行动宣言：明其心，知其地，行其路，续其明
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
             我们不知道天命运行规律究竟是什么。但我们知道，无论其运转函数如何，我们都有能力持续逼近它。

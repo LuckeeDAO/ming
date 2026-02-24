@@ -1,7 +1,7 @@
 /**
  * 完整哲学白皮书页面
  *
- * 展示 Ming 的完整哲学体系，按八个栏目（序 + 七卷）组织内容。
+ * 展示 Ming 的完整哲学体系，按八个栏目（第一节至第八节）组织内容。
  *
  * @module pages/Philosophy
  */
@@ -24,7 +24,7 @@ const Philosophy: React.FC = () => {
   const sections = [
     {
       id: 'intro',
-      title: '序 · 平台简介',
+      title: '第一节 · 平台缘起与定位',
       content: (
         <>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
@@ -44,7 +44,7 @@ const Philosophy: React.FC = () => {
     },
     {
       id: 'volume1',
-      title: '卷一 · 我们是谁',
+      title: '第二节 · 我们是谁',
       content: (
         <>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
@@ -64,7 +64,7 @@ const Philosophy: React.FC = () => {
     },
     {
       id: 'volume2',
-      title: '卷二 · 哲学基石 · 天·命·地·人·时',
+      title: '第三节 · 哲学基石：天·命·地·人·时',
       content: (
         <>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
@@ -112,7 +112,7 @@ const Philosophy: React.FC = () => {
     },
     {
       id: 'volume3',
-      title: '卷三 · 多元闭环 · 命理共学·参数选择·仪式实践',
+      title: '第四节 · 多元闭环：共学·参数·仪式',
       content: (
         <>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
@@ -135,7 +135,7 @@ const Philosophy: React.FC = () => {
     },
     {
       id: 'volume4',
-      title: '卷四 · 体验形态 · 你的工具箱',
+      title: '第五节 · 体验形态：你的工具箱',
       content: (
         <>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
@@ -164,7 +164,7 @@ const Philosophy: React.FC = () => {
     },
     {
       id: 'volume5',
-      title: '卷五 · 技术 · 只是载体，不是信仰',
+      title: '第六节 · 技术实现：载体，不是信仰',
       content: (
         <>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
@@ -189,7 +189,7 @@ const Philosophy: React.FC = () => {
     },
     {
       id: 'volume6',
-      title: '卷六 · 效用的归属',
+      title: '第七节 · 效用归属：验证在实践',
       content: (
         <>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
@@ -212,7 +212,7 @@ const Philosophy: React.FC = () => {
     },
     {
       id: 'volume7',
-      title: '卷七 · 明其心，知其地，行其路，续其明',
+      title: '第八节 · 行动宣言：明其心，知其地，行其路，续其明',
       content: (
         <>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
@@ -299,6 +299,29 @@ const Philosophy: React.FC = () => {
             </CardContent>
           </Card>
         ))}
+
+        <Card sx={{ mb: 4, border: `1px solid ${theme.palette.divider}`, bgcolor: `${theme.palette.secondary.main}05` }}>
+          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+              附：
+            </Typography>
+            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+              您阅读的这份文本，是 Ming 的白皮书摘要——它是我们关于「天地人三才共识」的核心思考。
+            </Typography>
+            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+              我们要这天，再不能以“不可知”为名，隐匿命运的源码；
+            </Typography>
+            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+              我们要这地，再不是少数先知垄断的海图，而是万人共撰的开源航道；
+            </Typography>
+            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
+              我们要那所谓的“天命”，在人族共识面前，如诸佛般——烟消云散。
+            </Typography>
+            <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9, mt: 2 }}>
+              明命 · Ming：以共识为笔，重铸每个人自己人生的剧本。
+            </Typography>
+          </CardContent>
+        </Card>
       </Container>
     </Box>
   );
