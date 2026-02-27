@@ -1,78 +1,50 @@
-# Ming Platform - 源代码目录
+# Ming Frontend (`srcs`)
 
-## 📁 目录结构
+`srcs` 是 Ming 的前端子项目，基于 React + TypeScript + Vite。
 
-```
+## 目录结构
+
+```text
 srcs/
-├── src/                    # 源代码目录
-│   ├── components/        # React组件
-│   ├── pages/            # 页面组件
-│   ├── hooks/            # 自定义Hooks
-│   ├── services/         # 服务层
-│   ├── store/            # 状态管理
-│   ├── utils/            # 工具函数
-│   ├── types/            # TypeScript类型
-│   ├── styles/           # 样式文件
-│   ├── i18n/             # 国际化
-│   ├── assets/           # 静态资源
-│   ├── App.tsx           # 根组件
-│   └── main.tsx          # 入口文件
-├── package.json          # 项目配置
-├── tsconfig.json         # TypeScript配置
-├── vite.config.ts        # Vite配置
-├── env.example           # 环境变量模板（可跟踪）
-└── README.md             # 本文件
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── hooks/
+│   ├── services/
+│   ├── store/
+│   ├── utils/
+│   ├── types/
+│   ├── styles/
+│   ├── i18n/
+│   ├── App.tsx
+│   └── main.tsx
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+├── env.example
+└── README.md
 ```
 
-## 🚀 快速开始
-
-### 安装依赖
+## 快速开始
 
 ```bash
 npm install
-```
-
-### 开发模式
-
-```bash
+cp env.example .env
 npm run dev
 ```
 
-### 环境变量
-
-复制并编辑：
+## 常用命令
 
 ```bash
-cp env.example .env
-```
-
-关键配置：
-
-- `VITE_CHAIN_FAMILY=evm|solana`
-- `VITE_CHAIN_NETWORK`（如 `sepolia` / `solana-devnet`）
-- `VITE_NFT_CONTRACT_ADDRESS`（EVM 合约地址或 Solana Program ID）
-
-### 构建生产版本
-
-```bash
+npm run dev
 npm run build
-```
-
-### 运行测试
-
-```bash
 npm test
 ```
 
-## 📝 开发规范
+## 环境变量关键项
 
-请参考 `../docs/04-开发指南/` 目录下的开发规范文档。
+- `VITE_CHAIN_FAMILY=evm|solana`
+- `VITE_CHAIN_NETWORK`
+- `VITE_NFT_CONTRACT_ADDRESS`
 
-## 🔗 相关文档
-
-- [项目概述](../docs/01-项目概述/)
-- [概要设计](../docs/02-概要设计/)
-- [详细设计](../docs/03-详细设计/)
-- [开发指南](../docs/04-开发指南/)
-- [钱包接口](../docs/钱包接口/)
-- [智能合约](../docs/智能合约/)
+本 README 仅说明 `srcs` 子项目自身，不依赖外部文档目录。
