@@ -48,7 +48,7 @@ test('钱包连接后应显示缩略地址', async ({ page }) => {
   });
 
   await page.goto('/');
-  const connectButton = page.getByRole('button', { name: '连接钱包' });
+  const connectButton = page.getByRole('button', { name: /连接( AnDaoWallet)?钱包/ });
   await expect(connectButton).toBeVisible();
   await connectButton.click();
 

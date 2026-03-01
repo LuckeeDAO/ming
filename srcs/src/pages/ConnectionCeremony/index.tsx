@@ -260,7 +260,7 @@ const ConnectionCeremony: React.FC = () => {
       setTasks(userTasks);
     } catch (error) {
       console.error('Error loading scheduled tasks:', error);
-      // 如果钱包接口未实现，显示空列表
+      // 查询失败时回退为空列表，避免影响主流程
       setTasks([]);
     }
   }, [walletAddress]);

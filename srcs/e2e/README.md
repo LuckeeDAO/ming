@@ -11,8 +11,19 @@
   - 钱包连接按钮展示与缩略地址显示（Mock `window.ethereum`）
 - `wallet-flow.spec.ts`
   - `SimpleMint` 通过钱包接口完成铸造（Mock 钱包桥接 + Mock Pinata 上传）
+- `wallet-cross-window.spec.ts`
+  - 跨窗口真实 popup 握手（非 `window.postMessage` mock）
+  - 验证 `GET_ACTIVE_ACCOUNT` 在 popup/source 匹配下返回地址
 
 ## 运行方式
+
+首次运行（新机器）先安装 Playwright 浏览器：
+
+```bash
+npx playwright install chromium
+```
+
+然后执行：
 
 ```bash
 npm run test:e2e
@@ -24,18 +35,31 @@ npm run test:e2e
 npx playwright test --project=chromium
 ```
 
+仅运行跨窗口用例（独立配置）：
+
+```bash
+npx playwright test e2e/wallet-cross-window.spec.ts --project=chromium --config=playwright.cross-window.config.ts
+```
+
 ## 环境变量与服务
 
 `playwright.config.ts` 已将 webServer 启动命令设置为：
 
 - `VITE_PINATA_API_KEY=e2e`
 - `VITE_PINATA_SECRET_KEY=e2e`
+- `VITE_WALLET_CONNECTION_MODE=metamask`
+- `VITE_NFT_CONTRACT_ADDRESS=0x1234567890123456789012345678901234567890`
 - `npm run dev -- --host 127.0.0.1 --port 5173`
 
 说明：
 
-- 用例内会拦截 `https://api.pinata.cloud/pinning/pinFileToIPFS` 并返回 Mock 哈希，不依赖真实 Pinata。
+- 用例内会拦截 `https://api.pinata.cloud/pinning/pinFileToIPFS` 与 `https://api.pinata.cloud/pinning/pinJSONToIPFS` 并返回 Mock 哈希，不依赖真实 Pinata。
 - 钱包桥接通过重写 `window.postMessage` + `MessageEvent` 回包模拟。
+
+`playwright.cross-window.config.ts` 额外启动：
+
+- Ming dev server：`http://localhost:5176`
+- 钱包 mock 页面服务：`http://localhost:5177`
 
 ## 常见问题
 

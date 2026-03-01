@@ -632,7 +632,7 @@ const Home: React.FC = () => {
                       区块链 & 存储
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      区块链与 NFT 采用多链兼容接入架构，通过钱包消息协议（`MING_WALLET_*`）统一调用；当前已接入 Solana Program（Anchor），并预留其他链的接入能力。
+                      区块链与 NFT 采用多链兼容接入架构，通过钱包消息协议（`MING_WALLET_*`）统一调用；当前已接入 EVM 与 Solana 路径，其中 Avalanche C-Chain 为优先执行链。
                       图片与元数据托管在 IPFS 与本地存储中：你的八字可以保存在本地设备，你的选择则以链上事件形式可验证地记录下来。
                     </Typography>
                   </CardContent>

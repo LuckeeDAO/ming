@@ -11,6 +11,19 @@
  */
 export const WALLET_PROTOCOL_VERSION = '1.0.0';
 
+export type GasPolicyType = 'self_pay' | 'sponsored';
+
+export interface GasPolicy {
+  primary: GasPolicyType;
+  fallback?: GasPolicyType;
+  sponsorIdOrInviteCode?: string;
+}
+
+export interface ClosurePolicy {
+  closeAfterSeconds?: number;
+  closeAt?: string;
+}
+
 export interface MintTiming {
   requestedAt: string; // 请求发起时间（ISO）
   executeAt: string;   // 期望执行时间（ISO）
@@ -75,8 +88,11 @@ export interface MintNFTResponse {
  */
 export interface CreateScheduledTaskRequest {
   protocolVersion: string; // 协议版本标识，当前固定为 WALLET_PROTOCOL_VERSION
+  planId?: string;
   scheduledTime: string;        // ISO格式时间
   timing: MintTiming;
+  gasPolicy?: GasPolicy;
+  closurePolicy?: ClosurePolicy;
   
   // IPFS哈希（Ming平台已上传）
   ipfs: {
@@ -141,6 +157,7 @@ export interface GetScheduledTaskResponse {
  */
 export interface WalletScheduledTaskData {
   taskId: string;
+  planId?: string;
   scheduledTime: string;
   status: string;
   walletAddress?: string;
@@ -169,6 +186,12 @@ export interface WalletScheduledTaskData {
     tokenId?: string;
     txHash?: string;
     error?: string;
+    effectiveGasPolicy?: GasPolicyType;
+    lifecycleReceipts?: {
+      closeTxHash?: string;
+      reviewTxHash?: string;
+      releaseTxHash?: string;
+    };
   };
   [key: string]: unknown;
 }
@@ -192,6 +215,35 @@ export interface GetScheduledTasksByWalletResponse {
   error?: {
     code: string;
     message: string;
+  };
+}
+
+/**
+ * 查询钱包当前活跃账户请求参数
+ */
+export interface GetActiveAccountRequest {
+  protocolVersion: string;
+  chainFamily?: 'evm' | 'solana';
+  chainId?: number;
+  network?: string;
+}
+
+/**
+ * 查询钱包当前活跃账户响应
+ */
+export interface GetActiveAccountResponse {
+  success: boolean;
+  data?: {
+    walletAddress: string;
+    chainFamily: 'evm' | 'solana';
+    chainId?: number;
+    network?: string;
+    status?: 'connected' | 'locked' | 'not_found';
+  };
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
   };
 }
 
@@ -253,6 +305,46 @@ export interface ReleaseConnectionResponse {
     message: string;
     details?: any;
   };
+}
+
+export interface WalletSendTransactionRequest {
+  protocolVersion: string;
+  chainId: number;
+  chainFamily?: 'evm' | 'solana';
+  network?: string;
+  to: string;
+  data: string;
+  value?: string;
+  gasPolicy: GasPolicy;
+  clientRequestId?: string;
+}
+
+export interface WalletSendTransactionResponse {
+  success: boolean;
+  data?: {
+    txHash: string;
+    status: 'submitted' | 'confirmed' | 'failed';
+    effectiveGasPolicy?: GasPolicyType;
+    businessResult?: Record<string, unknown>;
+  };
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
+  };
+}
+
+export type WalletEventName =
+  | 'mintTaskStatusChanged'
+  | 'mintSucceeded'
+  | 'mintFailed'
+  | 'closeConfirmed'
+  | 'reviewConfirmed'
+  | 'releaseConfirmed';
+
+export interface WalletEventEnvelope {
+  event: WalletEventName;
+  data: Record<string, unknown>;
 }
 
 /**

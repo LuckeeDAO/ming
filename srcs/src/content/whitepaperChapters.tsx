@@ -284,7 +284,7 @@ export const getWhitepaperChapters = (theme: Theme): WhitepaperChapter[] => [
         <CapabilityStatusLine text={CHAPTER_STATUS.volume5} />
         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.9 }}>
           我们使用现代 Web3 技术栈，只为一件事：让「意图锚定、集体见证、可追溯记录」成为可能。
-          前端基于 React 18 + TypeScript + Material-UI + Vite；区块链与 NFT 采用多链兼容的合约接入方式（当前已接入 Solana Program / Anchor），通过钱包消息协议（`MING_WALLET_*`）统一调用；
+          前端基于 React 18 + TypeScript + Material-UI + Vite；区块链与 NFT 采用多链兼容的合约接入方式（已接入 EVM 与 Solana 执行路径，其中 Avalanche C-Chain 为优先链），通过钱包消息协议（`MING_WALLET_*`）统一调用；
           链族由 `chainFamily` 参数选择（如 `solana` / `evm`）；存储结合 IPFS 与本地存储。
         </Typography>
         <Box sx={{ my: 3, p: 3, bgcolor: `${theme.palette.primary.main}08`, borderRadius: 1, border: `2px solid ${theme.palette.primary.main}40` }}>

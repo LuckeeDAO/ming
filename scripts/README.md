@@ -218,6 +218,53 @@ export VERCEL_PROJECT_ID="your-project-id"
    vercel whoami
    ```
 
+---
+
+### 3. `run_wallet_integration_checks.sh` - 钱包联调一键检查
+
+用于跨仓联调回归（Ming + AnDaoWallet）：
+
+```bash
+# 完整检查（含 Playwright E2E）
+./scripts/run_wallet_integration_checks.sh
+
+# 跳过 E2E，仅跑协议与类型测试
+./scripts/run_wallet_integration_checks.sh --skip-e2e
+```
+
+执行内容：
+
+- Ming：`mingWalletInterface` 单测
+- Ming：`example.spec.ts` + `wallet-flow.spec.ts` Chromium E2E 冒烟
+- Ming：`wallet-cross-window.spec.ts` 跨窗口 popup 握手 E2E（独立配置）
+- AnDaoWallet/h5：`type-check` + `MingWalletBridgeService` 测试
+
+### 4. `run_wallet_handshake_smoke.sh` - 钱包握手专项冒烟
+
+用于快速验证活跃账户握手（`GET_ACTIVE_ACCOUNT`）链路：
+
+```bash
+./scripts/run_wallet_handshake_smoke.sh
+```
+
+执行内容：
+
+- Ming：`mingWalletInterface` 中 `GET_ACTIVE_ACCOUNT` 相关关键测试（同页与跨窗口响应来源匹配）
+
+### 5. `run_wallet_cross_window_preflight.sh` - 跨窗口联调前置检查
+
+用于校验 Ming/AnDaoWallet 双侧 `.env.local` 是否满足跨窗口联调最小条件：
+
+```bash
+./scripts/run_wallet_cross_window_preflight.sh
+```
+
+检查项：
+
+- Ming 侧：`VITE_WALLET_APP_URL` / `VITE_WALLET_TARGET_ORIGIN` / `VITE_WALLET_ALLOWED_ORIGINS`
+- 钱包侧：`VITE_MING_ALLOWED_ORIGINS` / `VITE_SOLANA_NETWORK`
+- 关键一致性：目标 Origin 对齐、白名单覆盖、Solana 网络对齐
+
 3. **检查构建：**
    ```bash
    cd srcs

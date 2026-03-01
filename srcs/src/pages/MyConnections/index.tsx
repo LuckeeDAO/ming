@@ -45,7 +45,12 @@ import { ipfsService } from '../../services/ipfs/ipfsService';
 import { walletService } from '../../services/wallet/walletService';
 import { mingWalletInterface } from '../../services/wallet/mingWalletInterface';
 import { isValidContractAddress } from '../../utils/validation';
-import { WALLET_PROTOCOL_VERSION } from '../../types/wallet';
+import {
+  buildLifecycleRequests,
+  buildReviewCommentHash,
+  executeLifecycleFlow,
+} from '../../services/wallet/lifecycleTxService';
+import { matchesLifecycleEventSelection } from '../../services/wallet/lifecycleEventMatcher';
 
 interface ReleaseEvaluation {
   completionScore: number;
@@ -53,6 +58,52 @@ interface ReleaseEvaluation {
   publicNarrative: string;
   nextStageGoal: string;
 }
+
+type LifecycleStepKey = 'closeConfirmed' | 'reviewConfirmed' | 'releaseConfirmed';
+type LifecycleStepStatus = 'idle' | 'pending' | 'confirmed' | 'failed';
+
+interface LifecycleStepState {
+  status: LifecycleStepStatus;
+  txHash?: string;
+}
+
+const LIFECYCLE_STEP_LABELS: Record<LifecycleStepKey, string> = {
+  closeConfirmed: 'closeConfirmed',
+  reviewConfirmed: 'reviewConfirmed',
+  releaseConfirmed: 'releaseConfirmed',
+};
+
+const createInitialLifecycleSteps = (): Record<LifecycleStepKey, LifecycleStepState> => ({
+  closeConfirmed: { status: 'idle' },
+  reviewConfirmed: { status: 'idle' },
+  releaseConfirmed: { status: 'idle' },
+});
+
+const buildLifecycleRefLabel = (tokenId: string | null, planId?: string): string => {
+  if (planId) {
+    return `planId: ${planId}`;
+  }
+  if (tokenId) {
+    return `tokenId: ${tokenId}`;
+  }
+  return 'none';
+};
+
+const extractPlanIdFromMetadata = (metadata: NFTMetadata | null): string | undefined => {
+  if (!metadata) {
+    return undefined;
+  }
+  if (metadata.scheduledMint?.planId) {
+    return metadata.scheduledMint.planId;
+  }
+  const attr = metadata.attributes?.find(
+    (item) => item.trait_type === 'planId' || item.trait_type === '计划ID',
+  );
+  if (attr && (typeof attr.value === 'string' || typeof attr.value === 'number')) {
+    return String(attr.value);
+  }
+  return undefined;
+};
 
 const MyConnections: React.FC = () => {
   const theme = useTheme();
@@ -76,6 +127,54 @@ const MyConnections: React.FC = () => {
   const [releasedRecords, setReleasedRecords] = useState<
     Record<string, { releasedTokenURI: string; txHash?: string; timestamp?: number }>
   >({});
+  const [tokenPlanIds, setTokenPlanIds] = useState<Record<string, string>>({});
+  const [lifecycleSteps, setLifecycleSteps] = useState<Record<LifecycleStepKey, LifecycleStepState>>(
+    createInitialLifecycleSteps(),
+  );
+  const selectedPlanId = extractPlanIdFromMetadata(nftMetadata) || (selectedNFT ? tokenPlanIds[selectedNFT] : undefined);
+  const lifecycleMatchMode = selectedPlanId ? 'planId' : selectedNFT ? 'tokenId' : 'none';
+
+  useEffect(() => {
+    const unsubscribe = mingWalletInterface.subscribeEvents((walletEvent) => {
+      const selectedRef = {
+        tokenId: selectedNFT || undefined,
+        planId: selectedPlanId,
+      };
+      const eventRef = {
+        tokenId: walletEvent.data.tokenId,
+        planId: walletEvent.data.planId,
+      };
+      if (!matchesLifecycleEventSelection(eventRef, selectedRef)) {
+        return;
+      }
+
+      const txHash = typeof walletEvent.data.txHash === 'string' ? walletEvent.data.txHash : undefined;
+      if (walletEvent.event === 'closeConfirmed') {
+        setLifecycleSteps((prev) => ({
+          ...prev,
+          closeConfirmed: { status: 'confirmed', txHash },
+        }));
+        return;
+      }
+      if (walletEvent.event === 'reviewConfirmed') {
+        setLifecycleSteps((prev) => ({
+          ...prev,
+          reviewConfirmed: { status: 'confirmed', txHash },
+        }));
+        return;
+      }
+      if (walletEvent.event === 'releaseConfirmed') {
+        setLifecycleSteps((prev) => ({
+          ...prev,
+          releaseConfirmed: { status: 'confirmed', txHash },
+        }));
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [selectedNFT, selectedPlanId]);
 
   /**
    * 同步NFT到Redux store
@@ -95,6 +194,7 @@ const MyConnections: React.FC = () => {
     const syncReleasedRecords = async () => {
       if (nfts.length === 0) {
         setReleasedRecords({});
+        setTokenPlanIds({});
         return;
       }
 
@@ -103,16 +203,19 @@ const MyConnections: React.FC = () => {
           try {
             const metadata = await getNFTMetadata(nft.tokenURI);
             const released = Boolean(metadata?.metadata?.version?.includes('-released'));
+            const planId = extractPlanIdFromMetadata(metadata);
             return {
               tokenId: nft.tokenId,
               released,
               releasedTokenURI: nft.tokenURI,
+              planId,
             };
           } catch (err) {
             return {
               tokenId: nft.tokenId,
               released: false,
               releasedTokenURI: nft.tokenURI,
+              planId: undefined,
             };
           }
         })
@@ -131,6 +234,15 @@ const MyConnections: React.FC = () => {
               txHash: prev[item.tokenId]?.txHash,
               timestamp: prev[item.tokenId]?.timestamp,
             };
+          }
+        }
+        return next;
+      });
+      setTokenPlanIds(() => {
+        const next: Record<string, string> = {};
+        for (const item of results) {
+          if (item.planId) {
+            next[item.tokenId] = item.planId;
           }
         }
         return next;
@@ -181,6 +293,7 @@ const MyConnections: React.FC = () => {
       publicNarrative: '',
       nextStageGoal: '',
     });
+    setLifecycleSteps(createInitialLifecycleSteps());
   };
 
   const selectedNFTRecord = selectedNFT
@@ -263,6 +376,7 @@ const MyConnections: React.FC = () => {
     setReleaseProcessing(true);
     setReleaseError('');
     setReleaseMessage('');
+    setLifecycleSteps(createInitialLifecycleSteps());
 
     try {
       const chainContext = await walletService.getChainContext();
@@ -280,32 +394,80 @@ const MyConnections: React.FC = () => {
       const metadataHash = await ipfsService.uploadJSON(releasedMetadata);
       const releasedTokenURI = `ipfs://${metadataHash}`;
 
-      const response = await mingWalletInterface.releaseConnectionNFT({
-        protocolVersion: WALLET_PROTOCOL_VERSION,
-        contract: {
-          address: contractAddress,
-          chainId,
-          chainFamily,
-          network,
-        },
-        params: {
-          tokenId: selectedNFT,
+      const commentHash = buildReviewCommentHash(
+        JSON.stringify({
+          publicNarrative: releaseEvaluation.publicNarrative,
+          nextStageGoal: releaseEvaluation.nextStageGoal,
+          completionScore: releaseEvaluation.completionScore,
+          resonanceScore: releaseEvaluation.resonanceScore,
           releasedTokenURI,
-          removePrivateData: true,
+        }),
+      );
+      const requests = buildLifecycleRequests({
+        chainId,
+        chainFamily,
+        network,
+        contractAddress,
+        tokenId: selectedNFT,
+        rating: releaseEvaluation.completionScore,
+        commentHash,
+        gasPolicy: {
+          primary: 'sponsored',
+          fallback: 'self_pay',
         },
       });
+      const result = await executeLifecycleFlow(
+        (request) => mingWalletInterface.sendTransaction(request),
+        requests,
+        {
+          onStepStarted: (action) => {
+            const key =
+              action === 'close'
+                ? 'closeConfirmed'
+                : action === 'review'
+                  ? 'reviewConfirmed'
+                  : 'releaseConfirmed';
+            setLifecycleSteps((prev) => ({
+              ...prev,
+              [key]: { status: 'pending' },
+            }));
+          },
+          onStepConfirmed: (action, txHash) => {
+            const key =
+              action === 'close'
+                ? 'closeConfirmed'
+                : action === 'review'
+                  ? 'reviewConfirmed'
+                  : 'releaseConfirmed';
+            setLifecycleSteps((prev) => ({
+              ...prev,
+              [key]: { status: 'confirmed', txHash },
+            }));
+          },
+          onStepFailed: (action) => {
+            const key =
+              action === 'close'
+                ? 'closeConfirmed'
+                : action === 'review'
+                  ? 'reviewConfirmed'
+                  : 'releaseConfirmed';
+            setLifecycleSteps((prev) => ({
+              ...prev,
+              [key]: { status: 'failed' },
+            }));
+          },
+        },
+      );
 
-      if (!response.success) {
-        throw new Error(response.error?.message || '封局释放失败');
-      }
-
-      setReleaseMessage(`封局释放成功，交易哈希：${response.data?.txHash || '-'}`);
+      setReleaseMessage(
+        `封局释放成功\nmatch: ${lifecycleMatchMode}\nref: ${buildLifecycleRefLabel(selectedNFT, selectedPlanId)}\nclose: ${result.closeTxHash}\nreview: ${result.reviewTxHash}\nrelease: ${result.releaseTxHash}`,
+      );
       setReleasedRecords((prev) => ({
         ...prev,
         [selectedNFT]: {
           releasedTokenURI,
-          txHash: response.data?.txHash,
-          timestamp: response.data?.timestamp,
+          txHash: result.releaseTxHash,
+          timestamp: Date.now(),
         },
       }));
       setNftMetadata(releasedMetadata);
@@ -317,7 +479,6 @@ const MyConnections: React.FC = () => {
       setReleaseProcessing(false);
     }
   };
-
 
   return (
     <Container maxWidth="lg">
@@ -468,6 +629,14 @@ const MyConnections: React.FC = () => {
                       <Typography variant="h6" gutterBottom>
                         Token #{nft.tokenId}
                       </Typography>
+                      {tokenPlanIds[nft.tokenId] && (
+                        <Chip
+                          label={`Plan: ${tokenPlanIds[nft.tokenId]}`}
+                          size="small"
+                          variant="outlined"
+                          sx={{ mb: 1, mr: 1 }}
+                        />
+                      )}
                       {getReleasedState(nft.tokenId) && (
                         <Chip
                           label="已封局释放"
@@ -511,6 +680,7 @@ const MyConnections: React.FC = () => {
       >
         <DialogTitle>
           NFT 详情 - Token #{selectedNFT}
+          {selectedPlanId ? ` (Plan: ${selectedPlanId})` : ''}
         </DialogTitle>
         <DialogContent>
           {releaseError && (
@@ -523,6 +693,41 @@ const MyConnections: React.FC = () => {
               {releaseMessage}
             </Alert>
           )}
+          <Box sx={{ mb: 2, p: 2, border: `1px solid ${theme.palette.divider}`, borderRadius: 1 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              生命周期确认进度
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              事件匹配维度：{lifecycleMatchMode}
+              {selectedPlanId ? ` (planId: ${selectedPlanId})` : selectedNFT ? ` (tokenId: ${selectedNFT})` : ''}
+            </Typography>
+            <Grid container spacing={1}>
+              {(Object.keys(lifecycleSteps) as LifecycleStepKey[]).map((stepKey) => {
+                const step = lifecycleSteps[stepKey];
+                const color =
+                  step.status === 'confirmed'
+                    ? 'success'
+                    : step.status === 'failed'
+                      ? 'error'
+                      : step.status === 'pending'
+                        ? 'warning'
+                        : 'default' as const;
+                const label =
+                  step.status === 'confirmed'
+                    ? `${LIFECYCLE_STEP_LABELS[stepKey]} ✓`
+                    : step.status === 'failed'
+                      ? `${LIFECYCLE_STEP_LABELS[stepKey]} ✗`
+                      : step.status === 'pending'
+                        ? `${LIFECYCLE_STEP_LABELS[stepKey]} ...`
+                        : LIFECYCLE_STEP_LABELS[stepKey];
+                return (
+                  <Grid item key={stepKey}>
+                    <Chip label={label} color={color} size="small" />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Box>
           {isSelectedReleased && (
             <Alert severity="info" sx={{ mb: 2 }}>
               当前 NFT 已完成封局释放：隐私字段已移除，仅保留公开见证数据用于展示与流通。
@@ -597,6 +802,9 @@ const MyConnections: React.FC = () => {
                 <Box sx={{ mt: 2 }}>
                   <Typography variant="subtitle2" gutterBottom>
                     封局释放记录：
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    计划ID：{selectedPlanId || '-'}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     公开元数据：{releasedRecords[selectedNFT].releasedTokenURI}

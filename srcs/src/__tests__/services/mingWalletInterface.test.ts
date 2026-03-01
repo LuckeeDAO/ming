@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mingWalletInterface } from '../../services/wallet/mingWalletInterface';
+import { walletWindowBridge } from '../../services/wallet/walletWindowBridge';
 import {
   MintNFTRequest,
   ReleaseConnectionRequest,
+  WalletSendTransactionRequest,
   WalletErrorCode,
   WALLET_PROTOCOL_VERSION,
 } from '../../types/wallet';
@@ -78,6 +80,20 @@ const releaseRequest: ReleaseConnectionRequest = {
     releasedTokenURI: 'ipfs://QmReleasedMetadata',
     removePrivateData: true,
   },
+};
+
+const sendTxRequest: WalletSendTransactionRequest = {
+  protocolVersion: WALLET_PROTOCOL_VERSION,
+  chainId: 43114,
+  chainFamily: 'evm',
+  to: '0x1234567890123456789012345678901234567890',
+  data: '0xabcdef',
+  value: '0',
+  gasPolicy: {
+    primary: 'self_pay',
+    fallback: 'sponsored',
+  },
+  clientRequestId: 'req-123',
 };
 
 describe('mingWalletInterface', () => {
@@ -157,6 +173,102 @@ describe('mingWalletInterface', () => {
     expect(response.success).toBe(false);
     expect(response.error?.message).toContain('timeout');
     expect(response.error?.code).toBe(WalletErrorCode.NETWORK_ERROR);
+  });
+
+  it('应支持查询钱包当前活跃地址', async () => {
+    const postMessageSpy = vi
+      .spyOn(window, 'postMessage')
+      .mockImplementation(((message: any, targetOrigin: string) => {
+        expect(targetOrigin).toBe(window.location.origin);
+        expect(message?.type).toBe('MING_WALLET_GET_ACTIVE_ACCOUNT_REQUEST');
+
+        setTimeout(() => {
+          window.dispatchEvent(
+            new MessageEvent('message', {
+              origin: window.location.origin,
+              source: window,
+              data: {
+                type: 'MING_WALLET_GET_ACTIVE_ACCOUNT_RESPONSE',
+                messageId: message.messageId,
+                payload: {
+                  success: true,
+                  data: {
+                    walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
+                    chainFamily: 'evm',
+                    chainId: 43114,
+                    network: 'avalanche-c-chain',
+                    status: 'connected',
+                  },
+                },
+              },
+            })
+          );
+        }, 0);
+      }) as typeof window.postMessage);
+
+    const response = await mingWalletInterface.getActiveAccount({
+      chainFamily: 'evm',
+      chainId: 43114,
+    });
+
+    expect(postMessageSpy).toHaveBeenCalledOnce();
+    expect(response.success).toBe(true);
+    expect(response.data?.walletAddress).toBe(
+      '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0'
+    );
+  });
+
+  it('应支持跨窗口钱包来源的响应匹配（AnDaoWallet窗口）', async () => {
+    const fakePostMessage = vi.fn();
+    const fakeWalletWindow = {
+      closed: false,
+      focus: vi.fn(),
+      postMessage: fakePostMessage,
+    } as unknown as Window;
+
+    vi.spyOn(walletWindowBridge, 'isExternalWalletConfigured').mockReturnValue(true);
+    vi.spyOn(walletWindowBridge, 'openWalletWindow').mockReturnValue(fakeWalletWindow);
+    vi.spyOn(walletWindowBridge, 'getRequestTargetWindow').mockReturnValue(fakeWalletWindow);
+    vi.spyOn(walletWindowBridge, 'getExpectedResponseSource').mockReturnValue(fakeWalletWindow);
+    vi.spyOn(walletWindowBridge, 'isExpectedResponseSource').mockImplementation(
+      (source, expected) => source === expected
+    );
+    vi.spyOn(walletWindowBridge, 'getTargetOrigin').mockReturnValue('https://wallet.local');
+
+    fakePostMessage.mockImplementation((message: any) => {
+      setTimeout(() => {
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            origin: window.location.origin,
+            source: fakeWalletWindow as unknown as MessageEventSource,
+            data: {
+              type: 'MING_WALLET_GET_ACTIVE_ACCOUNT_RESPONSE',
+              messageId: message.messageId,
+              payload: {
+                success: true,
+                data: {
+                  walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
+                  chainFamily: 'evm',
+                  chainId: 43114,
+                  status: 'connected',
+                },
+              },
+            },
+          })
+        );
+      }, 0);
+    });
+
+    const response = await mingWalletInterface.getActiveAccount({
+      chainFamily: 'evm',
+      chainId: 43114,
+    });
+
+    expect(fakePostMessage).toHaveBeenCalledOnce();
+    expect(response.success).toBe(true);
+    expect(response.data?.walletAddress).toBe(
+      '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0'
+    );
   });
 
   it('solana请求缺少network时应返回CHAIN_NOT_SUPPORTED', async () => {
@@ -265,5 +377,123 @@ describe('mingWalletInterface', () => {
     expect(response.success).toBe(false);
     expect(response.error?.code).toBe(WalletErrorCode.INVALID_PARAMS);
     expect(postMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it('应支持通用交易发送并返回 effectiveGasPolicy', async () => {
+    const postMessageSpy = vi
+      .spyOn(window, 'postMessage')
+      .mockImplementation(((message: any, targetOrigin: string) => {
+        expect(targetOrigin).toBe(window.location.origin);
+        expect(message?.type).toBe('MING_WALLET_SEND_TRANSACTION_REQUEST');
+        expect(message?.payload?.gasPolicy?.primary).toBe('self_pay');
+        setTimeout(() => {
+          window.dispatchEvent(
+            new MessageEvent('message', {
+              origin: window.location.origin,
+              source: window,
+              data: {
+                type: 'MING_WALLET_SEND_TRANSACTION_RESPONSE',
+                messageId: message.messageId,
+                payload: {
+                  success: true,
+                  data: {
+                    txHash: '0xsendtx',
+                    status: 'confirmed',
+                    effectiveGasPolicy: 'sponsored',
+                  },
+                },
+              },
+            })
+          );
+        }, 0);
+      }) as typeof window.postMessage);
+
+    const response = await mingWalletInterface.sendTransaction(sendTxRequest);
+    expect(postMessageSpy).toHaveBeenCalledOnce();
+    expect(response.success).toBe(true);
+    expect(response.data?.effectiveGasPolicy).toBe('sponsored');
+  });
+
+  it('sendTransaction fallback 与 primary 相同应返回 INVALID_PARAMS', async () => {
+    const badRequest: WalletSendTransactionRequest = {
+      ...sendTxRequest,
+      gasPolicy: {
+        primary: 'self_pay',
+        fallback: 'self_pay',
+      },
+    };
+    const postMessageSpy = vi.spyOn(window, 'postMessage');
+    const response = await mingWalletInterface.sendTransaction(badRequest);
+    expect(response.success).toBe(false);
+    expect(response.error?.code).toBe(WalletErrorCode.INVALID_PARAMS);
+    expect(postMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it('sendTransaction 非法data应返回 INVALID_PARAMS', async () => {
+    const badRequest: WalletSendTransactionRequest = {
+      ...sendTxRequest,
+      data: 'not-hex',
+    };
+    const postMessageSpy = vi.spyOn(window, 'postMessage');
+    const response = await mingWalletInterface.sendTransaction(badRequest);
+    expect(response.success).toBe(false);
+    expect(response.error?.code).toBe(WalletErrorCode.INVALID_PARAMS);
+    expect(postMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it('应支持钱包事件订阅并接收 closeConfirmed', () => {
+    const listener = vi.fn();
+    const unsubscribe = mingWalletInterface.subscribeEvents(listener);
+
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        origin: window.location.origin,
+        source: window,
+        data: {
+          type: 'MING_WALLET_EVENT',
+          payload: {
+            event: 'closeConfirmed',
+            data: {
+              tokenId: '1',
+              txHash: '0xclose',
+            },
+          },
+        },
+      })
+    );
+
+    expect(listener).toHaveBeenCalledWith({
+      event: 'closeConfirmed',
+      data: {
+        tokenId: '1',
+        txHash: '0xclose',
+      },
+    });
+
+    unsubscribe();
+  });
+
+  it('钱包事件订阅应忽略未知事件', () => {
+    const listener = vi.fn();
+    const unsubscribe = mingWalletInterface.subscribeEvents(listener);
+
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        origin: window.location.origin,
+        source: window,
+        data: {
+          type: 'MING_WALLET_EVENT',
+          payload: {
+            event: 'unknownEvent',
+            data: {
+              tokenId: '1',
+            },
+          },
+        },
+      })
+    );
+
+    expect(listener).not.toHaveBeenCalled();
+    unsubscribe();
   });
 });

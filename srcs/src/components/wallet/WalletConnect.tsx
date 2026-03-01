@@ -18,6 +18,12 @@ const WalletConnect: React.FC = () => {
   const dispatch = useAppDispatch();
   const { address, isConnected } = useAppSelector((state) => state.wallet);
   const { connect, disconnect } = useWallet();
+  const connectionMode = (import.meta.env.VITE_WALLET_CONNECTION_MODE || '')
+    .trim()
+    .toLowerCase();
+  const useAnDaoWallet =
+    connectionMode === 'andao' ||
+    (connectionMode === '' && !!import.meta.env.VITE_WALLET_APP_URL);
 
   /**
    * 处理钱包连接
@@ -67,7 +73,7 @@ const WalletConnect: React.FC = () => {
       onClick={handleConnect}
       sx={{ textTransform: 'none' }}
     >
-      连接钱包
+      {useAnDaoWallet ? '连接 AnDaoWallet' : '连接钱包'}
     </Button>
   );
 };

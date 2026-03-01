@@ -20,6 +20,8 @@ import {
   MintNFTResponse,
   CreateScheduledTaskRequest,
   CreateScheduledTaskResponse,
+  GetActiveAccountRequest,
+  GetActiveAccountResponse,
   GetScheduledTaskResponse,
   GetScheduledTasksByWalletRequest,
   GetScheduledTasksByWalletResponse,
@@ -27,10 +29,16 @@ import {
   CancelScheduledTaskResponse,
   ReleaseConnectionRequest,
   ReleaseConnectionResponse,
+  WalletSendTransactionRequest,
+  WalletSendTransactionResponse,
+  GasPolicy,
+  WalletEventEnvelope,
+  WalletEventName,
   WalletErrorCode,
   WALLET_PROTOCOL_VERSION,
 } from '../../types/wallet';
 import { isValidContractAddress, isValidTokenURI } from '../../utils/validation';
+import { walletWindowBridge } from './walletWindowBridge';
 
 /**
  * 钱包接口服务类
@@ -39,8 +47,10 @@ class MingWalletInterface {
   private readonly MESSAGE_TYPE_PREFIX = 'MING_WALLET_';
   private readonly PROTOCOL_VERSION = WALLET_PROTOCOL_VERSION;
   private readonly REQUEST_TIMEOUT = 300000; // 5分钟超时
-  private readonly targetOrigin: string =
-    import.meta.env.VITE_WALLET_TARGET_ORIGIN || window.location.origin;
+  private readonly debugEnabled =
+    import.meta.env.VITE_WALLET_BRIDGE_DEBUG === 'true' ||
+    import.meta.env.VITE_WALLET_BRIDGE_DEBUG === '1';
+  private readonly targetOrigin: string = walletWindowBridge.getTargetOrigin();
   private readonly allowedOrigins: Set<string> = (() => {
     const raw = import.meta.env.VITE_WALLET_ALLOWED_ORIGINS;
     const configured = raw
@@ -54,6 +64,27 @@ class MingWalletInterface {
   })();
 
   private readonly CONSENSUS_HASH_PATTERN = /^0x[a-fA-F0-9]{64}$/;
+  private readonly HEX_DATA_PATTERN = /^0x[a-fA-F0-9]*$/;
+  private readonly EVENT_TYPE = `${this.MESSAGE_TYPE_PREFIX}EVENT`;
+  private readonly KNOWN_EVENTS: Set<WalletEventName> = new Set([
+    'mintTaskStatusChanged',
+    'mintSucceeded',
+    'mintFailed',
+    'closeConfirmed',
+    'reviewConfirmed',
+    'releaseConfirmed',
+  ]);
+
+  private debug(message: string, context?: Record<string, unknown>): void {
+    if (!this.debugEnabled) {
+      return;
+    }
+    if (context) {
+      console.debug(`[MingWalletInterface] ${message}`, context);
+      return;
+    }
+    console.debug(`[MingWalletInterface] ${message}`);
+  }
 
   private withProtocolVersion<T extends object>(payload: T): T & { protocolVersion: string } {
     return {
@@ -71,16 +102,45 @@ class MingWalletInterface {
    */
   private async sendMessage<T>(
     type: string,
-    payload: any
+    payload: unknown
   ): Promise<T> {
     return new Promise((resolve, reject) => {
-      const messageId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const useExternalWallet = walletWindowBridge.isExternalWalletConfigured();
+      if (useExternalWallet) {
+        walletWindowBridge.openWalletWindow();
+      }
+
+      const targetWindow = walletWindowBridge.getRequestTargetWindow();
+      const expectedResponseSource = walletWindowBridge.getExpectedResponseSource();
+      const postTargetOrigin =
+        targetWindow === window ? window.location.origin : this.targetOrigin;
+      if (useExternalWallet && targetWindow === window) {
+        this.debug('wallet window unavailable after open attempt', {
+          type,
+          postTargetOrigin,
+        });
+        reject(
+          new Error(
+            'Wallet window is unavailable. Please open AnDaoWallet and retry.'
+          )
+        );
+        return;
+      }
+
+      const messageId = `${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
       const requestType = `${this.MESSAGE_TYPE_PREFIX}${type}_REQUEST`;
       const responseType = `${this.MESSAGE_TYPE_PREFIX}${type}_RESPONSE`;
+      this.debug('send wallet request', {
+        requestType,
+        messageId,
+        postTargetOrigin,
+        externalWallet: useExternalWallet,
+      });
 
       // 设置超时
       const timeout = setTimeout(() => {
         window.removeEventListener('message', handler);
+        this.debug('wallet request timeout', { requestType, messageId });
         reject(new Error('Wallet request timeout'));
       }, this.REQUEST_TIMEOUT);
 
@@ -95,10 +155,25 @@ class MingWalletInterface {
         if (!data || typeof data !== 'object') {
           return;
         }
-        if (event.source !== window) {
+        if (
+          !walletWindowBridge.isExpectedResponseSource(
+            event.source,
+            expectedResponseSource
+          )
+        ) {
+          this.debug('ignore wallet response: unexpected source', {
+            requestType,
+            messageId,
+            eventOrigin: event.origin,
+          });
           return;
         }
         if (!this.allowedOrigins.has(event.origin)) {
+          this.debug('ignore wallet response: disallowed origin', {
+            requestType,
+            messageId,
+            eventOrigin: event.origin,
+          });
           return;
         }
         if (
@@ -109,8 +184,19 @@ class MingWalletInterface {
           window.removeEventListener('message', handler);
           
           if (data.payload?.success) {
+            this.debug('wallet response success', {
+              responseType,
+              messageId,
+              eventOrigin: event.origin,
+            });
             resolve(data.payload as T);
           } else {
+            this.debug('wallet response failed', {
+              responseType,
+              messageId,
+              eventOrigin: event.origin,
+              error: data.payload?.error?.message,
+            });
             reject(new Error(data.payload?.error?.message || 'Wallet request failed'));
           }
         }
@@ -119,15 +205,112 @@ class MingWalletInterface {
       window.addEventListener('message', handler);
 
       // 发送请求
-      window.postMessage(
+      targetWindow.postMessage(
         {
           type: requestType,
           messageId,
           payload,
         },
-        this.targetOrigin
+        postTargetOrigin
       );
     });
+  }
+
+  /**
+   * 主动打开钱包窗口（用于用户点击“连接钱包”时预热跨窗口通信）
+   */
+  openWalletWindow(): boolean {
+    return walletWindowBridge.openWalletWindow() !== null;
+  }
+
+  /**
+   * 订阅钱包推送事件（close/review/release 等）
+   */
+  subscribeEvents(
+    listener: (event: WalletEventEnvelope) => void
+  ): () => void {
+    const expectedResponseSource = walletWindowBridge.getExpectedResponseSource();
+    const handler = (event: MessageEvent) => {
+      const data = event.data as {
+        type?: string;
+        payload?: {
+          event?: WalletEventName;
+          data?: Record<string, unknown>;
+        };
+      } | null;
+
+      if (!data || typeof data !== 'object') {
+        return;
+      }
+      if (data.type !== this.EVENT_TYPE) {
+        return;
+      }
+      if (
+        !walletWindowBridge.isExpectedResponseSource(
+          event.source,
+          expectedResponseSource
+        )
+      ) {
+        return;
+      }
+      if (!this.allowedOrigins.has(event.origin)) {
+        return;
+      }
+      const eventName = data.payload?.event;
+      if (!eventName || !this.KNOWN_EVENTS.has(eventName)) {
+        return;
+      }
+
+      listener({
+        event: eventName,
+        data: data.payload?.data || {},
+      });
+    };
+
+    window.addEventListener('message', handler);
+    return () => {
+      window.removeEventListener('message', handler);
+    };
+  }
+
+  /**
+   * 查询钱包当前活跃地址（用于Ming连接态展示）
+   */
+  async getActiveAccount(
+    request: Omit<GetActiveAccountRequest, 'protocolVersion'> = {}
+  ): Promise<GetActiveAccountResponse> {
+    try {
+      if (
+        request.chainFamily &&
+        request.chainFamily !== 'evm' &&
+        request.chainFamily !== 'solana'
+      ) {
+        throw new Error('chainFamily must be evm or solana');
+      }
+      if (
+        request.chainFamily === 'evm' &&
+        request.chainId !== undefined &&
+        (!Number.isFinite(request.chainId) || request.chainId <= 0)
+      ) {
+        throw new Error('EVM chainId must be a positive number');
+      }
+
+      const response = await this.sendMessage<GetActiveAccountResponse>(
+        'GET_ACTIVE_ACCOUNT',
+        this.withProtocolVersion(request)
+      );
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return {
+        success: false,
+        error: {
+          code: this.mapErrorCode(message),
+          message,
+        },
+      };
+    }
   }
 
   /**
@@ -319,6 +502,33 @@ class MingWalletInterface {
   }
 
   /**
+   * 通用交易发送（用于 close/review/release 等链上调用）
+   */
+  async sendTransaction(
+    request: WalletSendTransactionRequest
+  ): Promise<WalletSendTransactionResponse> {
+    try {
+      this.validateSendTransactionRequest(request);
+
+      const response = await this.sendMessage<WalletSendTransactionResponse>(
+        'SEND_TRANSACTION',
+        this.withProtocolVersion(request)
+      );
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return {
+        success: false,
+        error: {
+          code: this.mapErrorCode(message),
+          message,
+        },
+      };
+    }
+  }
+
+  /**
    * 验证铸造请求参数
    */
   private validateMintRequest(request: MintNFTRequest): void {
@@ -420,6 +630,44 @@ class MingWalletInterface {
     }
   }
 
+  private validateGasPolicy(gasPolicy: GasPolicy): void {
+    if (!gasPolicy || !gasPolicy.primary) {
+      throw new Error('gasPolicy.primary is required');
+    }
+    if (gasPolicy.fallback && gasPolicy.fallback === gasPolicy.primary) {
+      throw new Error('gasPolicy.fallback must differ from primary');
+    }
+  }
+
+  private validateSendTransactionRequest(request: WalletSendTransactionRequest): void {
+    this.validateProtocolVersion(request.protocolVersion);
+    const chainFamily = request.chainFamily || 'evm';
+
+    if (!request.to) {
+      throw new Error('Transaction target address is required');
+    }
+    if (!request.data || !this.HEX_DATA_PATTERN.test(request.data)) {
+      throw new Error('Transaction data must be hex string');
+    }
+    if (request.value && !/^\d+$/.test(request.value)) {
+      throw new Error('Transaction value must be decimal numeric string');
+    }
+    this.validateGasPolicy(request.gasPolicy);
+
+    this.validateChainContext(
+      {
+        address: request.to,
+        chainId: request.chainId,
+        chainFamily,
+        network: request.network,
+      },
+      chainFamily
+    );
+    if (!isValidContractAddress(request.to, chainFamily)) {
+      throw new Error(`Invalid transaction target address for chain family: ${chainFamily}`);
+    }
+  }
+
   private validateConsensusHash(consensusHash: string): void {
     if (!consensusHash) {
       throw new Error('Consensus hash is required');
@@ -491,8 +739,19 @@ class MingWalletInterface {
       return WalletErrorCode.CHAIN_NOT_SUPPORTED;
     }
     if (
+      lower.includes('wallet not connected') ||
+      lower.includes('wallet account') ||
+      lower.includes('private key is not available') ||
+      lower.includes('wallet window is unavailable') ||
+      lower.includes('无法打开 andaowallet 窗口')
+    ) {
+      return WalletErrorCode.WALLET_NOT_CONNECTED;
+    }
+    if (
       lower.includes('invalid') ||
       lower.includes('required') ||
+      lower.includes('must be') ||
+      lower.includes('must differ') ||
       lower.includes('consensus hash must')
     ) {
       return WalletErrorCode.INVALID_PARAMS;

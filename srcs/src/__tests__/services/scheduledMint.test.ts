@@ -172,7 +172,7 @@ describe('scheduledMintService', () => {
   });
 
   describe('getAllTasks', () => {
-    it('应该返回所有任务（当前返回空数组，因为钱包接口未实现）', async () => {
+    it('应该返回所有任务（当前测试桩未注入任务数据时返回空数组）', async () => {
       const allTasks = await scheduledMintService.getAllTasks();
       expect(allTasks).toEqual([]);
     });

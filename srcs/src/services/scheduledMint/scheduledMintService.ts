@@ -20,7 +20,11 @@
  */
 
 import { ExternalObject } from '../../types/energy';
-import { WalletScheduledTaskData, WALLET_PROTOCOL_VERSION } from '../../types/wallet';
+import {
+  GasPolicyType,
+  WalletScheduledTaskData,
+  WALLET_PROTOCOL_VERSION,
+} from '../../types/wallet';
 import { mingWalletInterface } from '../wallet/mingWalletInterface';
 import { ipfsService } from '../ipfs/ipfsService';
 import { walletService } from '../wallet/walletService';
@@ -44,6 +48,11 @@ export interface ScheduledMintTask {
    * 任务唯一ID
    */
   id: string;
+
+  /**
+   * 计划ID（跨系统一致标识）
+   */
+  planId?: string;
   
   /**
    * 钱包地址
@@ -140,12 +149,31 @@ export interface ScheduledMintTask {
    * 错误信息（失败时填充）
    */
   error?: string;
+
+  /**
+   * 实际生效的Gas策略
+   */
+  effectiveGasPolicy?: GasPolicyType;
+
+  /**
+   * 生命周期链上回执
+   */
+  closeTxHash?: string;
+  reviewTxHash?: string;
+  releaseTxHash?: string;
 }
 
 /**
  * 定时MINT服务类（方案B：钱包管理定时任务）
  */
 class ScheduledMintService {
+  private generatePlanId(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return `plan_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  }
+
   /**
    * 将钱包状态映射为前端任务状态
    */
@@ -197,6 +225,7 @@ class ScheduledMintService {
 
     return {
       id: task.taskId,
+      planId: typeof task.planId === 'string' ? task.planId : task.taskId,
       walletAddress: task.walletAddress || walletAddressFallback,
       selectedObject: {
         id: task.selectedObject?.id || 'unknown',
@@ -225,6 +254,10 @@ class ScheduledMintService {
       tokenId: task.result?.tokenId,
       tokenURI: task.ipfs?.tokenURI,
       error: task.result?.error,
+      effectiveGasPolicy: task.result?.effectiveGasPolicy,
+      closeTxHash: task.result?.lifecycleReceipts?.closeTxHash,
+      reviewTxHash: task.result?.lifecycleReceipts?.reviewTxHash,
+      releaseTxHash: task.result?.lifecycleReceipts?.releaseTxHash,
     };
   }
 
@@ -257,6 +290,8 @@ class ScheduledMintService {
   async createTask(
     taskData: Omit<ScheduledMintTask, 'id' | 'status' | 'createdAt'>
   ): Promise<string> {
+    const planId = taskData.planId || this.generatePlanId();
+
     // 验证定时时间不能是过去
     const scheduledTime = new Date(taskData.scheduledTime);
     const now = new Date();
@@ -305,6 +340,7 @@ class ScheduledMintService {
         },
       }),
       scheduledMint: {
+        planId,
         scheduledTime: taskData.scheduledTime,
       },
       energyField: {
@@ -336,6 +372,7 @@ class ScheduledMintService {
     // 7. 调用钱包接口创建定时任务
     const response = await mingWalletInterface.createScheduledTask({
       protocolVersion: WALLET_PROTOCOL_VERSION,
+      planId,
       scheduledTime: taskData.scheduledTime,
       timing: {
         requestedAt: new Date().toISOString(),

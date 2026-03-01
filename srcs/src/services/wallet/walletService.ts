@@ -154,7 +154,13 @@ class WalletService {
       };
     }
 
-    const chainId = await this.getNetworkId();
+    const configuredChainId = Number(import.meta.env.VITE_CHAIN_ID);
+    const hasConfiguredChainId =
+      Number.isFinite(configuredChainId) && configuredChainId > 0;
+
+    const chainId = hasConfiguredChainId
+      ? configuredChainId
+      : await this.getNetworkId();
     return {
       chainFamily: 'evm',
       chainId,

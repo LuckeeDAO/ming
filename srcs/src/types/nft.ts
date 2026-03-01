@@ -179,6 +179,7 @@ export interface NFTMetadata {
   scheduledMint?: {
     scheduledTime: string;
     mintedTime?: string;
+    planId?: string;
   };
   /** 封局释放评价（可选） */
   releaseEvaluation?: {

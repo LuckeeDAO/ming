@@ -36,7 +36,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'VITE_PINATA_API_KEY=e2e VITE_PINATA_SECRET_KEY=e2e npm run dev -- --host 127.0.0.1 --port 5173',
+    command:
+      'VITE_PINATA_API_KEY=e2e VITE_PINATA_SECRET_KEY=e2e VITE_WALLET_CONNECTION_MODE=metamask VITE_NFT_CONTRACT_ADDRESS=0x1234567890123456789012345678901234567890 npm run dev -- --host 127.0.0.1 --port 5173',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
   },

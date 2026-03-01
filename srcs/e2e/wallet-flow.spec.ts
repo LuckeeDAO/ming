@@ -18,6 +18,32 @@ test.beforeEach(async ({ page }) => {
 
     const originalPostMessage = window.postMessage.bind(window);
     window.postMessage = ((message: any, targetOrigin?: string, transfer?: Transferable[]) => {
+      if (message?.type === 'MING_WALLET_GET_ACTIVE_ACCOUNT_REQUEST') {
+        setTimeout(() => {
+          window.dispatchEvent(
+            new MessageEvent('message', {
+              origin: window.location.origin,
+              source: window,
+              data: {
+                type: 'MING_WALLET_GET_ACTIVE_ACCOUNT_RESPONSE',
+                messageId: message.messageId,
+                payload: {
+                  success: true,
+                  data: {
+                    walletAddress: '0x1234567890123456789012345678901234567890',
+                    chainFamily: 'evm',
+                    chainId: 43113,
+                    network: 'avalanche-fuji-testnet',
+                    status: 'connected',
+                  },
+                },
+              },
+            })
+          );
+        }, 0);
+        return;
+      }
+
       if (message?.type === 'MING_WALLET_MINT_NFT_REQUEST') {
         setTimeout(() => {
           window.dispatchEvent(
@@ -77,12 +103,20 @@ test.beforeEach(async ({ page }) => {
       body: JSON.stringify({ IpfsHash: `QmMock${Date.now()}` }),
     });
   });
+
+  await page.route('https://api.pinata.cloud/pinning/pinJSONToIPFS', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ IpfsHash: `QmMockJson${Date.now()}` }),
+    });
+  });
 });
 
 test('SimpleMint 通过钱包接口完成铸造（Mock 钱包）', async ({ page }) => {
   await page.goto('/simple-mint');
 
-  await page.getByRole('button', { name: '连接钱包' }).click();
+  await page.getByRole('button', { name: /连接( AnDaoWallet)?钱包/ }).click();
   await expect(page.getByRole('button', { name: /0x1234...7890/i })).toBeVisible();
 
   await page.setInputFiles('#image-upload', {
