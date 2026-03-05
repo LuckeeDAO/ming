@@ -33,6 +33,8 @@ const FourPillarsConverter = lazy(() => import('./pages/FourPillarsConverter/ind
 const EnergyOriginal = lazy(() => import('./pages/EnergyOriginal/index'));
 const FortuneFlow = lazy(() => import('./pages/FortuneFlow/index'));
 const CeremonyResourceDetail = lazy(() => import('./pages/CeremonyResourceDetail/index'));
+const CeremonyResources = lazy(() => import('./pages/CeremonyResources/index'));
+const LearningMaterialDetail = lazy(() => import('./pages/LearningMaterialDetail/index'));
 const Tools = lazy(() => import('./pages/Tools/index'));
 const Learning = lazy(() => import('./pages/Learning/index'));
 const Technology = lazy(() => import('./pages/Learning/Technology'));
@@ -93,8 +95,10 @@ function App() {
             <Route path="/learning/technology" element={<Navigate to="/about/technology" replace />} />
             <Route path="/learning/ai-fortune" element={<AIFortune />} />
             <Route path="/learning/other" element={<Navigate to="/learning/ai-fortune" replace />} />
-            <Route path="/ceremony-resources" element={<Navigate to="/learning" replace />} />
+            <Route path="/ceremony-resources" element={<CeremonyResources />} />
             <Route path="/ceremony-resources/:id" element={<CeremonyResourceDetail />} />
+            <Route path="/learning/materials" element={<Navigate to="/ceremony-resources" replace />} />
+            <Route path="/learning/materials/:id" element={<LearningMaterialDetail />} />
             
             {/* 关于平台路由 */}
             <Route path="/about" element={<About key="about-intro" />} />

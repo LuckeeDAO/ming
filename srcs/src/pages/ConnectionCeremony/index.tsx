@@ -167,7 +167,7 @@ const ConnectionCeremony: React.FC = () => {
 
   useEffect(() => {
     if (tabFromUrl === '2') {
-      navigate('/learning', { replace: true });
+      navigate('/ceremony-resources', { replace: true });
     }
   }, [tabFromUrl, navigate]);
 

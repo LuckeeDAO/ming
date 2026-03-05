@@ -21,9 +21,87 @@ import {
   ListItem,
   ListItemText,
 } from '@mui/material';
+import { ceremonyResourcesService } from '../../services/ceremony/ceremonyResourcesService';
 
 const CeremonyResourceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+
+  const projectSnippets = ceremonyResourcesService.getProjectTextSnippets(id);
+  const learningMaterials = ceremonyResourcesService.getLearningMaterials(id);
+
+  const renderSupplement = () => (
+    <Box sx={{ mt: 4 }}>
+      <Typography variant="h6" gutterBottom>
+        项目文本资料摘录
+      </Typography>
+      {projectSnippets.length === 0 ? (
+        <Typography variant="body2" color="text.secondary" paragraph>
+          当前条目暂无额外摘录。
+        </Typography>
+      ) : (
+        <List dense>
+          {projectSnippets.map((snippet) => (
+            <ListItem key={snippet.id} sx={{ alignItems: 'flex-start' }}>
+              <ListItemText
+                primary={snippet.title}
+                secondary={
+                  <>
+                    <Typography component="span" variant="body2">
+                      {snippet.excerpt}
+                    </Typography>
+                  </>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      )}
+
+      <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+        关联学习资料
+      </Typography>
+      {learningMaterials.length === 0 ? (
+        <Typography variant="body2" color="text.secondary">
+          当前条目暂无额外学习资料。
+        </Typography>
+      ) : (
+        <List dense>
+          {learningMaterials.map((material) => (
+            <ListItem key={material.id} sx={{ alignItems: 'flex-start' }}>
+              <ListItemText
+                primary={material.title}
+                secondary={
+                  <>
+                    <Typography component="span" variant="body2" display="block">
+                      序号/级别：{material.sequence} / {material.level}
+                    </Typography>
+                    <Typography component="span" variant="caption" color="text.secondary" display="block">
+                      知识点：{material.knowledgePointTitle}
+                    </Typography>
+                    <Typography component="span" variant="caption" color="text.secondary" display="block">
+                      学习目标：{material.learningGoal}
+                    </Typography>
+                    <Typography component="span" variant="caption" color="text.secondary" display="block">
+                      摘录：{material.excerptBlocks[0]}
+                    </Typography>
+                    <Typography component="span" variant="caption" color="text.secondary" display="block">
+                      练习任务：{material.practicePrompt}
+                    </Typography>
+                    <Typography component="span" variant="caption" color="text.secondary" display="block">
+                      检索关键词：{material.publicSearchKeywords.join(' / ')}
+                    </Typography>
+                    <Link component={RouterLink} to={`/learning/materials/${material.id}`} underline="hover">
+                      进入该知识点学习页
+                    </Link>
+                  </>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </Box>
+  );
 
   const renderContent = () => {
     switch (id) {
@@ -88,6 +166,7 @@ const CeremonyResourceDetail: React.FC = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
               提示：你可以在“我的连接记录”中随时查看已完成的外物连接仪式以及对应的 NFT 信息，作为这段关系在数字世界中的见证。
             </Typography>
+            {renderSupplement()}
           </Box>
         );
 
@@ -125,6 +204,7 @@ const CeremonyResourceDetail: React.FC = () => {
             <Typography variant="body2" color="text.secondary">
               在进行具体仪式时，可结合当下的大运流年和自身能量状态，选择最合适的时间与外物组合。
             </Typography>
+            {renderSupplement()}
           </Box>
         );
 
@@ -158,6 +238,7 @@ const CeremonyResourceDetail: React.FC = () => {
             <Typography variant="body2" paragraph>
               可以根据外物所属五行（木、火、土、金、水），在文案中加入对应的象征意象，例如“如树木般生长”、“如火焰般点燃热情”等。
             </Typography>
+            {renderSupplement()}
           </Box>
         );
 
@@ -192,6 +273,7 @@ const CeremonyResourceDetail: React.FC = () => {
                 <ListItemText primary="顺应大运流年" secondary="结合大运与流年能量，选择合适的连接时机。" />
               </ListItem>
             </List>
+            {renderSupplement()}
           </Box>
         );
 
@@ -226,6 +308,7 @@ const CeremonyResourceDetail: React.FC = () => {
                 <ListItemText primary="设计时间轴" secondary="结合大运、流年、流月设计阶段性仪式。" />
               </ListItem>
             </List>
+            {renderSupplement()}
           </Box>
         );
 
@@ -246,9 +329,6 @@ const CeremonyResourceDetail: React.FC = () => {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-        <Link component={RouterLink} color="inherit" to="/connection-ceremony?tab=2">
-          仪式资源（连接仪式页）
-        </Link>
         <Link component={RouterLink} color="inherit" to="/ceremony-resources">
           仪式资源列表
         </Link>
@@ -260,4 +340,3 @@ const CeremonyResourceDetail: React.FC = () => {
 };
 
 export default CeremonyResourceDetail;
-
