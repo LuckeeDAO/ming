@@ -19,6 +19,7 @@ import {
   Divider,
   Grid,
   Chip,
+  Button,
   useTheme,
 } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
@@ -33,16 +34,30 @@ const About: React.FC = () => {
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ py: 4 }}>
+      <Box id="about-top" sx={{ py: 4 }}>
         {isIntro && (
           <>
             <Typography variant="h4" component="h1" gutterBottom>
               平台介绍
             </Typography>
 
+            <Card sx={{ mt: 2 }}>
+              <CardContent sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                <Button component="a" href="#platform-positioning" size="small" variant="outlined">
+                  平台定位
+                </Button>
+                <Button component="a" href="#platform-core" size="small" variant="outlined">
+                  平台内核
+                </Button>
+                <Button component="a" href="#core-propositions" size="small" variant="outlined">
+                  核心主张
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card sx={{ mt: 4 }}>
               <CardContent>
-                <Typography variant="h6" gutterBottom>
+                <Typography id="platform-positioning" variant="h6" gutterBottom>
                   平台定位
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
@@ -59,7 +74,7 @@ const About: React.FC = () => {
 
                 <Divider sx={{ my: 3 }} />
 
-                <Typography variant="h6" gutterBottom>
+                <Typography id="platform-core" variant="h6" gutterBottom>
                   平台内核
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
@@ -135,7 +150,7 @@ const About: React.FC = () => {
 
                 <Divider sx={{ my: 3 }} />
 
-                <Typography variant="h6" gutterBottom>
+                <Typography id="core-propositions" variant="h6" gutterBottom>
                   核心主张
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
@@ -155,6 +170,11 @@ const About: React.FC = () => {
                   {' '}
                   页面；本页仅保留平台定位与理念框架，避免与功能介绍重复。
                 </Typography>
+                <Box sx={{ mt: 2 }}>
+                  <Button component="a" href="#about-top" size="small" variant="outlined">
+                    返回顶部
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
           </>
@@ -166,9 +186,20 @@ const About: React.FC = () => {
               哲学理念
             </Typography>
 
+            <Card sx={{ mt: 2, mb: 2 }}>
+              <CardContent sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                <Button component="a" href="#philosophy-distinction" size="small" variant="outlined">
+                  天地道时区分
+                </Button>
+                <Button component="a" href="#philosophy-framework" size="small" variant="outlined">
+                  三才框架
+                </Button>
+              </CardContent>
+            </Card>
+
             {/* 天与道、地与共识的哲学区分 */}
             <Box sx={{ mt: 4, mb: 4 }}>
-              <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
+              <Typography id="philosophy-distinction" variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
                 天与道、地与共识的哲学区分
               </Typography>
               <Card sx={{ mb: 3 }}>
@@ -192,7 +223,7 @@ const About: React.FC = () => {
 
             {/* 三才框架 */}
             <Box sx={{ mt: 4, mb: 4 }}>
-              <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
+              <Typography id="philosophy-framework" variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
                 三才框架：天、地、人的认知三界
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph sx={{ fontStyle: 'italic', mb: 3 }}>
@@ -265,6 +296,11 @@ const About: React.FC = () => {
                   <Typography variant="body2" color="primary.main" sx={{ fontWeight: 600, mt: 2 }}>
                     明其心，知其地，行其路，续其明。
                   </Typography>
+                  <Box sx={{ mt: 2 }}>
+                    <Button component="a" href="#about-top" size="small" variant="outlined">
+                      返回顶部
+                    </Button>
+                  </Box>
                 </CardContent>
               </Card>
             </Box>

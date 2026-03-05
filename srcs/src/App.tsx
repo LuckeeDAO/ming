@@ -11,7 +11,7 @@
  * - / : 首页（白皮书与功能总览）
  * - /learning : 学习（AI命理学习、仪式资源）
  * - /about/* : 关于平台（平台介绍、技术说明、哲学理念）
- * - /connection-ceremony : 外物连接仪式（整合了连接指导、NFT仪式、定时MINT、仪式资源）
+ * - /connection-ceremony : 外物连接仪式（NFT铸造流程/定时任务管理）
  * - /my-connections : 我的连接记录
  * 
  * @module App
@@ -93,7 +93,7 @@ function App() {
             <Route path="/learning/technology" element={<Navigate to="/about/technology" replace />} />
             <Route path="/learning/ai-fortune" element={<AIFortune />} />
             <Route path="/learning/other" element={<Navigate to="/learning/ai-fortune" replace />} />
-            <Route path="/ceremony-resources" element={<Navigate to="/connection-ceremony?tab=2" replace />} />
+            <Route path="/ceremony-resources" element={<Navigate to="/learning" replace />} />
             <Route path="/ceremony-resources/:id" element={<CeremonyResourceDetail />} />
             
             {/* 关于平台路由 */}

@@ -1,21 +1,12 @@
 /**
- * 外物连接仪式页面（统一页面）
- * 
- * 整合了连接指导、NFT仪式、定时MINT、仪式资源四个功能的完整页面：
- * 
- * 标签页1 - 仪式流程：
- * 1. 能量分析：显示能量分析结果
- * 2. 外物推荐：展示推荐外物列表
- * 3. 选择外物：选择要连接的外物
- * 4. 准备连接：展示连接方式和准备事项
- * 5. 内容创建：上传图片、填写连接信息
- * 6. 铸造阶段：选择立即/定时铸造，执行铸造流程
- * 7. 完成阶段：确认信息、记录感受
- * 
- * 标签页2 - 定时任务管理：查看和管理定时MINT任务
- * 
- * 标签页3 - 仪式资源：获取仪式指南、素材和文化知识
- * 
+ * 外物连接仪式页面
+ *
+ * 该页当前仅承担两种单页职责（不再展示顶部标签分栏）：
+ * - 仪式流程页：完成从能量分析到 NFT 铸造
+ * - 定时任务页：查看和管理定时 MINT 任务
+ *
+ * 仪式资源已迁移到学习菜单，不再在此页展示。
+ *
  * 功能说明：
  * - 集成能量分析结果展示
  * - 集成外物选择组件
@@ -57,8 +48,6 @@ import {
   DialogActions,
   LinearProgress,
   IconButton,
-  Tabs,
-  Tab,
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -69,7 +58,6 @@ import { ethers } from 'ethers';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { setSelectedObject, setRecommendedObjects } from '../../store/slices/energySlice';
-import { ceremonyResourcesService } from '../../services/ceremony/ceremonyResourcesService';
 import { ExternalObject } from '../../types/energy';
 import { ipfsService } from '../../services/ipfs/ipfsService';
 import { walletService } from '../../services/wallet/walletService';
@@ -138,6 +126,11 @@ const ConnectionCeremony: React.FC = () => {
     (state) => state.energy
   );
   const { address: walletAddress } = useAppSelector((state) => state.wallet);
+  const chainFamilyHint = import.meta.env.VITE_CHAIN_FAMILY || 'evm';
+  const configuredContractAddress = import.meta.env.VITE_NFT_CONTRACT_ADDRESS || '';
+  const hasValidContractConfig = Boolean(
+    configuredContractAddress && isValidContractAddress(configuredContractAddress, chainFamilyHint)
+  );
 
   // 主流程步骤
   const [activeStep, setActiveStep] = useState(0);
@@ -168,37 +161,15 @@ const ConnectionCeremony: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
   
-  // 从URL query参数读取tab，如果没有或非法则默认为0
   const tabFromUrl = searchParams.get('tab');
-  const parsedInitialTab = tabFromUrl ? parseInt(tabFromUrl, 10) : 0;
-  const initialTab =
-    !isNaN(parsedInitialTab) && parsedInitialTab >= 0 && parsedInitialTab <= 2
-      ? parsedInitialTab
-      : 0;
-  const [activeTab, setActiveTab] = useState(initialTab); // 0: 仪式流程, 1: 定时任务管理, 2: 仪式资源
+  const pageMode: 'ceremony' | 'tasks' =
+    tabFromUrl === '1' ? 'tasks' : 'ceremony';
 
-  // 当URL query参数变化时，更新activeTab
   useEffect(() => {
-    const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl !== null) {
-      const tabValue = parseInt(tabFromUrl, 10);
-      if (!isNaN(tabValue) && tabValue >= 0 && tabValue <= 2) {
-        setActiveTab(tabValue);
-      } else {
-        setActiveTab(0);
-      }
-    } else {
-      setActiveTab(0);
+    if (tabFromUrl === '2') {
+      navigate('/learning', { replace: true });
     }
-  }, [searchParams]);
-
-  /**
-   * 切换顶部标签页并同步到URL
-   */
-  const handleTabChange = (_event: React.SyntheticEvent, newTab: number) => {
-    setActiveTab(newTab);
-    navigate(`/connection-ceremony?tab=${newTab}`);
-  };
+  }, [tabFromUrl, navigate]);
 
   // 统一流程步骤
   const steps = [
@@ -351,9 +322,13 @@ const ConnectionCeremony: React.FC = () => {
         }
         return true;
       case 5:
-        // 铸造阶段：需要钱包连接
+        // 铸造阶段：需要钱包与合约配置
         if (!walletAddress) {
           setError('请先连接钱包');
+          return false;
+        }
+        if (!hasValidContractConfig) {
+          setError('NFT铸造依赖合约。请先配置可用合约（VITE_NFT_CONTRACT_ADDRESS）');
           return false;
         }
         return true;
@@ -404,6 +379,11 @@ const ConnectionCeremony: React.FC = () => {
   const handleMint = async () => {
     if (!formData.selectedObject || !formData.image || !walletAddress) {
       setError('请完成所有必填项');
+      return;
+    }
+
+    if (!hasValidContractConfig) {
+      setError('NFT铸造依赖合约。请先配置可用合约（VITE_NFT_CONTRACT_ADDRESS）');
       return;
     }
 
@@ -663,26 +643,19 @@ const ConnectionCeremony: React.FC = () => {
       <Box sx={{ py: 4 }}>
         <Box sx={{ mb: 3 }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'left' }}>
-            外物连接仪式
+            {pageMode === 'tasks' ? '定时任务管理' : '外物连接仪式'}
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph sx={{ textAlign: 'left' }}>
-            完成从能量分析到NFT铸造的完整外物连接仪式流程
+            {pageMode === 'tasks'
+              ? '查看并管理你的定时 NFT 铸造任务'
+              : '完成从能量分析到NFT铸造的完整外物连接仪式流程'}
           </Typography>
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            sx={{ borderBottom: 1, borderColor: 'divider' }}
-          >
-            <Tab label="仪式流程" />
-            <Tab label="定时任务管理" />
-            <Tab label="仪式资源" />
-          </Tabs>
         </Box>
 
         {/* 内容区域 */}
         <Box>
             {/* 主流程标签页 */}
-            {activeTab === 0 && (
+            {pageMode === 'ceremony' && (
               <>
                 <Stepper activeStep={activeStep} sx={{ mt: 4, mb: 4 }}>
               {steps.map((label) => (
@@ -797,7 +770,7 @@ const ConnectionCeremony: React.FC = () => {
                       ) : (
                         <Alert severity="info">
                           <Typography variant="body2">
-                            暂无推荐外物。请先完成能量分析，或切换到“仪式资源”标签页了解更多外物选择。
+                            暂无推荐外物。请先完成能量分析，或前往“学习 {'>'} 仪式资源”了解更多外物选择。
                           </Typography>
                         </Alert>
                       )}
@@ -1070,6 +1043,15 @@ const ConnectionCeremony: React.FC = () => {
                       <Typography variant="body2" color="text.secondary" paragraph>
                         选择立即铸造或定时铸造
                       </Typography>
+                      <Alert severity="info" sx={{ mb: 2 }}>
+                        定时任务模式 = 选择图片 + 文字内容 + 定时时间，并通过钱包调用合约创建任务。
+                      </Alert>
+                      {!hasValidContractConfig && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                          当前未检测到可用的 NFT 合约配置，立即铸造和定时铸造都会失败。
+                          请先配置 `VITE_NFT_CONTRACT_ADDRESS` 并确保地址与链类型匹配，然后再执行铸造。
+                        </Alert>
+                      )}
                       
                       <Grid container spacing={2} sx={{ mt: 2 }}>
                         <Grid item xs={12}>
@@ -1080,6 +1062,7 @@ const ConnectionCeremony: React.FC = () => {
                             SelectProps={{ native: true }}
                             value={mintType}
                             onChange={(e) => setMintType(e.target.value as 'immediate' | 'scheduled')}
+                            disabled={!hasValidContractConfig}
                           >
                             <option value="immediate">立即铸造</option>
                             <option value="scheduled">定时铸造</option>
@@ -1203,14 +1186,14 @@ const ConnectionCeremony: React.FC = () => {
             </>
             )}
 
-            {/* 定时任务管理标签页 */}
-            {activeTab === 1 && (
+            {/* 定时任务管理页面 */}
+            {pageMode === 'tasks' && (
               <Box>
                 <Typography variant="h6" gutterBottom>
                   定时MINT任务
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                  管理你的定时NFT铸造任务
+                  管理你的定时NFT铸造任务（由钱包与合约协同执行）
                 </Typography>
 
                 {!walletAddress ? (
@@ -1307,59 +1290,6 @@ const ConnectionCeremony: React.FC = () => {
               </Box>
             )}
 
-            {/* 仪式资源标签页 */}
-            {activeTab === 2 && (
-              <Box>
-                <Typography variant="h6" gutterBottom>
-                  仪式资源
-                </Typography>
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  获取仪式指南、素材与知识库：把“地”的工具（含时间/节律）转化为可执行的仪式步骤，并沉淀为可复盘的记录。
-                </Typography>
-                <Box sx={{ mb: 2 }}>
-                  <Button size="small" onClick={() => navigate('/about/philosophy')}>
-                    先读哲学理念（天/道/地/人/时）
-                  </Button>
-                </Box>
-
-                <Grid container spacing={3} sx={{ mt: 2 }}>
-                  {ceremonyResourcesService.getAllResources().map((resource) => (
-                    <Grid item xs={12} sm={6} md={4} key={resource.id}>
-                      <Card
-                        sx={{
-                          height: '100%',
-                          transition: 'transform 0.2s, box-shadow 0.2s',
-                          '&:hover': {
-                            transform: 'translateY(-4px)',
-                            boxShadow: 4,
-                          },
-                        }}
-                      >
-                        <CardContent>
-                          <Typography variant="overline" color="text.secondary">
-                            {resource.category}
-                          </Typography>
-                          <Typography variant="h6" gutterBottom>
-                            {resource.title}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {resource.description}
-                          </Typography>
-                        </CardContent>
-                        <CardActions>
-                          <Button
-                            size="small"
-                            onClick={() => navigate(resource.route)}
-                          >
-                            查看详情
-                          </Button>
-                        </CardActions>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
-            )}
         </Box>
       </Box>
 
