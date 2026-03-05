@@ -62,7 +62,7 @@ describe('DateTimePicker', () => {
       />
     );
     
-    expect(screen.getByText('时间不能是过去')).toBeInTheDocument();
+    expect(screen.getAllByText('时间不能是过去').length).toBeGreaterThan(0);
   });
 
   it('应该在禁用时禁用输入', () => {

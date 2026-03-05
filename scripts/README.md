@@ -1,314 +1,129 @@
-# Ming 项目部署脚本说明
+# Ming scripts
 
-本目录包含 Ming 项目的自动化部署脚本。
+本目录是 Ming 的统一脚本入口层。
 
-## 📋 脚本列表
+## 1. 功能范围
 
-### 0. `deploy.sh` - 统一入口脚本 ⭐ 推荐
+- 前端发布（GitHub + Vercel）
+- EVM 合约部署（ConnectionNFT）
+- Ming 自定义 NFT 流程检查（不是普通 NFT 流程）
+- 钱包联调检查（Ming + AnDaoWallet）
 
-快速部署的统一入口，支持所有部署操作。
+## 2. 核心入口
 
-**使用方法：**
+- `deploy.sh`：统一总入口
+- `deploy_all.sh`：默认前端全流程，可选包含后端 EVM 步骤
+
+## 3. 子命令说明（deploy.sh）
 
 ```bash
-# 显示帮助信息
+# 帮助
 ./scripts/deploy.sh help
 
-# 仅提交到 GitHub
-./scripts/deploy.sh github "feat: 添加新功能"
-
-# 仅部署到 Vercel
+# 前端相关
+./scripts/deploy.sh github "chore: update"
 ./scripts/deploy.sh vercel production
+./scripts/deploy.sh all production "feat: release"
 
-# 完整流程：GitHub + Vercel
-./scripts/deploy.sh all production "feat: 更新功能"
+# 后端 EVM 合约（ConnectionNFT）
+./scripts/deploy.sh backend-evm sepolia
+./scripts/deploy.sh backend-evm fuji
+
+# Ming 自定义 NFT 流程检查（mintConnection staticCall 路径）
+./scripts/deploy.sh nft-flow-check sepolia 0xYourContractAddress
+# 或省略地址，自动读取 contracts/deployments 最新记录
+./scripts/deploy.sh nft-flow-check sepolia
 ```
 
-**功能：**
-- ✅ 统一的命令行接口
-- ✅ 支持单独操作或完整流程
-- ✅ 清晰的帮助信息
-- ✅ 调用其他脚本执行具体任务
+注意：`hardhat` 网络是一次性临时链，不适合跨命令做流程检查；请使用 `localhost`（先启动 `hardhat node`）或测试网。
 
----
+Avalanche 推荐网络：
 
-### 1. `upload_to_github.sh` - 上传到 GitHub
+- `fuji`（测试网，chainId `43113`）
+- `avalanche`（主网 C-Chain，chainId `43114`）
+- 详细部署说明见：`/home/lc/luckee_dao/ming/contracts/AVALANCHE_DEPLOYMENT.md`
 
-自动提交代码并推送到 GitHub 仓库。
+## 4. 新增脚本
 
-**使用方法：**
+- `deploy_contract_evm.sh`
+  - 调用 `contracts/scripts/deploy.js`
+  - 部署前会先执行 `contracts/scripts/preflight_deploy.js` 检查网络与余额
+  - 目标是 Ming 的 ConnectionNFT 合约，不是通用 NFT 模板
+- `check_custom_nft_flow.sh`
+  - 调用 `contracts/scripts/check_mint_permission.js`
+  - 校验 Ming 自定义铸造/释放流程可达性
+- `check_modelscope_api.sh`
+  - 校验 ModelScope API-Inference（OpenAI 兼容）联通性
+  - 默认模型为 `dclef233/BaZi-Qwen3-1.7B-GGUF`
+
+## 5. deploy_all 可选后端参数
+
+`deploy_all.sh` 默认仅做前端发布；如需带后端合约步骤：
 
 ```bash
-# 基本使用（自动生成提交信息）
-./scripts/upload_to_github.sh
-
-# 自定义提交信息
-./scripts/upload_to_github.sh "feat: 添加新功能"
+cd /home/lc/luckee_dao/ming
+MING_DEPLOY_BACKEND_EVM=true \
+MING_BACKEND_NETWORK=sepolia \
+MING_RUN_NFT_FLOW_CHECK=true \
+./scripts/deploy_all.sh production "feat: full release"
 ```
 
-**功能：**
-- ✅ 自动检查 Git 状态
-- ✅ 添加所有修改的文件
-- ✅ 自动生成提交信息（基于更改类型）
-- ✅ 检查并设置远程仓库
-- ✅ 推送到 GitHub
-- ✅ 显示项目统计信息
-
-**注意事项：**
-- 首次使用需要设置远程仓库 URL
-- 确保已配置 Git 用户信息
-- 确保有 GitHub 仓库的推送权限
-
----
-
-### 2. `deploy_vercel.sh` - 部署到 Vercel
-
-自动构建并部署项目到 Vercel。
-
-**使用方法：**
+可选指定地址（流程检查时）：
 
 ```bash
-# 部署到生产环境
-./scripts/deploy_vercel.sh production
-
-# 部署到预览环境
-./scripts/deploy_vercel.sh preview
-
-# 默认部署到生产环境
-./scripts/deploy_vercel.sh
+MING_CONTRACT_ADDRESS=0xYourContractAddress
 ```
 
-**功能：**
-- ✅ 检查 Vercel CLI 是否安装
-- ✅ 检查 Vercel 登录状态
-- ✅ 安装项目依赖
-- ✅ 运行构建测试
-- ✅ 创建 vercel.json 配置（如不存在）
-- ✅ 部署到 Vercel
-- ✅ 显示部署 URL 和统计信息
+合约依赖安装控制（网络不稳定时有用）：
 
-**环境变量：**
 ```bash
-export VERCEL_PROJECT_NAME="ming-platform"
-export VERCEL_ORG_ID="your-org-id"
-export VERCEL_PROJECT_ID="your-project-id"
+NPM_INSTALL_RETRY=3              # 默认 3 次重试
+CONTRACTS_SKIP_NPM_INSTALL=true  # 已预装依赖时可跳过安装
 ```
 
-**前置要求：**
-1. 安装 Node.js 和 npm
-2. 安装 Vercel CLI: `npm install -g vercel`
-3. 登录 Vercel: `vercel login`
+## 6. 注意事项
 
----
+1. Ming NFT 为定制流程（连接信息、共识哈希、流程控制），不要按普通 ERC721 发行流程替代。
+2. 合约部署依赖 `ming/contracts` 下 Hardhat 工程与环境变量（如 `PRIVATE_KEY`、RPC URL）。
+   - `deploy_contract_evm.sh` 会优先读取 `ming/contracts/.env`，并回退读取 `/home/lc/luckee_dao/env/.env`。
+3. 钱包联调脚本保持原有入口：
+   - `run_wallet_integration_checks.sh`
+   - `run_wallet_cross_window_preflight.sh`
+   - `run_wallet_handshake_smoke.sh`
 
-## 🚀 快速开始
+## 7. 钱包联调推荐命令
 
-### 首次使用
-
-1. **设置 Git 远程仓库：**
-   ```bash
-   cd /home/lc/luckee_dao/ming
-   git remote add origin https://github.com/your-username/ming.git
-   ```
-
-2. **登录 Vercel：**
-   ```bash
-   npm install -g vercel
-   vercel login
-   ```
-
-3. **运行脚本：**
-   ```bash
-   # 方式一：使用统一入口脚本（推荐）
-   ./scripts/deploy.sh all production "feat: 初始提交"
-   
-   # 方式二：分别执行
-   ./scripts/deploy.sh github "feat: 初始提交"
-   ./scripts/deploy.sh vercel production
-   
-   # 方式三：直接调用具体脚本
-   ./scripts/upload_to_github.sh "feat: 初始提交"
-   ./scripts/deploy_vercel.sh production
-   ```
-
----
-
-## 📝 使用示例
-
-### 示例 1: 完整部署流程（推荐）
+仅 Ming 前端（协议 + Mock E2E + 跨窗口）：
 
 ```bash
-# 使用统一入口脚本，一键完成所有操作
-./scripts/deploy.sh all production "feat: 添加NFT铸造功能"
-
-# 或者分步执行
-./scripts/deploy.sh github "feat: 添加NFT铸造功能"
-./scripts/deploy.sh vercel preview
-./scripts/deploy.sh vercel production
+cd /home/lc/luckee_dao/ming/srcs
+npm run test:wallet:unit
+npm run test:wallet:e2e:mock
+npm run test:wallet:e2e:cross-window
 ```
 
-### 示例 2: 仅更新代码
+一键联调（含 AnDaoWallet 校验）：
 
 ```bash
-# 使用统一入口脚本
-./scripts/deploy.sh github "docs: 更新文档"
-
-# 或直接调用
-./scripts/upload_to_github.sh "docs: 更新文档"
-```
-
-### 示例 3: 仅部署
-
-```bash
-# 使用统一入口脚本
-./scripts/deploy.sh vercel production
-
-# 或直接调用
-./scripts/deploy_vercel.sh production
-```
-
----
-
-## ⚙️ 配置说明
-
-### Vercel 配置
-
-项目已包含 `srcs/vercel.json` 配置文件，包含以下配置：
-
-- **构建命令**: `npm run build`
-- **输出目录**: `dist`
-- **框架**: Vite
-- **路由**: SPA 路由配置
-- **安全头**: XSS 防护、内容类型保护等
-- **缓存策略**: 静态资源长期缓存
-
-### 自定义配置
-
-如需修改 Vercel 配置，编辑 `srcs/vercel.json` 文件。
-
----
-
-## 🔧 故障排除
-
-### GitHub 上传失败
-
-1. **检查 Git 配置：**
-   ```bash
-   git config --global user.name "Your Name"
-   git config --global user.email "your.email@example.com"
-   ```
-
-2. **检查远程仓库：**
-   ```bash
-   git remote -v
-   ```
-
-3. **检查权限：**
-   确保有仓库的推送权限
-
-### Vercel 部署失败
-
-1. **检查 Vercel CLI：**
-   ```bash
-   vercel --version
-   ```
-
-2. **检查登录状态：**
-   ```bash
-   vercel whoami
-   ```
-
----
-
-### 3. `run_wallet_integration_checks.sh` - 钱包联调一键检查
-
-用于跨仓联调回归（Ming + AnDaoWallet）：
-
-```bash
-# 完整检查（含 Playwright E2E）
+cd /home/lc/luckee_dao/ming
 ./scripts/run_wallet_integration_checks.sh
-
-# 跳过 E2E，仅跑协议与类型测试
-./scripts/run_wallet_integration_checks.sh --skip-e2e
 ```
 
-执行内容：
-
-- Ming：`mingWalletInterface` 单测
-- Ming：`example.spec.ts` + `wallet-flow.spec.ts` Chromium E2E 冒烟
-- Ming：`wallet-cross-window.spec.ts` 跨窗口 popup 握手 E2E（独立配置）
-- AnDaoWallet/h5：`type-check` + `MingWalletBridgeService` 测试
-
-### 4. `run_wallet_handshake_smoke.sh` - 钱包握手专项冒烟
-
-用于快速验证活跃账户握手（`GET_ACTIVE_ACCOUNT`）链路：
+一键联调 + 合约测试：
 
 ```bash
-./scripts/run_wallet_handshake_smoke.sh
+cd /home/lc/luckee_dao/ming
+./scripts/run_wallet_integration_checks.sh --with-contracts
 ```
 
-执行内容：
-
-- Ming：`mingWalletInterface` 中 `GET_ACTIVE_ACCOUNT` 相关关键测试（同页与跨窗口响应来源匹配）
-
-### 5. `run_wallet_cross_window_preflight.sh` - 跨窗口联调前置检查
-
-用于校验 Ming/AnDaoWallet 双侧 `.env.local` 是否满足跨窗口联调最小条件：
+默认会自动清理 `srcs/playwright-report` 与 `srcs/test-results`，避免产物污染工作区。若需要保留报告：
 
 ```bash
-./scripts/run_wallet_cross_window_preflight.sh
+cd /home/lc/luckee_dao/ming
+KEEP_E2E_ARTIFACTS=true ./scripts/run_wallet_integration_checks.sh --with-contracts
 ```
 
-检查项：
+## 8. 线上钱包域名约定
 
-- Ming 侧：`VITE_WALLET_APP_URL` / `VITE_WALLET_TARGET_ORIGIN` / `VITE_WALLET_ALLOWED_ORIGINS`
-- 钱包侧：`VITE_MING_ALLOWED_ORIGINS` / `VITE_SOLANA_NETWORK`
-- 关键一致性：目标 Origin 对齐、白名单覆盖、Solana 网络对齐
-
-3. **检查构建：**
-   ```bash
-   cd srcs
-   npm run build
-   ```
-
-4. **查看日志：**
-   ```bash
-   vercel logs
-   ```
-
----
-
-## 📚 相关文档
-
-- [Git 文档](https://git-scm.com/doc)
-- [Vercel 文档](https://vercel.com/docs)
-- [Vite 文档](https://vitejs.dev/)
-
----
-
-## 🔒 安全提示
-
-1. **不要提交敏感信息：**
-   - 私钥、API 密钥等应使用环境变量
-   - 使用 `.gitignore` 排除敏感文件
-
-2. **Vercel 环境变量：**
-   - 在 Vercel 控制台设置环境变量
-   - 不要将环境变量提交到代码仓库
-
-3. **Git 权限：**
-   - 使用 SSH 密钥或 Personal Access Token
-   - 不要将凭据硬编码到脚本中
-
----
-
-## 📞 支持
-
-如有问题，请：
-1. 查看脚本输出日志
-2. 检查相关文档
-3. 联系项目维护者
-
----
-
-**最后更新**: 2025-01-30
+- 当前可用域名：`https://andao.cdao.online`
+- 钱包对接统一使用根域名，不使用 `www` 子域名。

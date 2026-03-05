@@ -4,8 +4,24 @@ set -euo pipefail
 
 MING_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MING_ENV_FILE="${MING_ROOT}/srcs/.env.local"
+MING_ENV_FALLBACK_FILE="${MING_ROOT}/srcs/env.local"
 WALLET_ROOT="/home/lc/luckee_dao/AnDaoWallet/h5"
 WALLET_ENV_FILE="${WALLET_ROOT}/.env.local"
+WALLET_ENV_FALLBACK_FILE="${WALLET_ROOT}/env.local"
+
+resolve_env_file() {
+  local preferred="$1"
+  local fallback="$2"
+  if [[ -f "${preferred}" ]]; then
+    echo "${preferred}"
+    return 0
+  fi
+  if [[ -f "${fallback}" ]]; then
+    echo "${fallback}"
+    return 0
+  fi
+  return 1
+}
 
 get_env_value() {
   local file="$1"
@@ -34,19 +50,26 @@ require_non_empty() {
 }
 
 echo "=== Wallet Cross-Window Preflight ==="
-echo "Ming env: ${MING_ENV_FILE}"
-echo "Wallet env: ${WALLET_ENV_FILE}"
-echo ""
 
 if [[ ! -f "${MING_ENV_FILE}" ]]; then
-  echo "❌ Ming env file not found: ${MING_ENV_FILE}"
-  exit 1
+  MING_ENV_FILE="$(resolve_env_file "${MING_ENV_FILE}" "${MING_ENV_FALLBACK_FILE}" || true)"
+  if [[ -z "${MING_ENV_FILE}" ]]; then
+    echo "❌ Ming env file not found: ${MING_ROOT}/srcs/.env.local or ${MING_ROOT}/srcs/env.local"
+    exit 1
+  fi
 fi
 
 if [[ ! -f "${WALLET_ENV_FILE}" ]]; then
-  echo "❌ Wallet env file not found: ${WALLET_ENV_FILE}"
-  exit 1
+  WALLET_ENV_FILE="$(resolve_env_file "${WALLET_ENV_FILE}" "${WALLET_ENV_FALLBACK_FILE}" || true)"
+  if [[ -z "${WALLET_ENV_FILE}" ]]; then
+    echo "❌ Wallet env file not found: ${WALLET_ROOT}/.env.local or ${WALLET_ROOT}/env.local"
+    exit 1
+  fi
 fi
+
+echo "Ming env: ${MING_ENV_FILE}"
+echo "Wallet env: ${WALLET_ENV_FILE}"
+echo ""
 
 MING_APP_URL="$(get_env_value "${MING_ENV_FILE}" "VITE_WALLET_APP_URL" || true)"
 MING_TARGET_ORIGIN="$(get_env_value "${MING_ENV_FILE}" "VITE_WALLET_TARGET_ORIGIN" || true)"
@@ -65,7 +88,12 @@ require_non_empty "Ming.VITE_WALLET_ALLOWED_ORIGINS" "${MING_ALLOWED_ORIGINS}" |
 require_non_empty "Ming.VITE_CHAIN_FAMILY" "${MING_CHAIN_FAMILY}" || ok=false
 require_non_empty "Ming.VITE_CHAIN_NETWORK" "${MING_CHAIN_NETWORK}" || ok=false
 require_non_empty "AnDaoWallet.VITE_MING_ALLOWED_ORIGINS" "${WALLET_ALLOWED_ORIGINS}" || ok=false
-require_non_empty "AnDaoWallet.VITE_SOLANA_NETWORK" "${WALLET_SOLANA_NETWORK}" || ok=false
+
+if [[ "${MING_CHAIN_FAMILY}" == "solana" ]]; then
+  require_non_empty "AnDaoWallet.VITE_SOLANA_NETWORK" "${WALLET_SOLANA_NETWORK}" || ok=false
+else
+  echo "ℹ️  skip: AnDaoWallet.VITE_SOLANA_NETWORK (Ming chain family is ${MING_CHAIN_FAMILY:-unknown})"
+fi
 
 if [[ "${MING_TARGET_ORIGIN}" != "${MING_APP_URL}" ]]; then
   echo "❌ mismatch: VITE_WALLET_TARGET_ORIGIN should equal VITE_WALLET_APP_URL"

@@ -17,6 +17,8 @@ interface ImportMetaEnv {
   readonly VITE_WALLET_TARGET_ORIGIN?: string;
   readonly VITE_WALLET_ALLOWED_ORIGINS?: string;
   readonly VITE_WALLET_BRIDGE_DEBUG?: 'true' | 'false' | '1' | '0';
+  readonly VITE_AI_CHAT_API_PATH?: string;
+  readonly VITE_AI_FORTUNE_MODEL?: string;
   // 更多环境变量...
 }
 

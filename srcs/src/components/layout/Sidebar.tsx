@@ -32,6 +32,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import LinkIcon from '@mui/icons-material/Link';
 import BuildIcon from '@mui/icons-material/Build';
 import SchoolIcon from '@mui/icons-material/School';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 
@@ -79,11 +80,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
       path: '/',
       icon: <HomeIcon />,
       children: [
-        { label: '功能介绍', path: '/' },
-        { label: '仪式流程', path: '/connection-ceremony?tab=0' },
+        { label: '链上铸造NFT', path: '/connection-ceremony?tab=0' },
         { label: '定时任务', path: '/connection-ceremony?tab=1' },
-        { label: '仪式资源（仪式页）', path: '/connection-ceremony?tab=2' },
-        { label: '关于平台', path: '/about/intro' },
       ],
     },
     {
@@ -95,7 +93,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
         { label: '五行能量测算', path: '/energy-original' },
         { label: 'AI图片编辑', path: '/tools' },
         { label: '图片模板', path: '/tools' },
-        { label: '仪式资源', path: '/connection-ceremony?tab=2' },
       ],
     },
     {
@@ -103,8 +100,17 @@ const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
       path: '/learning',
       icon: <SchoolIcon />,
       children: [
-        { label: '技术说明', path: '/learning/technology' },
-        { label: '其他', path: '/learning/other' },
+        { label: 'AI命理学习', path: '/learning/ai-fortune' },
+        { label: '仪式资源', path: '/ceremony-resources' },
+      ],
+    },
+    {
+      label: '关于平台',
+      path: '/about/intro',
+      icon: <InfoOutlinedIcon />,
+      children: [
+        { label: '平台介绍', path: '/about/intro' },
+        { label: '技术说明', path: '/about/technology' },
       ],
     },
     {

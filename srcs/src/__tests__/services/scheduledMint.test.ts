@@ -284,11 +284,16 @@ describe('scheduledMintService', () => {
   describe('deleteTask', () => {
     it('应该调用cancelTask取消任务', async () => {
       const taskId = 'test-task-id-123';
-      await scheduledMintService.deleteTask(taskId);
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      scheduledMintService.deleteTask(taskId);
       expect(mingWalletInterface.cancelScheduledTask).toHaveBeenCalledWith({
         protocolVersion: WALLET_PROTOCOL_VERSION,
         taskId,
       });
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('deleteTask() is deprecated')
+      );
+      consoleSpy.mockRestore();
     });
   });
 

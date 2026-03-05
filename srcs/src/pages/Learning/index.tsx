@@ -2,9 +2,8 @@
  * 学习页面
  *
  * 提供学习资源：
- * - 技术说明
  * - 仪式资源
- * - 其他学习材料
+ * - AI命理学习
  */
 
 import React from 'react';
@@ -19,20 +18,21 @@ import {
   Button,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import CodeIcon from '@mui/icons-material/Code';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SchoolIcon from '@mui/icons-material/School';
 
+interface LearningResource {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  path: string;
+  color: 'primary' | 'secondary';
+  comingSoon?: boolean;
+}
+
 const Learning: React.FC = () => {
-  const learningResources = [
-    {
-      id: 'technology',
-      title: '技术说明',
-      description: '了解Ming平台的技术架构、实现原理和开发文档，深入理解系统设计。',
-      icon: <CodeIcon sx={{ fontSize: 48 }} />,
-      path: '/learning/technology',
-      color: 'primary',
-    },
+  const learningResources: LearningResource[] = [
     {
       id: 'ceremony-resources',
       title: '仪式资源',
@@ -42,13 +42,12 @@ const Learning: React.FC = () => {
       color: 'secondary',
     },
     {
-      id: 'other',
-      title: '其他',
-      description: '更多学习材料和参考资料，持续更新中。',
+      id: 'ai-fortune',
+      title: 'AI命理学习',
+      description: '通过对话方式学习八字命理，支持基于本地或远程模型进行问答练习与解释。',
       icon: <SchoolIcon sx={{ fontSize: 48 }} />,
-      path: '/learning/other',
+      path: '/learning/ai-fortune',
       color: 'primary',
-      comingSoon: true,
     },
   ];
 
@@ -59,7 +58,7 @@ const Learning: React.FC = () => {
           学习
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-          深入学习Ming平台的技术原理、仪式文化和相关知识，提升对能量系统的理解。
+          聚焦命理学习与仪式知识资源，帮助你把概念理解转为可执行实践。
         </Typography>
 
         <Grid container spacing={3} sx={{ mt: 2 }}>

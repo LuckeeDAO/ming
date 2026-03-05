@@ -27,7 +27,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
  */
 contract ConnectionNFT is ERC721URIStorage, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
-    
     /**
      * @dev Token ID计数器
      */

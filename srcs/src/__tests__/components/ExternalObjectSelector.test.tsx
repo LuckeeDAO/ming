@@ -86,8 +86,9 @@ describe('ExternalObjectSelector', () => {
     const detailButtons = screen.getAllByText('查看详情');
     if (detailButtons.length > 0) {
       fireEvent.click(detailButtons[0]);
-      // 应该显示对话框
-      expect(screen.getByText(mockObjects[0].name)).toBeInTheDocument();
+      // 应该显示详情对话框（标题与外物名称一致）
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: mockObjects[0].name })).toBeInTheDocument();
     }
   });
 });

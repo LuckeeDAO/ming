@@ -29,6 +29,14 @@ async function main() {
   // 检查账户余额
   const balance = await hre.ethers.provider.getBalance(deployer.address);
   console.log('账户余额:', hre.ethers.formatEther(balance), 'ETH\n');
+  if (balance === 0n) {
+    if (hre.network.name === 'fuji') {
+      throw new Error(
+        'Fuji 账户余额为 0。请先领取测试币: https://core.app/tools/testnet-faucet/?subnet=c&token=c'
+      );
+    }
+    throw new Error(`部署账户余额为 0，无法在 ${hre.network.name} 发起部署交易`);
+  }
 
   // 部署合约
   const ConnectionNFT = await hre.ethers.getContractFactory('ConnectionNFT');

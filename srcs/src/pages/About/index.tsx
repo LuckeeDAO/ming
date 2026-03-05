@@ -21,7 +21,7 @@ import {
   Chip,
   useTheme,
 } from '@mui/material';
-import { useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 const About: React.FC = () => {
   const theme = useTheme();
@@ -148,13 +148,12 @@ const About: React.FC = () => {
                   • <strong>以人合天，以链载愿</strong>：通过 Web3 技术与区块链共识，将传统命理智慧与现代技术结合，以可编程的仪式 NFT 承载祈愿，实现个人与自然规律、社会规律的和谐共续
                 </Typography>
 
-                <Divider sx={{ my: 3 }} />
-
-                <Typography variant="h6" gutterBottom>
-                  体验形态
-                </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                  用户通过完成对应五行、节气、星宿的链上仪式，铸造专属能量 NFT，同时接入相应共识池，在时间中不断累积实践记录，形成个人与集体能量场的共振与循环。
+                  技术实现与系统架构已单独拆分到
+                  {' '}
+                  <RouterLink to="/about/technology">技术说明</RouterLink>
+                  {' '}
+                  页面；本页仅保留平台定位与理念框架，避免与功能介绍重复。
                 </Typography>
               </CardContent>
             </Card>

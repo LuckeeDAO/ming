@@ -99,7 +99,7 @@ describe('MyConnections', () => {
 
   it('在详情标题中展示 planId 并按 planId 显示匹配维度', async () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <MyConnections />
       </MemoryRouter>,
     );
@@ -115,7 +115,7 @@ describe('MyConnections', () => {
 
   it('有 selected planId 时应忽略 tokenId 匹配但 planId 不匹配的事件', async () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <MyConnections />
       </MemoryRouter>,
     );

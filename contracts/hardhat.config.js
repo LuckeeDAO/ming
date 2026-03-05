@@ -43,6 +43,16 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 11155111,
     },
+    fuji: {
+      url: process.env.FUJI_RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 43113,
+    },
+    avalanche: {
+      url: process.env.AVALANCHE_RPC_URL || 'https://api.avax.network/ext/bc/C/rpc',
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 43114,
+    },
     mainnet: {
       url: process.env.MAINNET_RPC_URL || '',
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
@@ -50,7 +60,7 @@ module.exports = {
     },
   },
   paths: {
-    sources: './',
+    sources: './src',
     tests: './test',
     cache: './cache',
     artifacts: './artifacts',

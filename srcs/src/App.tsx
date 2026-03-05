@@ -8,9 +8,9 @@
  * - 页面懒加载
  * 
  * 路由说明：
- * - / : 首页 - 关于平台（默认）
- * - /experience : 首页 - 体验与功能
- * - /technology : 首页 - 技术说明
+ * - / : 首页（白皮书与功能总览）
+ * - /learning : 学习（AI命理学习、仪式资源）
+ * - /about/* : 关于平台（平台介绍、技术说明、哲学理念）
  * - /connection-ceremony : 外物连接仪式（整合了连接指导、NFT仪式、定时MINT、仪式资源）
  * - /my-connections : 我的连接记录
  * 
@@ -36,6 +36,7 @@ const CeremonyResourceDetail = lazy(() => import('./pages/CeremonyResourceDetail
 const Tools = lazy(() => import('./pages/Tools/index'));
 const Learning = lazy(() => import('./pages/Learning/index'));
 const Technology = lazy(() => import('./pages/Learning/Technology'));
+const AIFortune = lazy(() => import('./pages/Learning/AIFortune'));
 const SimpleMint = lazy(() => import('./pages/SimpleMint/index'));
 const ImageTemplateReference = lazy(() => import('./pages/ImageTemplateReference/index'));
 
@@ -89,14 +90,16 @@ function App() {
             
             {/* 学习页面 */}
             <Route path="/learning" element={<Learning />} />
-            <Route path="/learning/technology" element={<Technology />} />
-            <Route path="/learning/other" element={<Learning />} />
+            <Route path="/learning/technology" element={<Navigate to="/about/technology" replace />} />
+            <Route path="/learning/ai-fortune" element={<AIFortune />} />
+            <Route path="/learning/other" element={<Navigate to="/learning/ai-fortune" replace />} />
             <Route path="/ceremony-resources" element={<Navigate to="/connection-ceremony?tab=2" replace />} />
             <Route path="/ceremony-resources/:id" element={<CeremonyResourceDetail />} />
             
             {/* 关于平台路由 */}
             <Route path="/about" element={<About key="about-intro" />} />
             <Route path="/about/intro" element={<About key="about-intro" />} />
+            <Route path="/about/technology" element={<Technology />} />
             <Route path="/about/philosophy" element={<About key="about-philosophy" />} />
             
             {/* 其他页面路由 */}
@@ -106,8 +109,8 @@ function App() {
             <Route path="/my-connections" element={<MyConnections />} />
             
             {/* 向后兼容路由 */}
-            <Route path="/experience" element={<Home key="experience" />} />
-            <Route path="/technology" element={<Home key="technology" />} />
+            <Route path="/experience" element={<Navigate to="/" replace />} />
+            <Route path="/technology" element={<Navigate to="/about/technology" replace />} />
             <Route path="/concept" element={<About key="about-philosophy" />} />
             <Route path="/connection-guide" element={<Navigate to="/connection-ceremony?tab=0" replace />} />
             <Route path="/nft-ceremony" element={<Navigate to="/connection-ceremony?tab=0" replace />} />

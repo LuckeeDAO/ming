@@ -66,7 +66,7 @@ class EnergyAnalysisService {
         missingElements,
         tenGods,
         patternAnalysis,
-        analyzedAt: new Date(),
+        analyzedAt: new Date().toISOString(),
       };
       const result = patternMedicineService.analyzePatternAndMedicine(tempAnalysis, state);
       patternMedicine = result;
@@ -134,7 +134,7 @@ class EnergyAnalysisService {
       ...(patternMedicine && { patternMedicine }),
       ...(dayMaster && { dayMaster }),
       energyDebugLog: debugLog,
-      analyzedAt: new Date(),
+      analyzedAt: new Date().toISOString(),
     };
   }
 

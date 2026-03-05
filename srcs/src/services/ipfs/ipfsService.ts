@@ -47,7 +47,11 @@ class IPFSService {
    * 初始化 IPFS 服务
    */
   init(config: IPFSConfig): void {
-    this.config = { ...this.config, ...config };
+    // 每次 init 以默认值为基线，避免上一次测试/运行残留配置污染当前上下文
+    this.config = {
+      gatewayUrl: 'https://gateway.pinata.cloud/ipfs/',
+      ...config,
+    };
   }
 
   /**

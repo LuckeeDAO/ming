@@ -65,6 +65,7 @@ describe('ipfsService', () => {
     });
 
     it('应该在未配置Pinata时抛出错误', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       ipfsService.init({});
 
       const file = new File(['test content'], 'test.txt', {
@@ -72,6 +73,7 @@ describe('ipfsService', () => {
       });
 
       await expect(ipfsService.uploadFile(file)).rejects.toThrow();
+      consoleSpy.mockRestore();
     });
   });
 

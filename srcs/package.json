@@ -11,6 +11,9 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
     "test": "vitest",
     "test:ci": "vitest run",
+    "test:wallet:unit": "vitest run src/__tests__/services/mingWalletInterface.test.ts src/__tests__/services/scheduledMint.test.ts",
+    "test:wallet:e2e:mock": "playwright test e2e/wallet-flow.spec.ts --project=chromium --config=playwright.config.ts",
+    "test:wallet:e2e:cross-window": "playwright test e2e/wallet-cross-window.spec.ts --project=chromium --config=playwright.cross-window.config.ts",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test"
   },

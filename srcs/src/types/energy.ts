@@ -282,7 +282,7 @@ export interface EnergyAnalysis {
       description: string;
     };
   };
-  analyzedAt: Date;
+  analyzedAt: string;
 }
 
 /**
