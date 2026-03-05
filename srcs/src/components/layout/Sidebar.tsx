@@ -111,6 +111,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
       children: [
         { label: '平台介绍', path: '/about/intro' },
         { label: '技术说明', path: '/about/technology' },
+        { label: '哲学理念', path: '/about/philosophy' },
+        { label: '完整白皮书', path: '/philosophy' },
       ],
     },
     {

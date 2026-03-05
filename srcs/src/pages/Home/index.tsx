@@ -186,6 +186,12 @@ const Home: React.FC = () => {
                 >
                   直接访问 <Link to="/philosophy" style={{ color: theme.palette.primary.main, textDecoration: 'none' }}>完整白皮书页面</Link> 查看全部内容。
                 </Typography>
+                <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'center', flexWrap: 'wrap', mt: 2 }}>
+                  <Button component={Link} to="/about/intro" size="small" variant="outlined">平台介绍</Button>
+                  <Button component={Link} to="/about/technology" size="small" variant="outlined">技术说明</Button>
+                  <Button component={Link} to="/about/philosophy" size="small" variant="outlined">哲学理念</Button>
+                  <Button component={Link} to="/philosophy" size="small" variant="contained">完整白皮书</Button>
+                </Box>
               </Box>
 
               <CapabilityStatusLegend maxWidth="1000px" compact />
