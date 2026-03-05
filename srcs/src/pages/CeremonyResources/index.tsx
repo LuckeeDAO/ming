@@ -9,133 +9,79 @@ import {
   Chip,
   Container,
   Divider,
-  FormControlLabel,
   Grid,
-  Link as MuiLink,
-  Switch,
-  ToggleButton,
-  ToggleButtonGroup,
+  TextField,
   Typography,
 } from '@mui/material';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import LockIcon from '@mui/icons-material/Lock';
-import { Link as RouterLink, useSearchParams } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { ceremonyResourcesService } from '../../services/ceremony/ceremonyResourcesService';
 
-const COMPLETED_STORAGE_KEY = 'ming_learning_material_completed_ids';
-
-const readCompleted = (): string[] => {
-  try {
-    const raw = localStorage.getItem(COMPLETED_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : [];
-  } catch {
-    return [];
-  }
+type EncyclopediaTopic = {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
 };
 
+const TOPICS: EncyclopediaTopic[] = [
+  {
+    id: 'topic_bazi',
+    title: '八字基础体系',
+    description: '聚焦日主、十神、格局与取用等四柱核心概念。',
+    tags: ['sizhu_bazi'],
+  },
+  {
+    id: 'topic_wuxing_jieqi',
+    title: '五行与节气历法',
+    description: '聚焦五行生克、交节边界与时间校验相关概念。',
+    tags: ['wuxing_energy'],
+  },
+  {
+    id: 'topic_liuren',
+    title: '六壬扩展体系',
+    description: '聚焦六壬课体、起课顺序与快速起盘方法。',
+    tags: ['natural_object_ceremonies'],
+  },
+];
+
 const CeremonyResources: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = React.useState('');
   const resources = ceremonyResourcesService.getAllResources();
   const snippets = ceremonyResourcesService.getProjectTextSnippets();
-  const learningMaterials = ceremonyResourcesService.getLearningMaterials();
-  const learningMeta = ceremonyResourcesService.getLearningMaterialsMeta();
-  const [completedIds, setCompletedIds] = React.useState<string[]>([]);
-  const [showOnlyPending, setShowOnlyPending] = React.useState(false);
-  const [pendingFilter, setPendingFilter] = React.useState<'all' | 'unlocked' | 'locked'>('all');
-  const focusId = searchParams.get('focus');
-
-  React.useEffect(() => {
-    setCompletedIds(readCompleted());
-
-    const reload = () => setCompletedIds(readCompleted());
-    window.addEventListener('focus', reload);
-    window.addEventListener('storage', reload);
-    return () => {
-      window.removeEventListener('focus', reload);
-      window.removeEventListener('storage', reload);
-    };
-  }, []);
-
-  React.useEffect(() => {
-    if (!focusId) return;
-    const timer = window.setTimeout(() => {
-      const target = document.getElementById(`learning-card-${focusId}`);
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      const next = new URLSearchParams(searchParams);
-      next.delete('focus');
-      setSearchParams(next, { replace: true });
-    }, 150);
-    return () => window.clearTimeout(timer);
-  }, [focusId, searchParams, setSearchParams]);
-
-  const completedCount = completedIds.filter((id) =>
-    learningMaterials.some((material) => material.id === id)
-  ).length;
-  const completedSet = new Set(completedIds);
-  const recommendation = ceremonyResourcesService.getRecommendedNextLearningMaterial(completedIds);
-  const nextMaterial = recommendation.material;
-  const allCompleted = learningMaterials.length > 0 && completedCount >= learningMaterials.length;
-  const beginnerMaterials = learningMaterials.filter((material) => material.level === '入门');
-  const advancedMaterials = learningMaterials.filter((material) => material.level === '进阶');
-  const isUnlocked = (material: (typeof learningMaterials)[number]) =>
-    material.prerequisites.every((item) => completedSet.has(item));
-  const pendingMaterials = learningMaterials.filter((material) => !completedIds.includes(material.id));
-  const unlockedPendingMaterials = pendingMaterials.filter((material) => isUnlocked(material));
-  const lockedPendingMaterials = pendingMaterials.filter((material) => !isUnlocked(material));
-  const visibleMaterials = (() => {
-    if (!showOnlyPending) return learningMaterials;
-    if (pendingFilter === 'unlocked') return unlockedPendingMaterials;
-    if (pendingFilter === 'locked') return lockedPendingMaterials;
-    return pendingMaterials;
-  })();
-  const formatPrerequisites = (ids: string[]) =>
-    ids
-      .map((item) => ceremonyResourcesService.getLearningMaterialById(item)?.title ?? item)
-      .join(' / ');
-  const prerequisiteEntries = (ids: string[], returnToId?: string) =>
-    ids.map((item) => ({
-      id: item,
-      title: ceremonyResourcesService.getLearningMaterialById(item)?.title ?? item,
-      to: returnToId ? `/learning/materials/${item}?returnTo=${returnToId}` : `/learning/materials/${item}`,
-    }));
+  const entries = ceremonyResourcesService.getLearningMaterials();
+  const meta = ceremonyResourcesService.getLearningMaterialsMeta();
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredEntries = entries.filter((entry) => {
+    if (!normalizedQuery) return true;
+    const haystack = [
+      entry.title,
+      entry.knowledgePointTitle,
+      entry.learningGoal,
+      ...entry.coreConcepts,
+      ...entry.publicSearchKeywords,
+    ]
+      .join(' ')
+      .toLowerCase();
+    return haystack.includes(normalizedQuery);
+  });
+  const getEntriesByTopic = (topic: EncyclopediaTopic) =>
+    filteredEntries.filter((entry) => entry.tags.some((tag) => topic.tags.includes(tag)));
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        学习资料中心
+        命理概念词条库
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        面向命理学习场景整理的功能型资料页：每份文件对应一个知识点，包含学习目标、核心概念、练习任务与示例摘录。
+        本页采用百科式结构，按“概念定义-核心要点-原文摘录-关联词条”整理项目资料，不做考试化交互。
       </Typography>
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        学习资料由脚本从项目文本自动整理，当前共 {learningMeta.count} 份，最近生成时间：{new Date(learningMeta.generatedAt).toLocaleString('zh-CN')}
+        词条由项目文本自动整理，当前共 {meta.count} 条，最近更新时间：{new Date(meta.generatedAt).toLocaleString('zh-CN')}
       </Alert>
-      <Alert severity="success" sx={{ mb: 3 }}>
-        学习进度：已完成 {completedCount} / {learningMaterials.length} 份
-      </Alert>
-      {recommendation.reason !== 'blocked' && nextMaterial && (
-        <Alert severity={allCompleted ? 'info' : 'warning'} sx={{ mb: 3 }}>
-          {allCompleted ? '你已完成全部资料，可从头复习。' : `推荐下一条：${nextMaterial.title}`}
-          <Box sx={{ mt: 1 }}>
-            <Button component={RouterLink} to={`/learning/materials/${nextMaterial.id}`} size="small" variant="contained">
-              {allCompleted ? '重新学习' : '继续学习'}
-            </Button>
-          </Box>
-        </Alert>
-      )}
-      {recommendation.reason === 'blocked' && (
-        <Alert severity="warning" sx={{ mb: 3 }}>
-          当前没有可直接学习的知识点，请先完成已解锁的前置内容后再继续。
-        </Alert>
-      )}
 
       <Typography variant="h6" gutterBottom>
-        仪式资源目录
+        仪式主题目录
       </Typography>
       <Grid container spacing={2} sx={{ mb: 4 }}>
         {resources.map((resource) => (
@@ -152,7 +98,7 @@ const CeremonyResources: React.FC = () => {
               </CardContent>
               <CardActions>
                 <Button component={RouterLink} to={resource.route} size="small">
-                  查看详情
+                  查看主题
                 </Button>
               </CardActions>
             </Card>
@@ -163,7 +109,7 @@ const CeremonyResources: React.FC = () => {
       <Divider sx={{ my: 3 }} />
 
       <Typography variant="h6" gutterBottom>
-        项目学习摘录
+        项目概念摘录
       </Typography>
       <Grid container spacing={2} sx={{ mb: 4 }}>
         {snippets.map((snippet) => (
@@ -183,243 +129,86 @@ const CeremonyResources: React.FC = () => {
       <Divider sx={{ my: 3 }} />
 
       <Typography variant="h6" gutterBottom>
-        结构化学习资料（每文件一个知识点）
+        概念词条（百科形式）
       </Typography>
-      <Typography variant="body2" color="text.secondary" paragraph>
-        学习路径：先完成“入门”再进入“进阶”。每个知识点均包含目标、概念和练习任务。
-      </Typography>
-      <Box sx={{ mb: 2 }}>
-        {beginnerMaterials.length > 0 && (
-          <Chip label={`入门 ${beginnerMaterials.length} 份`} color="primary" size="small" sx={{ mr: 1 }} />
-        )}
-        {advancedMaterials.length > 0 && (
-          <Chip label={`进阶 ${advancedMaterials.length} 份`} color="secondary" size="small" />
-        )}
-      </Box>
-      <FormControlLabel
-        sx={{ mb: 1 }}
-        control={<Switch checked={showOnlyPending} onChange={(_, checked) => setShowOnlyPending(checked)} />}
-        label="仅看未完成"
+      <TextField
+        fullWidth
+        size="small"
+        label="搜索词条关键词"
+        placeholder="例如：十神 / 交节 / 六壬 / 月令"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        sx={{ mb: 2 }}
       />
-      {showOnlyPending && (
-        <Box sx={{ mb: 1.5 }}>
-          <ToggleButtonGroup
+      <Alert severity="success" sx={{ mb: 2 }}>
+        检索结果：{filteredEntries.length} / {entries.length} 条
+      </Alert>
+      <Box sx={{ mb: 2 }}>
+        {TOPICS.map((topic) => (
+          <Chip
+            key={topic.id}
+            label={`${topic.title}（${getEntriesByTopic(topic).length}）`}
             size="small"
-            exclusive
-            value={pendingFilter}
-            onChange={(_, value: 'all' | 'unlocked' | 'locked' | null) => {
-              if (value) setPendingFilter(value);
-            }}
-          >
-            <ToggleButton value="all">全部未完成</ToggleButton>
-            <ToggleButton value="unlocked">可学未完成</ToggleButton>
-            <ToggleButton value="locked">锁定未完成</ToggleButton>
-          </ToggleButtonGroup>
-          <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            <Button
-              size="small"
-              variant="contained"
-              component={unlockedPendingMaterials[0] ? RouterLink : 'button'}
-              to={unlockedPendingMaterials[0] ? `/learning/materials/${unlockedPendingMaterials[0].id}` : undefined}
-              disabled={!unlockedPendingMaterials[0]}
-            >
-              一键学习首个可学项
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setPendingFilter('locked')}
-              disabled={lockedPendingMaterials.length === 0}
-            >
-              查看锁定项（{lockedPendingMaterials.length}）
-            </Button>
-            <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>
-              可学 {unlockedPendingMaterials.length} / 锁定 {lockedPendingMaterials.length}
-            </Typography>
-          </Box>
-        </Box>
-      )}
-
-      <Typography variant="subtitle1" gutterBottom>
-        学习路径图
-      </Typography>
-      <Box
-        sx={{
-          mb: 2,
-          p: 1.5,
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: 1,
-          backgroundColor: 'background.paper',
-          overflowX: 'auto',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 720 }}>
-          {learningMaterials.map((material, index) => {
-            const completed = completedIds.includes(material.id);
-            const unlocked = isUnlocked(material);
-            const isRecommended = recommendation.reason === 'next_unlocked' && nextMaterial?.id === material.id;
-            return (
-              <React.Fragment key={`path-${material.id}`}>
-                <Card
-                  variant="outlined"
-                  component={unlocked ? RouterLink : 'div'}
-                  to={unlocked ? `/learning/materials/${material.id}` : undefined}
-                  sx={{
-                    minWidth: 220,
-                    borderColor: completed ? 'success.main' : 'divider',
-                    backgroundColor: completed ? 'success.light' : isRecommended ? 'warning.light' : 'background.default',
-                    textDecoration: 'none',
-                    color: 'inherit',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                    '&:hover': {
-                      transform: unlocked ? 'translateY(-2px)' : 'none',
-                      boxShadow: unlocked ? 2 : 0,
-                    },
-                    opacity: unlocked ? 1 : 0.7,
-                    cursor: unlocked ? 'pointer' : 'not-allowed',
-                  }}
-                >
-                  <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {material.sequence}. {material.title}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" display="block">
-                      级别：{material.level}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" display="block">
-                      先修：{material.prerequisites.length > 0 ? formatPrerequisites(material.prerequisites) : '无'}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: completed ? 'success.dark' : 'text.secondary', fontWeight: 600 }}
-                    >
-                      {completed ? '已完成' : !unlocked ? '已锁定' : isRecommended ? '推荐学习' : '待学习'}
-                    </Typography>
-                    {!unlocked && (
-                      <Box sx={{ mt: 0.5 }}>
-                        <Typography variant="caption" color="warning.dark" display="block">
-                          需先完成：
-                        </Typography>
-                        {prerequisiteEntries(material.prerequisites, material.id).map((entry) => (
-                          <MuiLink
-                            key={`path-prereq-${material.id}-${entry.id}`}
-                            component={RouterLink}
-                            to={entry.to}
-                            underline="hover"
-                            sx={{ mr: 1 }}
-                            variant="caption"
-                          >
-                            {entry.title}
-                          </MuiLink>
-                        ))}
-                      </Box>
-                    )}
-                  </CardContent>
-                </Card>
-                {index < learningMaterials.length - 1 && (
-                  <Box sx={{ px: 1, display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                    <ArrowForwardIcon fontSize="small" />
-                  </Box>
-                )}
-              </React.Fragment>
-            );
-          })}
-        </Box>
+            component="a"
+            clickable
+            href={`#${topic.id}`}
+            sx={{ mr: 1, mb: 1 }}
+          />
+        ))}
       </Box>
 
-      <Grid container spacing={2}>
-        {visibleMaterials.map((material) => (
-          <Grid item xs={12} md={6} key={material.id}>
-              {(() => {
-                const unlocked = isUnlocked(material);
-                return (
-              <Card
-                id={`learning-card-${material.id}`}
-                variant="outlined"
-                sx={{
-                  height: '100%',
-                  borderColor: focusId === material.id ? 'warning.main' : undefined,
-                  boxShadow: focusId === material.id ? 3 : undefined,
-                }}
-              >
-                <CardContent>
-                <Typography variant="subtitle1" gutterBottom>
-                  {material.sequence}. {material.title}
-                </Typography>
-                {completedIds.includes(material.id) && (
-                  <Chip label="已完成" color="success" size="small" sx={{ mb: 1 }} />
-                )}
-                <Chip label={material.level} size="small" sx={{ mb: 1, ml: 1 }} />
-                {!unlocked && (
-                  <Chip icon={<LockIcon />} label="未解锁" color="warning" size="small" sx={{ mb: 1, ml: 1 }} />
-                )}
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  知识点：{material.knowledgePointTitle}
-                </Typography>
-                {material.prerequisites.length > 0 && (
-                  <Box sx={{ mb: 1 }}>
-                    <Typography variant="caption" color="text.secondary" display="block">
-                      先修：
-                    </Typography>
-                    {prerequisiteEntries(material.prerequisites, material.id).map((entry) => (
-                      <MuiLink
-                        key={`card-prereq-${material.id}-${entry.id}`}
-                        component={RouterLink}
-                        to={entry.to}
-                        underline="hover"
-                        sx={{ mr: 1 }}
-                        variant="caption"
-                      >
-                        {entry.title}
-                      </MuiLink>
-                    ))}
-                  </Box>
-                )}
-                {!unlocked && (
-                  <Typography variant="caption" color="warning.dark" display="block" sx={{ mb: 1 }}>
-                    当前已锁定，请先完成前置知识点。
-                  </Typography>
-                )}
-                <Typography variant="body2" paragraph>
-                  学习目标：{material.learningGoal}
-                </Typography>
-                <Box sx={{ mb: 1 }}>
-                  {material.coreConcepts.map((concept) => (
-                    <Chip key={concept} label={concept} size="small" sx={{ mr: 1, mb: 1 }} />
-                  ))}
-                </Box>
-                <Typography variant="subtitle2" sx={{ mt: 1 }}>
-                  练习任务
-                </Typography>
-                <Typography variant="body2" paragraph>
-                  {material.practicePrompt}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  建议检索词：{material.publicSearchKeywords.join(' / ')}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  component={unlocked ? RouterLink : 'button'}
-                  to={unlocked ? `/learning/materials/${material.id}` : undefined}
-                  size="small"
-                  disabled={!unlocked}
-                >
-                  {unlocked ? '进入学习' : '先完成前置'}
-                </Button>
-              </CardActions>
-            </Card>
-                );
-              })()}
-          </Grid>
-        ))}
-      </Grid>
-      {visibleMaterials.length === 0 && (
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          当前筛选下暂无资料。
+      {filteredEntries.length === 0 && (
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          当前关键词未命中词条，请尝试更短的关键词或同义词。
         </Typography>
       )}
+
+      {TOPICS.map((topic) => {
+        const topicEntries = getEntriesByTopic(topic);
+        if (topicEntries.length === 0) return null;
+        return (
+          <Box key={topic.id} id={topic.id} sx={{ mb: 3, scrollMarginTop: 88 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              {topic.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              {topic.description}
+            </Typography>
+            <Grid container spacing={2}>
+              {topicEntries.map((entry) => (
+                <Grid item xs={12} md={6} key={entry.id}>
+                  <Card variant="outlined" sx={{ height: '100%' }}>
+                    <CardContent>
+                      <Typography variant="subtitle1" gutterBottom>
+                        {entry.sequence}. {entry.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" paragraph>
+                        概念定义：{entry.knowledgePointTitle}
+                      </Typography>
+                      <Typography variant="body2" paragraph>
+                        概念说明：{entry.learningGoal}
+                      </Typography>
+                      <Box sx={{ mb: 1 }}>
+                        {entry.coreConcepts.map((concept) => (
+                          <Chip key={concept} label={concept} size="small" sx={{ mr: 1, mb: 1 }} />
+                        ))}
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        关联检索词：{entry.publicSearchKeywords.join(' / ')}
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Button component={RouterLink} to={`/learning/materials/${entry.id}`} size="small">
+                        查看词条详情
+                      </Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        );
+      })}
     </Container>
   );
 };

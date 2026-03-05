@@ -85,7 +85,7 @@ const CeremonyResourceDetail: React.FC = () => {
                       摘录：{material.excerptBlocks[0]}
                     </Typography>
                     <Typography component="span" variant="caption" color="text.secondary" display="block">
-                      练习任务：{material.practicePrompt}
+                      概念关联说明：{material.practicePrompt}
                     </Typography>
                     <Typography component="span" variant="caption" color="text.secondary" display="block">
                       检索关键词：{material.publicSearchKeywords.join(' / ')}
