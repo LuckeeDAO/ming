@@ -32,9 +32,15 @@ export interface LearningMaterial {
   title: string;
   knowledgePointTitle: string;
   learningGoal: string;
+  scopeBoundary: string;
   coreConcepts: string[];
   excerptBlocks: string[];
   practicePrompt: string;
+  commonMisconceptions: string[];
+  counterExample: string;
+  minimumAlgorithm: string;
+  glossary: string[];
+  sourceNote: string;
   publicSearchKeywords: string[];
   prerequisites: string[];
   tags: string[];

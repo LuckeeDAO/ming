@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import {
-  Box,
   Breadcrumbs,
   Chip,
   Container,
@@ -12,6 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { ceremonyResourcesService } from '../../services/ceremony/ceremonyResourcesService';
+import { RuleCardByEntryId } from '../../components/knowledge/RuleReferenceCards';
 
 const LearningMaterialDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,27 +61,81 @@ const LearningMaterialDetail: React.FC = () => {
       <Chip label={entry.level} size="small" sx={{ mb: 1 }} />
 
       <Typography variant="h6" color="text.secondary" gutterBottom>
-        概念定义
+        本质定义
       </Typography>
       <Typography variant="body1" paragraph>
         {entry.knowledgePointTitle}
       </Typography>
 
       <Typography variant="h6" color="text.secondary" gutterBottom>
-        概念说明
+        关键说明
       </Typography>
       <Typography variant="body1" paragraph>
         {entry.learningGoal}
       </Typography>
+      <Typography variant="h6" color="text.secondary" gutterBottom>
+        适用边界
+      </Typography>
+      <Typography variant="body1" paragraph>
+        {entry.scopeBoundary}
+      </Typography>
 
       <Typography variant="h6" gutterBottom>
-        核心概念
+        必须掌握
       </Typography>
-      <Box sx={{ mb: 2 }}>
+      <List dense>
         {entry.coreConcepts.map((concept) => (
-          <Chip key={concept} label={concept} size="small" sx={{ mr: 1, mb: 1 }} />
+          <ListItem key={concept} sx={{ alignItems: 'flex-start' }}>
+            <ListItemText primary={concept} />
+          </ListItem>
         ))}
-      </Box>
+      </List>
+
+      <Typography variant="h6" gutterBottom sx={{ mt: 1 }}>
+        最小判断步骤
+      </Typography>
+      <Typography variant="body1" paragraph>
+        {entry.minimumAlgorithm}
+      </Typography>
+
+      <Typography variant="h6" gutterBottom>
+        常见误区
+      </Typography>
+      <List dense>
+        {entry.commonMisconceptions.map((item) => (
+          <ListItem key={item} sx={{ alignItems: 'flex-start' }}>
+            <ListItemText primary={item} />
+          </ListItem>
+        ))}
+      </List>
+
+      <Typography variant="h6" gutterBottom sx={{ mt: 1 }}>
+        反例说明
+      </Typography>
+      <Typography variant="body1" paragraph>
+        {entry.counterExample}
+      </Typography>
+
+      <Typography variant="h6" gutterBottom>
+        术语表
+      </Typography>
+      <List dense>
+        {entry.glossary.map((item) => (
+          <ListItem key={item} sx={{ alignItems: 'flex-start' }}>
+            <ListItemText
+              primary={
+                <Link
+                  component={RouterLink}
+                  to={`/ceremony-resources?term=${encodeURIComponent(item.split(/[：:]/)[0].trim())}`}
+                  underline="hover"
+                >
+                  {item}
+                </Link>
+              }
+            />
+          </ListItem>
+        ))}
+      </List>
 
       <Typography variant="h6" gutterBottom>
         原文摘录
@@ -144,6 +198,14 @@ const LearningMaterialDetail: React.FC = () => {
       <Typography variant="body2" color="text.secondary">
         {entry.publicSearchKeywords.join(' / ')}
       </Typography>
+      <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+        出处说明
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        {entry.sourceNote}
+      </Typography>
+
+      <RuleCardByEntryId entryId={entry.id} />
     </Container>
   );
 };
