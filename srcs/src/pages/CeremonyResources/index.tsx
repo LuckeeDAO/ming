@@ -130,42 +130,21 @@ const CeremonyResources: React.FC = () => {
       return a[0].localeCompare(b[0], 'zh-Hans-CN');
     });
 
-  React.useEffect(() => {
-    const urlTerms = (searchParams.get('term') ?? '')
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
-    const urlMode = (searchParams.get('mode') as 'any' | 'all') || 'any';
-    const urlQuery = searchParams.get('q') ?? '';
-    if (urlTerms.join('|') !== selectedTerms.join('|')) {
-      setSelectedTerms(urlTerms);
-    }
-    if (urlMode !== termMatchMode) {
-      setTermMatchMode(urlMode);
-    }
-    if (urlQuery !== query) {
-      setQuery(urlQuery);
-    }
-  }, [searchParams, selectedTerms, termMatchMode, query]);
+  const currentSearch = searchParams.toString();
 
   React.useEffect(() => {
-    const next = new URLSearchParams(searchParams);
+    const next = new URLSearchParams();
     if (query.trim()) {
       next.set('q', query.trim());
-    } else {
-      next.delete('q');
     }
     if (selectedTerms.length > 0) {
       next.set('term', selectedTerms.join(','));
       next.set('mode', termMatchMode);
-    } else {
-      next.delete('term');
-      next.delete('mode');
     }
-    if (next.toString() !== searchParams.toString()) {
+    if (next.toString() !== currentSearch) {
       setSearchParams(next, { replace: true });
     }
-  }, [searchParams, query, selectedTerms, termMatchMode, setSearchParams]);
+  }, [currentSearch, query, selectedTerms, termMatchMode, setSearchParams]);
 
   React.useEffect(() => {
     if (selectedTerms.length === 0) return;

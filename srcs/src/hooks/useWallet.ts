@@ -52,6 +52,71 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function extractWalletError(error: unknown): { code?: string | number; message: string } {
+  if (error instanceof Error) {
+    const withCode = error as Error & { code?: string | number };
+    return {
+      code: withCode.code,
+      message: error.message || '未知钱包错误',
+    };
+  }
+
+  if (error && typeof error === 'object') {
+    const record = error as {
+      code?: string | number;
+      message?: string;
+      reason?: string;
+      data?: { code?: string | number; message?: string };
+    };
+    return {
+      code: record.code ?? record.data?.code,
+      message:
+        record.message ||
+        record.reason ||
+        record.data?.message ||
+        JSON.stringify(error),
+    };
+  }
+
+  return {
+    message: typeof error === 'string' ? error : '未知钱包错误',
+  };
+}
+
+function mapConnectErrorMessage(rawError: unknown): string {
+  const { code, message } = extractWalletError(rawError);
+  const normalized = (message || '').toLowerCase();
+
+  if (
+    code === 4001 ||
+    String(code) === '4001' ||
+    normalized.includes('wallet must has at least one account') ||
+    normalized.includes('no account') ||
+    normalized.includes('账户') ||
+    normalized.includes('未获取到钱包地址')
+  ) {
+    return '钱包暂无账户，请先在钱包中创建或导入账户后重试。';
+  }
+
+  if (
+    normalized.includes('user rejected') ||
+    normalized.includes('denied') ||
+    normalized.includes('cancel')
+  ) {
+    return '你已取消钱包授权请求。';
+  }
+
+  if (normalized.includes('metamask is not installed')) {
+    return '未检测到 MetaMask，请先安装后再重试。';
+  }
+
+  if (normalized.includes('wallet window is unavailable')) {
+    return '无法连接钱包窗口，请检查弹窗权限后重试。';
+  }
+
+  return message || '钱包连接失败，请稍后重试。';
+}
+
 export const useWallet = () => {
   /**
    * 连接钱包
@@ -94,6 +159,13 @@ export const useWallet = () => {
 
         lastError = activeAccount.error?.message || null;
         const errorCode = activeAccount.error?.code;
+        const normalizedError = (lastError || '').toLowerCase();
+        if (
+          normalizedError.includes('wallet must has at least one account') ||
+          normalizedError.includes('no account')
+        ) {
+          break;
+        }
         if (errorCode === 'CHAIN_NOT_SUPPORTED' || errorCode === 'INVALID_PARAMS') {
           break;
         }
@@ -101,6 +173,10 @@ export const useWallet = () => {
         if (attempt < MAX_RETRIES) {
           await sleep(500);
         }
+      }
+
+      if ((lastError || '').toLowerCase().includes('wallet must has at least one account')) {
+        throw new Error('钱包暂无账户，请先在钱包中创建或导入账户后重试。');
       }
 
       throw new Error(
@@ -117,8 +193,9 @@ export const useWallet = () => {
       const accounts = await provider.send('eth_requestAccounts', []);
       return accounts[0] || null;
     } catch (error) {
+      const mappedMessage = mapConnectErrorMessage(error);
       console.error('Error connecting wallet:', error);
-      throw error;
+      throw new Error(mappedMessage);
     }
   }, []);
 

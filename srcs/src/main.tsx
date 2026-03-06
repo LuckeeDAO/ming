@@ -54,19 +54,26 @@ const isWalletInjectionNoise = (message: string): boolean => {
   return (
     text.includes('cannot redefine property: ethereum') ||
     text.includes('cannot set property chainid') ||
+    text.includes('wallet must has at least one account') ||
+    text.includes("websocket connection to 'ws://localhost:8081/' failed") ||
     text.includes('evmask.js') ||
-    text.includes('inpage.js')
+    text.includes('inpage.js') ||
+    text.includes('refresh.js')
   );
 };
 
 window.addEventListener('unhandledrejection', (event) => {
   const reason = event.reason;
+  const reasonRecord =
+    reason && typeof reason === 'object'
+      ? (reason as { code?: string | number; message?: string })
+      : null;
   const reasonText =
     typeof reason === 'string'
       ? reason
-      : reason && typeof reason.message === 'string'
-        ? reason.message
-        : JSON.stringify(reason || '');
+      : reasonRecord?.message ||
+        `${reasonRecord?.code ?? ''}` ||
+        JSON.stringify(reason || '');
 
   if (isWalletInjectionNoise(reasonText)) {
     event.preventDefault();
