@@ -55,7 +55,9 @@ const TOPICS: EncyclopediaTopic[] = [
 
 const CeremonyResources: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [query, setQuery] = React.useState('');
+  const [query, setQuery] = React.useState(searchParams.get('q') ?? '');
+  const [glossaryQuery, setGlossaryQuery] = React.useState('');
+  const [glossarySort, setGlossarySort] = React.useState<'weight' | 'alpha'>('weight');
   const [termMatchMode, setTermMatchMode] = React.useState<'any' | 'all'>(
     (searchParams.get('mode') as 'any' | 'all') || 'any'
   );
@@ -98,6 +100,7 @@ const CeremonyResources: React.FC = () => {
     filteredEntries.filter((entry) => entry.tags.some((tag) => topic.tags.includes(tag)));
   const getTopicHitCount = (topic: EncyclopediaTopic) => getEntriesByTopic(topic).length;
   const glossaryMap = new Map<string, string>();
+  const glossaryHitMap = new Map<string, number>();
   entries.forEach((entry) => {
     entry.glossary.forEach((item) => {
       const [term, ...rest] = item.split(/[：:]/);
@@ -106,8 +109,25 @@ const CeremonyResources: React.FC = () => {
       if (!key || glossaryMap.has(key)) return;
       glossaryMap.set(key, desc || item.trim());
     });
+    entry.glossary.forEach((item) => {
+      const key = item.split(/[：:]/)[0].trim();
+      if (!key) return;
+      glossaryHitMap.set(key, (glossaryHitMap.get(key) ?? 0) + 1);
+    });
   });
-  const glossaryList = Array.from(glossaryMap.entries()).sort((a, b) => a[0].localeCompare(b[0], 'zh-Hans-CN'));
+  const glossaryList = Array.from(glossaryMap.entries())
+    .filter(([term, desc]) => {
+      if (!glossaryQuery.trim()) return true;
+      const q = glossaryQuery.trim().toLowerCase();
+      return term.toLowerCase().includes(q) || desc.toLowerCase().includes(q);
+    })
+    .sort((a, b) => {
+      if (glossarySort === 'weight') {
+        const diff = (glossaryHitMap.get(b[0]) ?? 0) - (glossaryHitMap.get(a[0]) ?? 0);
+        if (diff !== 0) return diff;
+      }
+      return a[0].localeCompare(b[0], 'zh-Hans-CN');
+    });
 
   React.useEffect(() => {
     const urlTerms = (searchParams.get('term') ?? '')
@@ -115,16 +135,25 @@ const CeremonyResources: React.FC = () => {
       .map((item) => item.trim())
       .filter(Boolean);
     const urlMode = (searchParams.get('mode') as 'any' | 'all') || 'any';
+    const urlQuery = searchParams.get('q') ?? '';
     if (urlTerms.join('|') !== selectedTerms.join('|')) {
       setSelectedTerms(urlTerms);
     }
     if (urlMode !== termMatchMode) {
       setTermMatchMode(urlMode);
     }
-  }, [searchParams, selectedTerms, termMatchMode]);
+    if (urlQuery !== query) {
+      setQuery(urlQuery);
+    }
+  }, [searchParams, selectedTerms, termMatchMode, query]);
 
   React.useEffect(() => {
     const next = new URLSearchParams(searchParams);
+    if (query.trim()) {
+      next.set('q', query.trim());
+    } else {
+      next.delete('q');
+    }
     if (selectedTerms.length > 0) {
       next.set('term', selectedTerms.join(','));
       next.set('mode', termMatchMode);
@@ -135,7 +164,7 @@ const CeremonyResources: React.FC = () => {
     if (next.toString() !== searchParams.toString()) {
       setSearchParams(next, { replace: true });
     }
-  }, [searchParams, selectedTerms, termMatchMode, setSearchParams]);
+  }, [searchParams, query, selectedTerms, termMatchMode, setSearchParams]);
 
   React.useEffect(() => {
     if (selectedTerms.length === 0) return;
@@ -215,6 +244,34 @@ const CeremonyResources: React.FC = () => {
       <Typography variant="h6" gutterBottom>
         术语总表
       </Typography>
+      <TextField
+        fullWidth
+        size="small"
+        label="搜索术语"
+        placeholder="例如：月令 / 交节 / 七杀"
+        value={glossaryQuery}
+        onChange={(event) => setGlossaryQuery(event.target.value)}
+        sx={{ mb: 2 }}
+      />
+      <Box sx={{ mb: 1.5, display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Typography variant="caption" color="text.secondary">
+          术语排序：
+        </Typography>
+        <Button
+          size="small"
+          variant={glossarySort === 'weight' ? 'contained' : 'outlined'}
+          onClick={() => setGlossarySort('weight')}
+        >
+          按关联度
+        </Button>
+        <Button
+          size="small"
+          variant={glossarySort === 'alpha' ? 'contained' : 'outlined'}
+          onClick={() => setGlossarySort('alpha')}
+        >
+          按字典序
+        </Button>
+      </Box>
       <Grid container spacing={2} sx={{ mb: 3 }}>
         {glossaryList.map(([term, desc]) => (
           <Grid item xs={12} md={6} key={term}>
@@ -236,6 +293,9 @@ const CeremonyResources: React.FC = () => {
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {desc}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                  关联词条数：{glossaryHitMap.get(term) ?? 0}
                 </Typography>
                 <Box sx={{ mt: 1 }}>
                   <Button
@@ -301,8 +361,15 @@ const CeremonyResources: React.FC = () => {
           severity="info"
           sx={{ mb: 2 }}
           action={
-            <Button color="inherit" size="small" onClick={() => setSelectedTerms([])}>
-              清除全部术语
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setSelectedTerms([]);
+                setQuery('');
+              }}
+            >
+              清空所有筛选
             </Button>
           }
         >
