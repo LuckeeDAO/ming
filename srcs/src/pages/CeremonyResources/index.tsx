@@ -67,6 +67,7 @@ const CeremonyResources: React.FC = () => {
       .map((item) => item.trim())
       .filter(Boolean)
   );
+  const hasAutoScrolledRef = React.useRef(false);
   const resources = ceremonyResourcesService.getAllResources();
   const snippets = ceremonyResourcesService.getProjectTextSnippets();
   const entries = ceremonyResourcesService.getLearningMaterials();
@@ -168,11 +169,19 @@ const CeremonyResources: React.FC = () => {
 
   React.useEffect(() => {
     if (selectedTerms.length === 0) return;
+    if (hasAutoScrolledRef.current) return;
     const target = document.getElementById(`glossary-${selectedTerms[0]}`);
     if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.scrollIntoView({ behavior: 'auto', block: 'center' });
+      hasAutoScrolledRef.current = true;
     }
   }, [selectedTerms]);
+
+  React.useEffect(() => {
+    if (selectedTerms.length === 0) {
+      hasAutoScrolledRef.current = false;
+    }
+  }, [selectedTerms.length]);
 
   const toggleTerm = (term: string) => {
     setSelectedTerms((prev) =>

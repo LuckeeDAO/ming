@@ -42,6 +42,48 @@ if (!import.meta.env.VITE_PINATA_API_KEY || !import.meta.env.VITE_PINATA_SECRET_
 }
 
 /**
+ * 过滤浏览器钱包扩展注入脚本噪声（不影响应用逻辑）
+ *
+ * 背景：
+ * - 多钱包扩展并存时，扩展会竞争注入 window.ethereum
+ * - 控制台常见报错：Cannot redefine property: ethereum / Cannot set property chainId...
+ * - 这些错误通常来自扩展 inpage 脚本，不是站点业务代码
+ */
+const isWalletInjectionNoise = (message: string): boolean => {
+  const text = message.toLowerCase();
+  return (
+    text.includes('cannot redefine property: ethereum') ||
+    text.includes('cannot set property chainid') ||
+    text.includes('evmask.js') ||
+    text.includes('inpage.js')
+  );
+};
+
+window.addEventListener('unhandledrejection', (event) => {
+  const reason = event.reason;
+  const reasonText =
+    typeof reason === 'string'
+      ? reason
+      : reason && typeof reason.message === 'string'
+        ? reason.message
+        : JSON.stringify(reason || '');
+
+  if (isWalletInjectionNoise(reasonText)) {
+    event.preventDefault();
+    console.warn('Suppressed wallet-extension injection noise:', reasonText);
+  }
+});
+
+window.addEventListener('error', (event) => {
+  const message = event.message || '';
+  const filename = event.filename || '';
+  if (isWalletInjectionNoise(`${message} ${filename}`)) {
+    event.preventDefault();
+    console.warn('Suppressed wallet-extension script error:', message);
+  }
+});
+
+/**
  * 渲染应用根组件
  * 
  * 配置说明：
